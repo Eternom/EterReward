@@ -7,7 +7,7 @@
 #  d'un jour, un jour manqué fait repartir au jour 1, et après le jour 7 la
 #  série recommence. Les textes sont dans lang/.
 #  Valeurs calées sur la grille de l'économie (README d'EterEconomy, « Repères
-#  économiques ») : un cycle complet vaut environ 1 000 à 1 400 Heloks.
+#  économiques ») : un cycle complet vaut environ 600 à 750 Heloks (10 % du revenu des quêtes).
 #  Toute modification nécessite un redémarrage du serveur.
 
 daily:
@@ -29,54 +29,54 @@ daily:
       icon: WHEAT
       loots:
         - weight: 70
-          money: 30
+          money: 20
         - weight: 30
-          items: [ "BREAD 10" ]
+          items: [ "BREAD 6" ]
     2:
       icon: COAL
       loots:
         - weight: 70
-          money: 50
+          money: 30
         - weight: 30
-          items: [ "COAL 16" ]
+          items: [ "COAL 10" ]
     3:
       icon: IRON_INGOT
       loots:
         - weight: 60
-          money: 75
+          money: 50
         - weight: 40
-          items: [ "IRON_INGOT 8" ]
+          items: [ "IRON_INGOT 5" ]
     4:
       icon: GOLD_INGOT
       loots:
         - weight: 60
-          money: 100
+          money: 70
         - weight: 40
-          items: [ "GOLD_INGOT 8" ]
+          items: [ "GOLD_INGOT 5" ]
     5:
       icon: LAPIS_LAZULI
       loots:
         - weight: 60
-          money: 150
+          money: 100
         - weight: 40
-          items: [ "EXPERIENCE_BOTTLE 16" ]
+          items: [ "EXPERIENCE_BOTTLE 8" ]
     6:
       icon: EMERALD
       loots:
         - weight: 60
-          money: 200
+          money: 130
         - weight: 40
-          items: [ "DIAMOND 2" ]
+          items: [ "DIAMOND 1" ]
     7:
       icon: NETHER_STAR
       loots:
         - weight: 60
-          money: 400
-          items: [ "DIAMOND 2" ]
+          money: 200
+          items: [ "DIAMOND 1" ]
         - weight: 30
-          money: 800
+          money: 350
         - weight: 10
-          money: 300
+          money: 150
           items: [ "NETHERITE_SCRAP 1" ]
         # Exemple avec une commande :
         # - weight: 5
