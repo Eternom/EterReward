@@ -1,0 +1,39 @@
+# Messages d'EterReward, format MiniMessage : https://docs.advntr.dev/minimessage/format
+# Balises de la palette (EterLib/config.yml > language.colors) : <primary> <accent> <info> <error> <success>
+#   <info> = texte courant gris clair, <accent> = mots importants en orange.
+# Les valeurs entre <> comme <day> sont remplies par le plugin. Pour afficher un "<", écrire \< entre 'guillemets simples'.
+# Une clé absente reprend le texte intégré au plugin : tu peux ne garder que les lignes que tu modifies.
+# Le préfixe des messages (« Core ») est commun à tous les plugins : EterLib/config.yml > language.prefix.
+
+command:
+  players-only: "<error>Commande réservée aux joueurs."
+
+error:
+  generic: "<error>Une erreur est survenue, réessaie plus tard."
+
+daily:
+  available: "<info>Ta récompense du jour t'attend : <accent>jour <day></accent> de ta série !"
+  available-reset: "<info>Tu as manqué un jour : ta série repart au <accent>jour 1</accent>. Ta récompense t'attend !"
+  button: "<accent><bold>[Ouvrir les récompenses]</bold></accent>"
+  button-hover: "<info>Ouvrir <accent>/daily"
+  claimed: "<info>Jour <accent><day></accent> réclamé : <accent><content></accent> !"
+  already: "<error>Tu as déjà réclamé ta récompense aujourd'hui. Prochaine dans <accent><time></accent>."
+  dropped: "<info>Inventaire plein : le reste est posé au sol devant toi."
+  economy-missing: "<error>L'économie n'est pas disponible : réessaie plus tard."
+  loot:
+    line: "<dark_gray>• <white><content></white> <dark_gray>(<chance> %)"
+    surprise: "Surprise"
+  day:
+    name: "<accent>Jour <day>"
+    name-last: "<primary><bold>Jour <day></bold></primary> <accent>· grosse récompense"
+    loots: "<info>Récompenses possibles :"
+    claimed: "<success>✔ Réclamé"
+    claim: "<accent>Clic <dark_gray>· <info>réclamer"
+    upcoming: "<dark_gray>À venir"
+  menu:
+    title: "<primary>Récompense du jour"
+    player: "<accent><player>"
+    streak: "<info>Série : <accent><days></accent><dark_gray>/</dark_gray><accent><cycle></accent> jours"
+    ready: "<success>● <info>Récompense disponible"
+    next: "<error>● <info>Prochaine dans <accent><time>"
+    rule: "<dark_gray>Un jour manqué : retour au jour 1"

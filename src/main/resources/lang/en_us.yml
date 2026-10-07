@@ -1,0 +1,39 @@
+# EterReward messages, MiniMessage format: https://docs.advntr.dev/minimessage/format
+# Palette tags (EterLib/config.yml > language.colors): <primary> <accent> <info> <error> <success>
+#   <info> = normal light gray text, <accent> = important words in orange.
+# Values between <> such as <day> are filled in by the plugin. To show a literal "<", write \< inside 'single quotes'.
+# A missing key falls back to the plugin's built-in text: you only need to keep the lines you change.
+# The message prefix ("Core") is shared by all plugins: EterLib/config.yml > language.prefix.
+
+command:
+  players-only: "<error>This command can only be used by players."
+
+error:
+  generic: "<error>Something went wrong, please try again later."
+
+daily:
+  available: "<info>Your daily reward is waiting: <accent>day <day></accent> of your streak!"
+  available-reset: "<info>You missed a day: your streak is back to <accent>day 1</accent>. Your reward is waiting!"
+  button: "<accent><bold>[Open rewards]</bold></accent>"
+  button-hover: "<info>Open <accent>/daily"
+  claimed: "<info>Day <accent><day></accent> claimed: <accent><content></accent>!"
+  already: "<error>You already claimed today's reward. Next one in <accent><time></accent>."
+  dropped: "<info>Inventory full: the rest is on the ground in front of you."
+  economy-missing: "<error>The economy is not available: try again later."
+  loot:
+    line: "<dark_gray>• <white><content></white> <dark_gray>(<chance>%)"
+    surprise: "Surprise"
+  day:
+    name: "<accent>Day <day>"
+    name-last: "<primary><bold>Day <day></bold></primary> <accent>· big reward"
+    loots: "<info>Possible rewards:"
+    claimed: "<success>✔ Claimed"
+    claim: "<accent>Click <dark_gray>· <info>claim"
+    upcoming: "<dark_gray>Upcoming"
+  menu:
+    title: "<primary>Daily reward"
+    player: "<accent><player>"
+    streak: "<info>Streak: <accent><days></accent><dark_gray>/</dark_gray><accent><cycle></accent> days"
+    ready: "<success>● <info>Reward available"
+    next: "<error>● <info>Next one in <accent><time>"
+    rule: "<dark_gray>Miss a day: back to day 1"

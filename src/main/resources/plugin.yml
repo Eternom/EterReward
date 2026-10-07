@@ -1,0 +1,27 @@
+name: EterReward
+version: '${version}'
+
+main: fr.eternom.eterReward.Main
+api-version: '26.2'
+load: POSTWORLD
+authors: [ NadTum ]
+description: Récompenses du réseau (récompense quotidienne sur 7 jours).
+depend: [EterLib]
+softdepend: [Vault, EterEconomy]
+
+commands:
+  daily:
+    description: Récompense quotidienne (série de 7 jours).
+    usage: /daily
+    aliases: [reward, recompense]
+    permission: eterreward.daily
+
+permissions:
+  eterreward.daily:
+    description: Réclamer la récompense quotidienne.
+    default: true
+  eterreward.admin:
+    description: Toutes les permissions d'EterReward.
+    default: op
+    children:
+      eterreward.daily: true

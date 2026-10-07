@@ -1,0 +1,88 @@
+# ============================================================
+#  EterReward
+# ============================================================
+#
+#  Récompense quotidienne (/daily) : une par jour et par joueur, sur tout le
+#  réseau. Une série de 7 jours : chaque jour réclamé d'affilée fait avancer
+#  d'un jour, un jour manqué fait repartir au jour 1, et après le jour 7 la
+#  série recommence. Les textes sont dans lang/.
+#  Toute modification nécessite un redémarrage du serveur.
+
+daily:
+  # Le jour change à minuit dans ce fuseau, le même pour tout le monde.
+  time-zone: Europe/Paris
+
+  # Pour chaque jour : une icône, et un ou plusieurs tirages possibles (loots).
+  # Un seul tirage est donné, au hasard : plus son poids (weight) est grand,
+  # plus il a de chances de sortir (le menu affiche le pourcentage).
+  # Un tirage peut donner, ensemble :
+  #   money    : de l'argent (EterEconomy)
+  #   items    : des objets, "MATIÈRE quantité" (ex : "DIAMOND 3") ; ce qui ne
+  #              rentre pas dans l'inventaire est posé au sol devant le joueur
+  #   commands : des commandes lancées par la console, {player} = le pseudo
+  #   label    : texte montré à la place du détail (utile pour une commande,
+  #              ex : "Clé de caisse rare"), format MiniMessage
+  days:
+    1:
+      icon: WHEAT
+      loots:
+        - weight: 70
+          money: 50
+        - weight: 30
+          items: [ "BREAD 16" ]
+    2:
+      icon: COAL
+      loots:
+        - weight: 70
+          money: 75
+        - weight: 30
+          items: [ "COAL 32" ]
+    3:
+      icon: IRON_INGOT
+      loots:
+        - weight: 60
+          money: 100
+        - weight: 40
+          items: [ "IRON_INGOT 12" ]
+    4:
+      icon: GOLD_INGOT
+      loots:
+        - weight: 60
+          money: 150
+        - weight: 40
+          items: [ "GOLD_INGOT 12" ]
+    5:
+      icon: LAPIS_LAZULI
+      loots:
+        - weight: 60
+          money: 200
+        - weight: 40
+          items: [ "EXPERIENCE_BOTTLE 16" ]
+    6:
+      icon: EMERALD
+      loots:
+        - weight: 60
+          money: 300
+        - weight: 40
+          items: [ "DIAMOND 2" ]
+    7:
+      icon: NETHER_STAR
+      loots:
+        - weight: 60
+          money: 500
+          items: [ "DIAMOND 3" ]
+        - weight: 30
+          money: 1000
+        - weight: 10
+          money: 500
+          items: [ "NETHERITE_SCRAP 1" ]
+        # Exemple avec une commande :
+        # - weight: 5
+        #   label: "<accent>Clé de caisse rare"
+        #   commands: [ "crate give {player} rare 1" ]
+
+# Menus : bouton en bas du menu. Avec une commande (sans le /), il la lance pour le joueur et relie
+# les menus entre eux (ex : "profile" pour revenir au menu du profil) ; vide, il ferme le menu.
+menus:
+  daily:
+    back-command: ""
