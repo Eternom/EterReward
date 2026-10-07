@@ -15,8 +15,8 @@ import java.time.ZoneId;
 /** Récompenses du réseau : pour l'instant la récompense quotidienne (/daily), plus tard celles des votes. */
 public final class Main extends JavaPlugin {
 
-    /** Version minimale d'EterLib : préfixe commun, bouton Retour/Fermer et durées lisibles arrivent en 1.5.0. */
-    private static final String REQUIRED_ETERLIB = "1.5.0";
+    /** Version minimale d'EterLib : bouton Retour/Fermer des menus et durées lisibles depuis 1.5.1. */
+    private static final String REQUIRED_ETERLIB = "1.5.1";
 
     /** Préfixe des tables d'EterReward dans la base commune : eterreward_daily. */
     private static final String TABLE_PREFIX = "eterreward_";
