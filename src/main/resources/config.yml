@@ -6,6 +6,8 @@
 #  réseau. Une série de 7 jours : chaque jour réclamé d'affilée fait avancer
 #  d'un jour, un jour manqué fait repartir au jour 1, et après le jour 7 la
 #  série recommence. Les textes sont dans lang/.
+#  Valeurs calées sur la grille de l'économie (README d'EterEconomy, « Repères
+#  économiques ») : un cycle complet vaut environ 1 000 à 1 400 Heloks.
 #  Toute modification nécessite un redémarrage du serveur.
 
 daily:
@@ -27,54 +29,54 @@ daily:
       icon: WHEAT
       loots:
         - weight: 70
-          money: 50
+          money: 30
         - weight: 30
-          items: [ "BREAD 16" ]
+          items: [ "BREAD 10" ]
     2:
       icon: COAL
       loots:
         - weight: 70
-          money: 75
+          money: 50
         - weight: 30
-          items: [ "COAL 32" ]
+          items: [ "COAL 16" ]
     3:
       icon: IRON_INGOT
       loots:
         - weight: 60
-          money: 100
+          money: 75
         - weight: 40
-          items: [ "IRON_INGOT 12" ]
+          items: [ "IRON_INGOT 8" ]
     4:
       icon: GOLD_INGOT
       loots:
         - weight: 60
-          money: 150
+          money: 100
         - weight: 40
-          items: [ "GOLD_INGOT 12" ]
+          items: [ "GOLD_INGOT 8" ]
     5:
       icon: LAPIS_LAZULI
       loots:
         - weight: 60
-          money: 200
+          money: 150
         - weight: 40
           items: [ "EXPERIENCE_BOTTLE 16" ]
     6:
       icon: EMERALD
       loots:
         - weight: 60
-          money: 300
+          money: 200
         - weight: 40
           items: [ "DIAMOND 2" ]
     7:
       icon: NETHER_STAR
       loots:
         - weight: 60
-          money: 500
-          items: [ "DIAMOND 3" ]
+          money: 400
+          items: [ "DIAMOND 2" ]
         - weight: 30
-          money: 1000
+          money: 800
         - weight: 10
-          money: 500
+          money: 300
           items: [ "NETHERITE_SCRAP 1" ]
         # Exemple avec une commande :
         # - weight: 5
