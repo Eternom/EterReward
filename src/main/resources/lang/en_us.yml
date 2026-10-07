@@ -4,12 +4,7 @@
 # Values between <> such as <day> are filled in by the plugin. To show a literal "<", write \< inside 'single quotes'.
 # A missing key falls back to the plugin's built-in text: you only need to keep the lines you change.
 # The message prefix ("Core") is shared by all plugins: EterLib/config.yml > language.prefix.
-
-command:
-  players-only: "<error>This command can only be used by players."
-
-error:
-  generic: "<error>Something went wrong, please try again later."
+# Shared texts ("Cancel", "Unknown player", "players only"...): in EterLib/lang/, for every plugin.
 
 daily:
   available: "<info>Your daily reward is waiting: <accent>day <day></accent> of your streak!"

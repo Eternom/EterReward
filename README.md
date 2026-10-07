@@ -5,7 +5,7 @@ vote. Document développeur, à tenir à jour avec le code.
 
 ## Prérequis
 
-- **EterLib 1.5.0+** (`depend`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
+- **EterLib 1.6.0+** (`depend`, textes communs, cadre des menus, bus réseau, `Money`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
 - **Vault + EterEconomy** pour les récompenses en argent (facultatif : un jour qui donne de l'argent refuse d'être
   réclamé tant que l'économie manque, sans rien consommer).
 

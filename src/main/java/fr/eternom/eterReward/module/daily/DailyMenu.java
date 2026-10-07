@@ -1,5 +1,6 @@
 package fr.eternom.eterReward.module.daily;
 
+import fr.eternom.eterLib.helper.gui.Frame;
 import fr.eternom.eterLib.helper.gui.Items;
 import fr.eternom.eterLib.helper.gui.Menu;
 import fr.eternom.eterLib.helper.gui.Sounds;
@@ -19,7 +20,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Menu /daily, 5 lignes :
@@ -37,7 +37,6 @@ class DailyMenu implements Menu {
     private static final int INFO = 4;
     private static final int FIRST_DAY = 19;
     private static final int BACK = 40;
-    private static final Set<Integer> ACCENT_FRAME = Set.of(0, 1, 7, 8, 9, 17, 27, 35, 36, 37, 43, 44);
 
     private final DailyService service;
     private final Messages messages;
@@ -82,15 +81,7 @@ class DailyMenu implements Menu {
     }
 
     private void render() {
-        ItemStack accent = Items.pane(Material.ORANGE_STAINED_GLASS_PANE);
-        ItemStack neutral = Items.pane(Material.GRAY_STAINED_GLASS_PANE);
-        for (int slot = 0; slot < inventory.getSize(); slot++) {
-            int row = slot / 9;
-            int column = slot % 9;
-            if (row == 0 || row == 4 || column == 0 || column == 8) {
-                inventory.setItem(slot, ACCENT_FRAME.contains(slot) ? accent : neutral);
-            }
-        }
+        Frame.draw(inventory, Material.ORANGE_STAINED_GLASS_PANE);
         for (int day = 1; day <= DailyState.CYCLE; day++) {
             inventory.setItem(FIRST_DAY + day - 1, dayItem(service.rewards().day(day)));
         }

@@ -1,5 +1,6 @@
 package fr.eternom.eterReward.module.daily;
 
+import fr.eternom.eterLib.helper.economy.Money;
 import fr.eternom.eterLib.EterLib;
 import fr.eternom.eterLib.helper.gui.BackButton;
 import fr.eternom.eterLib.helper.message.Messages;
@@ -19,7 +20,6 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.time.Duration;
@@ -88,7 +88,7 @@ public class DailyService {
     /** Clic sur le jour du jour dans le menu. */
     void claim(Player player, DailyState shown) {
         Day day = rewards.day(shown.claimable());
-        if (day.givesMoney() && economy() == null) {
+        if (day.givesMoney() && Money.economy() == null) {
             messages.send(player, "daily.economy-missing");
             return;
         }
@@ -122,7 +122,7 @@ public class DailyService {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
         }
         if (loot.money() > 0) {
-            Economy economy = economy();
+            Economy economy = Money.economy();
             UUID uuid = player.getUniqueId();
             Tasks.async(plugin, () -> economy.depositPlayer(Bukkit.getOfflinePlayer(uuid), loot.money()),
                     "Récompense du jour non versée à " + player.getName() + " (" + loot.money() + ")");
@@ -147,7 +147,7 @@ public class DailyService {
         }
         List<Component> parts = new ArrayList<>();
         if (loot.money() > 0) {
-            Economy economy = economy();
+            Economy economy = Money.economy();
             parts.add(Component.text(economy != null ? economy.format(loot.money()) : String.valueOf(loot.money())));
         }
         for (Reward reward : loot.items()) {
@@ -191,9 +191,4 @@ public class DailyService {
         return raw == null ? key : raw;
     }
 
-    /** Lu à chaque fois : EterEconomy peut être chargé après nous. null sans économie. */
-    private static Economy economy() {
-        RegisteredServiceProvider<Economy> provider = Bukkit.getServicesManager().getRegistration(Economy.class);
-        return provider == null ? null : provider.getProvider();
-    }
 }
