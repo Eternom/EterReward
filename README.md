@@ -6,7 +6,7 @@ vote. Document développeur, à tenir à jour avec le code.
 ## Prérequis
 
 - **EterLib 1.10.0+** (`depend`, textes communs, cadre des menus, bus réseau, `Money`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
-- **EterEconomy 2.2.1+** (`depend`, son API `EconomyApi`) pour les récompenses en argent.
+- **EterEconomy 2.2.2+** (`depend`, son API `EconomyApi`) pour les récompenses en argent.
 
 ## Récompense quotidienne
 
