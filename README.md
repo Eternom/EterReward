@@ -5,9 +5,8 @@ vote. Document développeur, à tenir à jour avec le code.
 
 ## Prérequis
 
-- **EterLib 1.6.0+** (`depend`, textes communs, cadre des menus, bus réseau, `Money`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
-- **Vault + EterEconomy** pour les récompenses en argent (facultatif : un jour qui donne de l'argent refuse d'être
-  réclamé tant que l'économie manque, sans rien consommer).
+- **EterLib 1.10.0+** (`depend`, textes communs, cadre des menus, bus réseau, `Money`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
+- **EterEconomy 2.2.1+** (`depend`, son API `EconomyApi`) pour les récompenses en argent.
 
 ## Récompense quotidienne
 
@@ -23,7 +22,7 @@ réclamé, série qui continue (réclamé hier), ou retour au jour 1.
 (`UPDATE ... WHERE last_claim = <valeur lue>`, ou `INSERT IGNORE` la première fois) : deux clics ou deux serveurs au même
 moment ne donnent qu'une récompense. Ensuite seulement, un tirage est choisi au hasard selon les poids et donné :
 objets (ce qui ne rentre pas est **posé au sol** devant le joueur), commandes lancées par la console (`{player}`),
-argent par Vault en tâche de fond. Son et particules, plus marqués le jour 7.
+argent par EterEconomy en tâche de fond (source « EterReward · récompense du jour »). Son et particules, plus marqués le jour 7.
 
 **Rappel** : 3 secondes après l'arrivée, si la récompense du jour attend, un message avec un bouton `/daily` (et un
 avertissement si la série vient d'être perdue).
@@ -42,3 +41,10 @@ bouton Retour/Fermer (`menus.daily.back-command`).
 | `/daily` (`reward`, `recompense`) | `eterreward.daily` | tous |
 
 `eterreward.admin` regroupe tout.
+
+## API (pour les autres plugins)
+
+`fr.eternom.eterReward.api.RewardApi` (`RewardApi.get()`) : personne d'autre ne lit `eterreward_daily`.
+
+- `streak(uuid)` : jours réclamés de la série en cours (0 si perdue), `claimedToday(uuid)` (bloquant) ;
+- `openMenu(joueur)` : le menu `/daily`.

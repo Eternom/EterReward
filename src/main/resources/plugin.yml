@@ -6,8 +6,7 @@ api-version: '26.2'
 load: POSTWORLD
 authors: [ NadTum ]
 description: Récompenses du réseau (récompense quotidienne sur 7 jours).
-depend: [EterLib]
-softdepend: [Vault, EterEconomy]
+depend: [EterLib, EterEconomy]
 
 commands:
   daily:

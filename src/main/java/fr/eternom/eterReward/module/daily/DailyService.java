@@ -5,6 +5,7 @@ import fr.eternom.eterLib.EterLib;
 import fr.eternom.eterLib.helper.gui.BackButton;
 import fr.eternom.eterLib.helper.message.Messages;
 import fr.eternom.eterLib.helper.task.Tasks;
+import fr.eternom.eterReward.api.RewardApi;
 import fr.eternom.eterReward.module.daily.DailyRewards.Day;
 import fr.eternom.eterReward.module.daily.DailyRewards.Loot;
 import fr.eternom.eterReward.module.daily.DailyRewards.Reward;
@@ -14,7 +15,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.milkbowl.vault.economy.Economy;
+import fr.eternom.eterEconomy.api.EconomyApi;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -38,7 +39,7 @@ import java.util.UUID;
  * Réclamer : la base enregistre d'abord (une seule réclamation possible, même sur deux serveurs à la fois), puis le
  * tirage est donné. Objets qui ne rentrent pas : posés au sol devant le joueur. Argent : par Vault, en tâche de fond.
  */
-public class DailyService {
+public class DailyService implements RewardApi {
 
     public static final String PERMISSION = "eterreward.daily";
 
@@ -60,6 +61,23 @@ public class DailyService {
     }
 
     /** /daily : ouvre le menu avec l'état du joueur. */
+    @Override
+    public int streak(UUID player) {
+        long today = today();
+        DailyState state = DailyState.of(store.get(player), today);
+        return state.streakLost(today) ? 0 : state.claimed();
+    }
+
+    @Override
+    public boolean claimedToday(UUID player) {
+        return store.get(player).lastClaim() == today();
+    }
+
+    @Override
+    public void openMenu(Player player) {
+        open(player);
+    }
+
     public void open(Player player) {
         UUID uuid = player.getUniqueId();
         Tasks.async(plugin, player, () -> DailyState.of(store.get(uuid), today()),
@@ -88,7 +106,7 @@ public class DailyService {
     /** Clic sur le jour du jour dans le menu. */
     void claim(Player player, DailyState shown) {
         Day day = rewards.day(shown.claimable());
-        if (day.givesMoney() && Money.economy() == null) {
+        if (day.givesMoney() && EconomyApi.get().isEmpty()) {
             messages.send(player, "daily.economy-missing");
             return;
         }
@@ -122,9 +140,9 @@ public class DailyService {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
         }
         if (loot.money() > 0) {
-            Economy economy = Money.economy();
+            EconomyApi economy = EconomyApi.get().orElse(null);
             UUID uuid = player.getUniqueId();
-            Tasks.async(plugin, () -> economy.depositPlayer(Bukkit.getOfflinePlayer(uuid), loot.money()),
+            Tasks.async(plugin, () -> economy.deposit(uuid, loot.money(), "EterReward · récompense du jour"),
                     "Récompense du jour non versée à " + player.getName() + " (" + loot.money() + ")");
         }
 
@@ -147,8 +165,7 @@ public class DailyService {
         }
         List<Component> parts = new ArrayList<>();
         if (loot.money() > 0) {
-            Economy economy = Money.economy();
-            parts.add(Component.text(economy != null ? economy.format(loot.money()) : String.valueOf(loot.money())));
+            parts.add(Component.text(Money.format(loot.money())));
         }
         for (Reward reward : loot.items()) {
             parts.add(Component.text(reward.amount() + "× ").append(Component.translatable(reward.material().translationKey())));

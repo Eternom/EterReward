@@ -1,12 +1,13 @@
 plugins {
     id("java-library")
+    id("maven-publish")
 }
 
 repositories {
     // PaperMC en premier : Maven Central limite les téléchargements (429)
     maven("https://repo.papermc.io/repository/maven-public/")
     mavenCentral()
-    // EterLib et VaultAPI : compilés depuis GitHub
+    // EterLib et les API des plugins Eter : compilés depuis GitHub
     maven("https://jitpack.io")
     // Repli : EterLib publié sur cette machine (`gradlew publishToMavenLocal` dans EterLib), pour tester avant de pousser
     mavenLocal()
@@ -16,11 +17,9 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:26.2.build.129-stable")
 
     // Socle commun : base, langues, menus (plugin EterLib installé sur le serveur)
-    compileOnly("com.github.Eternom:EterLib:1.6.0")
-    // Récompenses en argent : Vault (fourni par EterEconomy), facultatif
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7.1") {
-        exclude(group = "org.bukkit")
-    }
+    compileOnly("com.github.Eternom:EterLib:1.10.3")
+    // Argent : l'API d'EterEconomy (chaque mouvement avec sa source)
+    compileOnly("com.github.Eternom:EterEconomy:2.2.1")
 }
 
 java {
@@ -55,3 +54,13 @@ val deployPlugin by tasks.registering(Copy::class) {
     }
 }
 tasks.build { finalizedBy(deployPlugin) }
+
+// Publié pour les autres plugins (son API, fr.eternom.eterReward.api) : compileOnly("com.github.Eternom:EterReward:<tag>")
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            artifactId = "EterReward"
+            from(components["java"])
+        }
+    }
+}

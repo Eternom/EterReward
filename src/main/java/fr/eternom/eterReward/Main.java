@@ -7,6 +7,8 @@ import fr.eternom.eterReward.listeners.Events;
 import fr.eternom.eterReward.module.daily.DailyRewards;
 import fr.eternom.eterReward.module.daily.DailyService;
 import fr.eternom.eterReward.module.daily.DailyStore;
+import fr.eternom.eterReward.api.RewardApi;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.time.DateTimeException;
@@ -16,7 +18,7 @@ import java.time.ZoneId;
 public final class Main extends JavaPlugin {
 
     /** Version minimale d'EterLib : textes communs et outils partagés (Frame, Money, NetworkBus) depuis 1.6.0. */
-    private static final String REQUIRED_ETERLIB = "1.6.0";
+    private static final String REQUIRED_ETERLIB = "1.10.0";
 
     /** Préfixe des tables d'EterReward dans la base commune : eterreward_daily. */
     private static final String TABLE_PREFIX = "eterreward_";
@@ -43,6 +45,9 @@ public final class Main extends JavaPlugin {
         daily = new DailyService(this, new DailyStore(lib.database(TABLE_PREFIX)),
                 DailyRewards.load(getConfig().getConfigurationSection("daily.days"), getLogger()), messages, zone(),
                 lib.backButton(getConfig().getString("menus.daily.back-command", "")));
+
+        // API pour les autres plugins (RewardApi.get())
+        getServer().getServicesManager().register(RewardApi.class, daily, this, ServicePriority.Normal);
 
         new Commands(this);
         new Events(this);
