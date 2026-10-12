@@ -89,12 +89,13 @@ daily:
 # Les récompenses non réclamées à la fin du mois sont perdues. Un pass = un fichier de passes/ (le nom du fichier
 # est son identifiant) ; les 8 fournis sont copiés au premier démarrage.
 pass:
-  # XP pour passer un palier (30 paliers). Repères avec les valeurs ci-dessous :
-  # - joueur occasionnel (1 h de jeu, /daily, 1 quête normale : ~800 XP/jour) : palier 24 environ en fin de mois ;
-  # - joueur assidu (temps plafonné, /daily, 3 quêtes + la bonus : ~1 700 XP/jour) : fini vers le 18e jour,
-  #   vers le 14e quand le bonus du mois est sur son métier.
-  # Attention en montant l'XP des quêtes : c'est elle qui fait finir le pass trop vite aux joueurs assidus.
-  xp-per-tier: 1000
+  # XP pour passer un palier (30 paliers). Repères avec les valeurs ci-dessous et les défis (challenges.yml) :
+  # - joueur occasionnel (1 h de jeu, /daily, 1 quête normale, 1 défi du jour : ~900 XP/jour) : palier 22 environ
+  #   en fin de mois ;
+  # - joueur assidu (temps plafonné, /daily, 3 quêtes + la bonus, tous les défis : ~2 150 XP/jour) : fini vers le
+  #   17e jour, vers le 14e quand le bonus du mois est sur son métier.
+  # Attention en montant l'XP des quêtes ou des défis : ce sont eux qui font finir le pass trop vite.
+  xp-per-tier: 1200
   # Temps de jeu ACTIF (le joueur a bougé, agi ou parlé dans la minute) : XP par minute, et plafond par jour
   # (100 minutes) : l'AFK ne suffit pas, il faut faire les quêtes pour finir le pass.
   playtime-xp-per-minute: 5
@@ -115,3 +116,6 @@ menus:
     back-command: ""
   pass:
     back-command: ""
+  # Défis : par défaut, le bouton ramène au pass.
+  challenges:
+    back-command: "pass"

@@ -1,0 +1,164 @@
+# ============================================================
+#  Défis du jour et de la semaine (/defis)
+# ============================================================
+#
+#  Chaque jour (minuit) et chaque semaine (lundi minuit), dans le fuseau daily.time-zone de config.yml, des défis
+#  sont tirés au hasard ici, les MÊMES pour tout le réseau. Un défi validé donne de l'XP du pass et de l'argent.
+#  Le texte de chaque défi est dans lang/ (challenges.list.<identifiant>), <target> = le nombre à atteindre.
+#
+#  kind  : break (casser des blocs NATURELS : un bloc posé par un joueur ne compte pas), harvest (récolter des
+#          cultures mûres), kill (tuer des créatures), fish (pêcher), quest (valider des quêtes de métier)
+#  match : blocs ou créatures qui comptent (vide : tout). Groupes : #ores, #logs, #stone, #dirt, #sand, #monsters
+#  target, icon ; xp et money pour changer la récompense d'un défi (sinon : defaults)
+#  Garder ce fichier identique sur tous les serveurs (un défi absent d'un serveur n'y avance pas).
+#  Toute modification nécessite un redémarrage.
+
+daily-count: 3
+weekly-count: 3
+
+# Récompense par défaut. Repère : 3 défis du jour + 3 de la semaine valent ~470 XP du pass par jour.
+defaults:
+  daily:
+    xp: 100
+    money: 30
+  weekly:
+    xp: 300
+    money: 150
+
+daily:
+  pierre:
+    kind: break
+    match: [ "#stone" ]
+    target: 400
+    icon: STONE
+  bucheron:
+    kind: break
+    match: [ "#logs" ]
+    target: 96
+    icon: OAK_LOG
+  minerais:
+    kind: break
+    match: [ "#ores" ]
+    target: 48
+    icon: IRON_ORE
+  terre:
+    kind: break
+    match: [ "#dirt" ]
+    target: 320
+    icon: GRAVEL
+  moisson:
+    kind: harvest
+    target: 192
+    icon: WHEAT
+  monstres:
+    kind: kill
+    match: [ "#monsters" ]
+    target: 40
+    icon: ROTTEN_FLESH
+  zombies:
+    kind: kill
+    match: [ "zombie", "husk", "drowned", "zombie_villager" ]
+    target: 20
+    icon: ZOMBIE_HEAD
+  squelettes:
+    kind: kill
+    match: [ "skeleton", "stray", "bogged" ]
+    target: 20
+    icon: SKELETON_SKULL
+  araignees:
+    kind: kill
+    match: [ "spider", "cave_spider" ]
+    target: 15
+    icon: SPIDER_EYE
+  creepers:
+    kind: kill
+    match: [ "creeper" ]
+    target: 10
+    icon: CREEPER_HEAD
+  peche:
+    kind: fish
+    target: 20
+    icon: COD
+  quetes:
+    kind: quest
+    target: 2
+    icon: WRITABLE_BOOK
+  charbon:
+    kind: break
+    match: [ "coal_ore", "deepslate_coal_ore" ]
+    target: 40
+    icon: COAL_ORE
+  fer:
+    kind: break
+    match: [ "iron_ore", "deepslate_iron_ore" ]
+    target: 32
+    icon: RAW_IRON
+  sable:
+    kind: break
+    match: [ "#sand" ]
+    target: 256
+    icon: SAND
+
+weekly:
+  carriere:
+    kind: break
+    match: [ "#stone" ]
+    target: 5000
+    icon: DEEPSLATE
+  foret:
+    kind: break
+    match: [ "#logs" ]
+    target: 1000
+    icon: SPRUCE_LOG
+  filons:
+    kind: break
+    match: [ "#ores" ]
+    target: 600
+    icon: GOLD_ORE
+  diamants:
+    kind: break
+    match: [ "diamond_ore", "deepslate_diamond_ore" ]
+    target: 32
+    icon: DIAMOND
+  or:
+    kind: break
+    match: [ "gold_ore", "deepslate_gold_ore", "nether_gold_ore" ]
+    target: 96
+    icon: RAW_GOLD
+  recoltes:
+    kind: harvest
+    target: 2500
+    icon: HAY_BLOCK
+  chasse:
+    kind: kill
+    match: [ "#monsters" ]
+    target: 500
+    icon: IRON_SWORD
+  endermen:
+    kind: kill
+    match: [ "enderman" ]
+    target: 40
+    icon: ENDER_PEARL
+  blazes:
+    kind: kill
+    match: [ "blaze" ]
+    target: 48
+    icon: BLAZE_ROD
+  sorcieres:
+    kind: kill
+    match: [ "witch" ]
+    target: 16
+    icon: GLASS_BOTTLE
+  grande-peche:
+    kind: fish
+    target: 200
+    icon: SALMON
+  guilde:
+    kind: quest
+    target: 15
+    icon: BOOK
+  quartz:
+    kind: break
+    match: [ "nether_quartz_ore" ]
+    target: 400
+    icon: QUARTZ

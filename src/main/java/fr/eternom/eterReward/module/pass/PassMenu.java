@@ -43,6 +43,7 @@ class PassMenu implements Menu {
     private static final int PREMIUM_ROW = 28;
     private static final int PASS_INFO = 40;
     private static final int PREVIOUS = 45;
+    private static final int CHALLENGES = 47;
     private static final int BACK = 49;
     private static final int NEXT = 53;
 
@@ -71,6 +72,11 @@ class PassMenu implements Menu {
     public void onClick(Player player, int slot, ClickType click) {
         if (slot == BACK) {
             service.backButton().click(player);
+            return;
+        }
+        if (slot == CHALLENGES) {
+            Sounds.click(player);
+            service.openChallenges(player);
             return;
         }
         if (slot == PREVIOUS && page > 0 || slot == NEXT && page < pages - 1) {
@@ -141,6 +147,7 @@ class PassMenu implements Menu {
         if (page < pages - 1) {
             inventory.setItem(NEXT, Items.item(Material.ARROW, text("pass.menu.next"), List.of()));
         }
+        inventory.setItem(CHALLENGES, Items.item(Material.TARGET, text("pass.menu.challenges"), List.of(text("pass.menu.challenges-lore"))));
         inventory.setItem(BACK, service.backButton().item(viewer));
         refreshInfo();
     }

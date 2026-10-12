@@ -21,6 +21,16 @@ public class Commands {
         PassCommand admin = new PassCommand(main.getPass(), main.getMessages(), true);
         command(main, "eterreward").setExecutor(admin);
         command(main, "eterreward").setTabCompleter(admin);
+
+        command(main, "defis").setExecutor((sender, command, label, args) -> {
+            if (sender instanceof org.bukkit.entity.Player player) {
+                main.getChallenges().open(player);
+            } else {
+                main.getMessages().send(sender, "command.players-only");
+            }
+            return true;
+        });
+        command(main, "defis").setTabCompleter((sender, command, label, args) -> List.of());
     }
 
     private static PluginCommand command(Main main, String name) {

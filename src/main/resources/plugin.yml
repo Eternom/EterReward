@@ -5,7 +5,7 @@ main: fr.eternom.eterReward.Main
 api-version: '26.2'
 load: POSTWORLD
 authors: [ NadTum ]
-description: Récompenses du réseau (récompense quotidienne sur 7 jours, pass de saison).
+description: Récompenses du réseau (récompense quotidienne sur 7 jours, pass de saison, défis).
 depend: [EterLib, EterEconomy]
 # EterMarket : XP du pass pour les quêtes ; EterResource : clés de ressource ; LuckPerms : permissions temporaires
 softdepend: [EterMarket, EterResource, LuckPerms]
@@ -21,6 +21,11 @@ commands:
     usage: /pass
     aliases: [battlepass, saison]
     permission: eterreward.pass
+  defis:
+    description: Les défis du jour et de la semaine.
+    usage: /defis
+    aliases: [challenges, defi, challenge]
+    permission: eterreward.challenges
   eterreward:
     description: Gérer le pass (staff, aussi depuis la console).
     usage: /eterreward pass <premium|set|xp> ...
@@ -33,6 +38,9 @@ permissions:
   eterreward.pass:
     description: Le pass de saison (ligne gratuite) et son XP de temps de jeu.
     default: true
+  eterreward.challenges:
+    description: Les défis du jour et de la semaine.
+    default: true
   eterreward.pass.premium.*:
     description: La ligne premium de tous les pass. D'habitude, on donne eterreward.pass.premium.<pass> pour le mois.
     default: op
@@ -42,4 +50,5 @@ permissions:
     children:
       eterreward.daily: true
       eterreward.pass: true
+      eterreward.challenges: true
       eterreward.pass.premium.*: true

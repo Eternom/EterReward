@@ -1,11 +1,11 @@
 # EterReward
 
-Les récompenses du réseau : la **récompense quotidienne** (`/daily`) et le **pass de saison** (`/pass`). Plus tard : les
-récompenses de vote. Document développeur, à tenir à jour avec le code.
+Les récompenses du réseau : la **récompense quotidienne** (`/daily`), le **pass de saison** (`/pass`) et les **défis**
+(`/defis`). Plus tard : les récompenses de vote. Document développeur, à tenir à jour avec le code.
 
 ## Prérequis
 
-- **EterLib 1.10.0+** (`depend`, textes communs, cadre des menus, bus réseau, `Money`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
+- **EterLib 1.11.0+** (`depend`, textes communs, cadre des menus, bus réseau, `Money`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
 - **EterEconomy 2.2.2+** (`depend`, son API `EconomyApi`) pour les récompenses en argent.
 - Facultatifs (`softdepend`), chacun dans une classe à part chargée seulement s'il est là :
   - **EterMarket 1.5.0+** : son événement `JobQuestCompleteEvent` donne l'XP du pass des quêtes de métier ;
@@ -70,12 +70,30 @@ d'usage, jamais ce que le joueur garde comme des homes), `commands`, `label`.
 <joueur>` (staff ou console, ex : une boutique) la donne par LuckPerms **jusqu'à la fin du mois** exactement, même hors
 ligne.
 
+## Défis
+
+**Tirage** (`ChallengeService#active`) : chaque jour (minuit) et chaque semaine (lundi minuit), fuseau `daily.time-zone`,
+`daily-count` et `weekly-count` défis sont tirés au hasard dans `challenges.yml`, **les mêmes pour tout le réseau** : le
+premier serveur qui en a besoin les écrit (`INSERT IGNORE` dans `eterreward_challenge_periods`, période `d:<jour julien>` ou
+`w:<année>-<semaine>`).
+
+**Comptage** (`ChallengeListener`, en survie) : `break` (blocs **naturels** seulement : un bloc posé par un joueur ne compte
+pas, EterLib `PlacedBlocks`), `harvest` (cultures mûres), `kill` (tuées par le joueur ; `#monsters` = les `Enemy`), `fish`,
+`quest` (EterMarket). Chaque action s'ajoute en mémoire (`compute` atomique avec la vidange), puis part en base toutes les
+15 s et au départ (une requête relative par défi). Un défi atteint est validé par une requête conditionnelle
+(`done = FALSE AND progress >= target`) : récompense (XP du pass, argent « EterReward · défis ») une seule fois, même avec
+plusieurs serveurs ; puis l'événement `ChallengeCompleteEvent`.
+
+**Menu** `/defis` (aussi depuis le menu du pass) : défis du jour et de la semaine, barre d'avancée, récompense, temps
+restant. Les textes de chaque défi : `challenges.list.<id>` dans `lang/`.
+
 ## Commandes et permissions
 
 | Commande | Permission | Par défaut |
 |---|---|---|
 | `/daily` (`reward`, `recompense`) | `eterreward.daily` | tous |
 | `/pass` (`battlepass`, `saison`) | `eterreward.pass` ; premium : `eterreward.pass.premium.<pass>` | tous / personne |
+| `/defis` (`challenges`, `defi`) | `eterreward.challenges` | tous |
 | `/eterreward pass premium <joueur>` | `set <pass>` | `xp <joueur> <montant>` (aussi depuis la console) | `eterreward.admin` | op |
 
 `eterreward.admin` regroupe tout.
@@ -86,7 +104,9 @@ ligne.
 
 - `streak(uuid)` : jours réclamés de la série en cours (0 si perdue), `claimedToday(uuid)` (bloquant) ;
 - `openMenu(joueur)` : le menu `/daily` ;
-- `addPassXp(uuid, xp)` : XP du pass en cours (bloquant), `openPass(joueur)` : le menu `/pass`.
+- `addPassXp(uuid, xp)` : XP du pass en cours, `passTier(uuid)` : palier atteint (bloquants) ; `openPass(joueur)` : le menu `/pass` ;
+- `openChallenges(joueur)` : le menu `/defis` ; événement `ChallengeCompleteEvent` (joueur, défi, semaine ou jour) à chaque
+  défi validé.
 
 ## Données
 
@@ -94,3 +114,5 @@ ligne.
 - `eterreward_pass_seasons` : `season` (`2026-10`), `pass`.
 - `eterreward_pass_progress` : `uuid`, `season`, `xp`, `play_day` / `play_xp` (temps de jeu compté aujourd'hui, pour le plafond).
 - `eterreward_pass_claims` : `uuid`, `season`, `tier`, `premium` (clé : les quatre).
+- `eterreward_challenge_periods` : `period`, `challenges` (identifiants tirés, séparés par des virgules).
+- `eterreward_challenge_progress` : `uuid`, `period`, `challenge`, `progress`, `done`.

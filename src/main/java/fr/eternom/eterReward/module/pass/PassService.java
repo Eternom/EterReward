@@ -71,6 +71,8 @@ public class PassService {
     private final ZoneId zone;
     private final BackButton backButton;
     private volatile Season current;
+    /** Le menu /defis, pour le bouton du menu du pass (null tant qu'il n'est pas branché). */
+    private java.util.function.Consumer<Player> challengesMenu;
 
     public PassService(JavaPlugin plugin, PassStore store, Map<String, PassDefinition> passes, Settings settings,
                        Messages messages, ZoneId zone, BackButton backButton) {
@@ -81,6 +83,25 @@ public class PassService {
         this.messages = messages;
         this.zone = zone;
         this.backButton = backButton;
+    }
+
+    public void setChallengesMenu(java.util.function.Consumer<Player> challengesMenu) {
+        this.challengesMenu = challengesMenu;
+    }
+
+    void openChallenges(Player player) {
+        if (challengesMenu != null) {
+            challengesMenu.accept(player);
+        }
+    }
+
+    /** Palier atteint dans le pass en cours (0 sans pass). Bloquant (base). */
+    public int tierOf(UUID player) {
+        if (!enabled()) {
+            return 0;
+        }
+        Season season = season();
+        return tier(season, store.xp(player, season.key()));
     }
 
     public boolean enabled() {

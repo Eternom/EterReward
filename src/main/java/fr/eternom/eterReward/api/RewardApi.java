@@ -7,7 +7,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Ce qu'EterReward offre aux autres plugins : la série de récompenses du jour d'un joueur (/daily) et le pass de saison.
+ * Ce qu'EterReward offre aux autres plugins : la série de récompenses du jour d'un joueur (/daily), le pass de saison et
+ * les défis (événement ChallengeCompleteEvent).
  * Personne d'autre ne lit les tables eterreward_* : on demande ici.
  * <pre>
  *     // compileOnly("com.github.Eternom:EterReward:&lt;tag&gt;") ; plugin.yml : softdepend: [EterReward]
@@ -32,6 +33,12 @@ public interface RewardApi {
     /** Donne de l'XP du pass de saison en cours (ex : une action propre à un autre plugin). Bloquant (base). */
     void addPassXp(UUID player, int amount);
 
+    /** Palier atteint dans le pass en cours (0 à 30). Bloquant (base). */
+    int passTier(UUID player);
+
     /** Le menu /pass. Thread principal. */
     void openPass(Player player);
+
+    /** Le menu /defis. Thread principal. */
+    void openChallenges(Player player);
 }

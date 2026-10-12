@@ -7,6 +7,9 @@ import fr.eternom.eterReward.api.RewardApi;
 import fr.eternom.eterReward.listeners.Commands;
 import fr.eternom.eterReward.listeners.Events;
 import fr.eternom.eterReward.module.RewardApiService;
+import fr.eternom.eterReward.module.challenge.ChallengeCatalog;
+import fr.eternom.eterReward.module.challenge.ChallengeService;
+import fr.eternom.eterReward.module.challenge.ChallengeStore;
 import fr.eternom.eterReward.module.daily.DailyRewards;
 import fr.eternom.eterReward.module.daily.DailyService;
 import fr.eternom.eterReward.module.daily.DailyStore;
@@ -26,7 +29,7 @@ import java.util.Map;
 public final class Main extends JavaPlugin {
 
     /** Version minimale d'EterLib : textes communs et outils partagés (Frame, Money, NetworkBus) depuis 1.6.0. */
-    private static final String REQUIRED_ETERLIB = "1.10.0";
+    private static final String REQUIRED_ETERLIB = "1.11.0";
 
     /** Préfixe des tables d'EterReward dans la base commune : eterreward_daily, eterreward_pass_... */
     private static final String TABLE_PREFIX = "eterreward_";
@@ -37,6 +40,7 @@ public final class Main extends JavaPlugin {
     private Messages messages;
     private DailyService daily;
     private PassService pass;
+    private ChallengeService challenges;
 
     @Override
     public void onEnable() {
@@ -61,9 +65,14 @@ public final class Main extends JavaPlugin {
         daily = new DailyService(this, new DailyStore(database),
                 DailyRewards.load(getConfig().getConfigurationSection("daily.days"), getLogger()), messages, zone,
                 lib.backButton(getConfig().getString("menus.daily.back-command", "")), pass);
+        ChallengeCatalog.Catalog catalog = ChallengeCatalog.load(this);
+        challenges = new ChallengeService(this, new ChallengeStore(database), catalog.pools(), catalog.counts(), pass, messages,
+                zone, lib.backButton(getConfig().getString("menus.challenges.back-command", "pass")));
+        pass.setChallengesMenu(challenges::open);
+        challenges.start();
 
         // API pour les autres plugins (RewardApi.get())
-        getServer().getServicesManager().register(RewardApi.class, new RewardApiService(daily, pass), this, ServicePriority.Normal);
+        getServer().getServicesManager().register(RewardApi.class, new RewardApiService(daily, pass, challenges), this, ServicePriority.Normal);
 
         new Commands(this);
         new Events(this);
@@ -76,7 +85,7 @@ public final class Main extends JavaPlugin {
             questXp.put(tier, Math.max(0, getConfig().getInt("pass.quest-xp." + tier)));
         }
         return new PassService.Settings(
-                Math.max(1, section == null ? 1000 : section.getInt("xp-per-tier", 1000)),
+                Math.max(1, section == null ? 1200 : section.getInt("xp-per-tier", 1200)),
                 Math.max(0, section == null ? 5 : section.getInt("playtime-xp-per-minute", 5)),
                 Math.max(0, section == null ? 500 : section.getInt("playtime-daily-cap", 500)),
                 Math.max(0, section == null ? 300 : section.getInt("daily-xp", 300)),
@@ -104,5 +113,9 @@ public final class Main extends JavaPlugin {
 
     public PassService getPass() {
         return pass;
+    }
+
+    public ChallengeService getChallenges() {
+        return challenges;
     }
 }
