@@ -53,6 +53,8 @@ public class ChallengeService {
     private final ZoneId zone;
     private final BackButton backButton;
     private final Map<Period, Active> current = new ConcurrentHashMap<>();
+    /** La période d'avant : les actions faites juste avant minuit, enregistrées après, la valident encore. */
+    private final Map<Period, Active> previous = new ConcurrentHashMap<>();
     /** Appelé en tâche de fond à chaque défi validé (classement du mois). */
     private java.util.function.Consumer<UUID> onComplete = uuid -> { };
     /** Avancée pas encore enregistrée : joueur -> "période|défi" -> quantité. */
@@ -94,8 +96,12 @@ public class ChallengeService {
             // Un défi absent de ce serveur (challenges.yml différent) est ignoré ici
             pool.stream().filter(challenge -> challenge.id().equals(id)).findFirst().ifPresent(challenges::add);
         }
+        Active old = current.get(period);
         active = new Active(period, key, List.copyOf(challenges), end(period));
         current.put(period, active);
+        if (old != null) {
+            previous.put(period, old);
+        }
         return active;
     }
 
@@ -186,7 +192,9 @@ public class ChallengeService {
 
     /** Valide le défi s'il vient d'être atteint, et donne la récompense. Bloquant. */
     private void checkCompletion(UUID uuid, String periodKey, String id) {
-        for (Active active : current.values()) {
+        List<Active> known = new ArrayList<>(current.values());
+        known.addAll(previous.values());
+        for (Active active : known) {
             if (!active.key().equals(periodKey)) {
                 continue;
             }

@@ -88,8 +88,9 @@ public class RankingService {
                 if (board.available()) {
                     fresh.put(board, lines(board.top(store, season, SIZE)));
                 }
-            } catch (RuntimeException e) {
-                plugin.getLogger().warning("Classement " + board.id() + " illisible : " + e.getMessage());
+            } catch (RuntimeException | LinkageError e) {
+                // LinkageError : le plugin qui possède les données est trop ancien (son API n'a pas encore le classement)
+                plugin.getLogger().warning("Classement " + board.id() + " illisible : " + e);
             }
         }
         cache = fresh;
@@ -176,7 +177,13 @@ public class RankingService {
     void openBoard(Player player, Boards board) {
         UUID uuid = player.getUniqueId();
         String season = season();
-        Tasks.async(plugin, player, () -> board.of(store, season, uuid),
+        Tasks.async(plugin, player, () -> {
+                    try {
+                        return board.of(store, season, uuid);
+                    } catch (LinkageError tooOld) {
+                        return new long[]{0, 0}; // plugin des données trop ancien : pas de place
+                    }
+                },
                 mine -> player.openInventory(new BoardMenu(this, player, board, mine).getInventory()),
                 () -> messages.send(player, "error.generic"));
     }
