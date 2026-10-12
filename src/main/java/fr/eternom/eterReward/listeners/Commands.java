@@ -31,6 +31,16 @@ public class Commands {
             return true;
         });
         command(main, "defis").setTabCompleter((sender, command, label, args) -> List.of());
+
+        command(main, "classement").setExecutor((sender, command, label, args) -> {
+            if (sender instanceof org.bukkit.entity.Player player) {
+                main.getRanking().open(player);
+            } else {
+                main.getMessages().send(sender, "command.players-only");
+            }
+            return true;
+        });
+        command(main, "classement").setTabCompleter((sender, command, label, args) -> List.of());
     }
 
     private static PluginCommand command(Main main, String name) {

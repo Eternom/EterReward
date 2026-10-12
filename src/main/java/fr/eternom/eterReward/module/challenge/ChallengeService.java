@@ -53,6 +53,8 @@ public class ChallengeService {
     private final ZoneId zone;
     private final BackButton backButton;
     private final Map<Period, Active> current = new ConcurrentHashMap<>();
+    /** Appelé en tâche de fond à chaque défi validé (classement du mois). */
+    private java.util.function.Consumer<UUID> onComplete = uuid -> { };
     /** Avancée pas encore enregistrée : joueur -> "période|défi" -> quantité. */
     private final Map<UUID, Map<String, Integer>> pending = new ConcurrentHashMap<>();
 
@@ -70,6 +72,10 @@ public class ChallengeService {
 
     public void start() {
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this::flushAll, 20 * 15, 20 * 15);
+    }
+
+    public void setOnComplete(java.util.function.Consumer<UUID> onComplete) {
+        this.onComplete = onComplete;
     }
 
     // ---------- Périodes ----------
@@ -196,6 +202,11 @@ public class ChallengeService {
     private void reward(UUID uuid, ChallengeDefinition challenge, Period period) {
         if (challenge.money() > 0) {
             EconomyApi.get().ifPresent(economy -> economy.deposit(uuid, challenge.money(), "EterReward · défis"));
+        }
+        try {
+            onComplete.accept(uuid);
+        } catch (RuntimeException e) {
+            plugin.getLogger().warning("Défi non compté au classement : " + e.getMessage());
         }
         try {
             pass.addXp(uuid, challenge.xp());

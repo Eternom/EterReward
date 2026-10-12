@@ -140,3 +140,47 @@ challenges:
     grande-peche: "Pêcher <target> fois"
     guilde: "Valider <target> quêtes de métier"
     quartz: "Miner <target> minerais de quartz"
+
+ranking:
+  menu:
+    title: "<primary>Classements"
+    info: "<accent>Classements du réseau"
+    ends: "<dark_gray>▸ <info>Fin du mois dans <accent><time>"
+    rule: "<dark_gray>Le top 3 des classements du mois est récompensé."
+    monthly: "<accent>Ce mois-ci</accent> <dark_gray>· top 3 récompensé"
+    forever: "<info>Depuis toujours"
+    line: "<accent><place>.</accent> <info><player> <dark_gray>· <accent><value>"
+    empty-line: "<dark_gray><place>. personne"
+    open: "<accent>Clic <dark_gray>· <info>voir le top 10"
+  board:
+    pass: "<primary>XP du pass"
+    challenges: "<primary>Défis du mois"
+    success: "<primary>Points de succès"
+    wealth: "<primary>Fortune"
+    quests: "<primary>Quêtes de métier"
+  board-title: "<primary>Classement <dark_gray>·</dark_gray> <board>"
+  # La valeur de chaque classement (<value>)
+  unit:
+    pass: "<info><accent><value></accent> XP de pass ce mois-ci"
+    challenges: "<info><accent><value></accent> défis réussis ce mois-ci"
+    success: "<info><accent><value></accent> points de succès"
+    wealth: "<info><accent><value></accent> Heloks"
+    quests: "<info><accent><value></accent> quêtes validées"
+  entry:
+    name: "<accent><place>. <player>"
+    none: "<error>Personne pour l'instant"
+  mine:
+    name: "<accent><player></accent> <dark_gray>(toi)"
+    place: "<dark_gray>▸ <info>Ta place : <accent><place>"
+    none: "<dark_gray>▸ <info>Pas encore classé"
+  rewards:
+    title: "<accent>Récompenses du mois"
+    ends: "<dark_gray>▸ <info>Fin du mois dans <accent><time>"
+    line: "<accent><place>.</accent> <info><money>, <accent><keys></accent> clés de ressource, <accent><xp> XP</accent> de pass"
+  back: "<accent>« Classements"
+  winner:
+    pass: "<success>Bravo !</success> <info>Tu finis <accent><place>e</accent> du classement <accent>XP du pass</accent> du mois : <accent><money></accent> et <accent><keys></accent> clés de ressource !"
+    challenges: "<success>Bravo !</success> <info>Tu finis <accent><place>e</accent> du classement <accent>Défis du mois</accent> : <accent><money></accent> et <accent><keys></accent> clés de ressource !"
+  announce:
+    pass: "<info>Classement <accent>XP du pass</accent> du mois : <accent>1. <first></accent>, <accent>2. <second></accent>, <accent>3. <third></accent>. Bravo !"
+    challenges: "<info>Classement <accent>Défis du mois</accent> : <accent>1. <first></accent>, <accent>2. <second></accent>, <accent>3. <third></accent>. Bravo !"

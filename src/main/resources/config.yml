@@ -109,13 +109,33 @@ pass:
     hard: 300
     bonus: 300
 
-# Menus : bouton en bas du menu. Avec une commande (sans le /), il la lance pour le joueur et relie
-# les menus entre eux (ex : "profile" pour revenir au menu du profil) ; vide, il ferme le menu.
+# Classements (/classement) : XP du pass et défis réussis du mois (remis à zéro chaque mois), points de succès,
+# fortune, quêtes de métier (depuis toujours). Tops recalculés toutes les 5 minutes.
+# À la fin du mois, le top 3 des classements du mois gagne (une seule fois, sur un serveur qui a EterResource) :
+#   money : argent ; keys : clés de monde ressource ; pass-xp : XP du pass du nouveau mois
+ranking:
+  rewards:
+    1:
+      money: 1500
+      keys: 3
+      pass-xp: 1200
+    2:
+      money: 1000
+      keys: 2
+      pass-xp: 800
+    3:
+      money: 500
+      keys: 1
+      pass-xp: 400
+
+# Menus : bouton en bas du menu. Avec une commande (sans le /), il la lance pour le joueur et relie les menus entre
+# eux ; vide, il ramène au menu central /menu ; "close", il ferme. Ici : le sous-menu Progression de /menu.
 menus:
   daily:
     back-command: "menu progression"
   pass:
     back-command: "menu progression"
-  # Défis, pass, récompense du jour : retour au sous-menu Progression de /menu (EterEssential).
   challenges:
+    back-command: "menu progression"
+  ranking:
     back-command: "menu progression"

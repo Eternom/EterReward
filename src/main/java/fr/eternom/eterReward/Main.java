@@ -16,6 +16,8 @@ import fr.eternom.eterReward.module.daily.DailyStore;
 import fr.eternom.eterReward.module.pass.PassCatalog;
 import fr.eternom.eterReward.module.pass.PassService;
 import fr.eternom.eterReward.module.pass.PassStore;
+import fr.eternom.eterReward.module.ranking.RankingService;
+import fr.eternom.eterReward.module.ranking.RankingStore;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -29,7 +31,7 @@ import java.util.Map;
 public final class Main extends JavaPlugin {
 
     /** Version minimale d'EterLib : textes communs et outils partagés (Frame, Money, NetworkBus) depuis 1.6.0. */
-    private static final String REQUIRED_ETERLIB = "1.11.0";
+    private static final String REQUIRED_ETERLIB = "1.12.0";
 
     /** Préfixe des tables d'EterReward dans la base commune : eterreward_daily, eterreward_pass_... */
     private static final String TABLE_PREFIX = "eterreward_";
@@ -41,6 +43,7 @@ public final class Main extends JavaPlugin {
     private DailyService daily;
     private PassService pass;
     private ChallengeService challenges;
+    private RankingService ranking;
 
     @Override
     public void onEnable() {
@@ -70,6 +73,10 @@ public final class Main extends JavaPlugin {
                 zone, lib.backButton(getConfig().getString("menus.challenges.back-command", "menu progression")));
         pass.setChallengesMenu(challenges::open);
         challenges.start();
+        ranking = new RankingService(this, new RankingStore(database), pass, messages, zone,
+                lib.backButton(getConfig().getString("menus.ranking.back-command", "menu progression")), rankingRewards());
+        challenges.setOnComplete(ranking::challengeCompleted);
+        ranking.start();
 
         // API pour les autres plugins (RewardApi.get())
         getServer().getServicesManager().register(RewardApi.class, new RewardApiService(daily, pass, challenges), this, ServicePriority.Normal);
@@ -90,6 +97,17 @@ public final class Main extends JavaPlugin {
                 Math.max(0, section == null ? 500 : section.getInt("playtime-daily-cap", 500)),
                 Math.max(0, section == null ? 300 : section.getInt("daily-xp", 300)),
                 Map.copyOf(questXp));
+    }
+
+    /** Récompenses du top 3 des classements du mois (config.yml > ranking.rewards.1 à 3). */
+    private java.util.List<RankingService.Reward> rankingRewards() {
+        java.util.List<RankingService.Reward> rewards = new java.util.ArrayList<>();
+        for (int place = 1; place <= 3; place++) {
+            String path = "ranking.rewards." + place + ".";
+            rewards.add(new RankingService.Reward(Math.max(0, getConfig().getDouble(path + "money")),
+                    Math.max(0, getConfig().getInt(path + "keys")), Math.max(0, getConfig().getInt(path + "pass-xp"))));
+        }
+        return java.util.List.copyOf(rewards);
     }
 
     /** Fuseau du changement de jour et de mois (daily.time-zone), Europe/Paris si invalide. */
@@ -117,5 +135,9 @@ public final class Main extends JavaPlugin {
 
     public ChallengeService getChallenges() {
         return challenges;
+    }
+
+    public RankingService getRanking() {
+        return ranking;
     }
 }

@@ -5,7 +5,7 @@ Les récompenses du réseau : la **récompense quotidienne** (`/daily`), le **pa
 
 ## Prérequis
 
-- **EterLib 1.11.0+** (`depend`, textes communs, cadre des menus, bus réseau, `Money`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
+- **EterLib 1.12.0+** (`depend`, textes communs, cadre des menus, bus réseau, `Money`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
 - **EterEconomy 2.2.2+** (`depend`, son API `EconomyApi`) pour les récompenses en argent.
 - Facultatifs (`softdepend`), chacun dans une classe à part chargée seulement s'il est là :
   - **EterMarket 1.5.0+** : son événement `JobQuestCompleteEvent` donne l'XP du pass des quêtes de métier ;
@@ -87,6 +87,20 @@ plusieurs serveurs ; puis l'événement `ChallengeCompleteEvent`.
 **Menu** `/defis` (aussi depuis le menu du pass) : défis du jour et de la semaine, barre d'avancée, récompense, temps
 restant. Les textes de chaque défi : `challenges.list.<id>` dans `lang/`.
 
+## Classements
+
+`/classement` (`RankingService`) : 5 classements. **Du mois** (remis à zéro chaque mois, top 3 récompensé) : XP du pass
+(`eterreward_pass_progress`) et défis réussis (`eterreward_challenge_monthly`, compté à chaque défi validé). **Depuis
+toujours** : points de succès (source `success` d'EterSuccess, lue par EterLib `RankingSource` : EterReward ne dépend pas
+d'EterSuccess, qui dépend déjà de lui), fortune (`EconomyApi#richest`), quêtes de métier (`MarketApi#topQuests`).
+Les tops (10) sont recalculés toutes les 5 minutes en tâche de fond et gardés en mémoire ; la place du joueur est lue à
+l'ouverture d'un classement.
+
+**Fin du mois** : le premier serveur qui voit le nouveau mois et qui a EterResource réserve les récompenses de chaque
+classement du mois (`INSERT IGNORE` dans `eterreward_ranking_rewards`) et donne au top 3 du mois fini `ranking.rewards`
+(argent, clés de ressource, XP du pass du nouveau mois) ; chaque gagnant est prévenu où qu'il soit, et les gagnants sont
+annoncés sur tout le réseau (bus `eterreward`, message `ranking-winners`).
+
 ## Commandes et permissions
 
 | Commande | Permission | Par défaut |
@@ -94,6 +108,7 @@ restant. Les textes de chaque défi : `challenges.list.<id>` dans `lang/`.
 | `/daily` (`reward`, `recompense`) | `eterreward.daily` | tous |
 | `/pass` (`battlepass`, `saison`) | `eterreward.pass` ; premium : `eterreward.pass.premium.<pass>` | tous / personne |
 | `/defis` (`challenges`, `defi`) | `eterreward.challenges` | tous |
+| `/classement` (`ranking`, `top`) | `eterreward.ranking` | tous |
 | `/eterreward pass premium <joueur>` | `set <pass>` | `xp <joueur> <montant>` (aussi depuis la console) | `eterreward.admin` | op |
 
 `eterreward.admin` regroupe tout.
@@ -116,3 +131,5 @@ restant. Les textes de chaque défi : `challenges.list.<id>` dans `lang/`.
 - `eterreward_pass_claims` : `uuid`, `season`, `tier`, `premium` (clé : les quatre).
 - `eterreward_challenge_periods` : `period`, `challenges` (identifiants tirés, séparés par des virgules).
 - `eterreward_challenge_progress` : `uuid`, `period`, `challenge`, `progress`, `done`.
+- `eterreward_challenge_monthly` : `uuid`, `season`, `completed` (défis réussis du mois, pour le classement).
+- `eterreward_ranking_rewards` : `season`, `board`, `given_at` (récompenses de fin de mois déjà données).
