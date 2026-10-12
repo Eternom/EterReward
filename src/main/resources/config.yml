@@ -113,9 +113,9 @@ pass:
 # les menus entre eux (ex : "profile" pour revenir au menu du profil) ; vide, il ferme le menu.
 menus:
   daily:
-    back-command: ""
+    back-command: "menu progression"
   pass:
-    back-command: ""
-  # Défis : par défaut, le bouton ramène au pass.
+    back-command: "menu progression"
+  # Défis, pass, récompense du jour : retour au sous-menu Progression de /menu (EterEssential).
   challenges:
-    back-command: "pass"
+    back-command: "menu progression"

@@ -67,7 +67,7 @@ public final class Main extends JavaPlugin {
                 lib.backButton(getConfig().getString("menus.daily.back-command", "")), pass);
         ChallengeCatalog.Catalog catalog = ChallengeCatalog.load(this);
         challenges = new ChallengeService(this, new ChallengeStore(database), catalog.pools(), catalog.counts(), pass, messages,
-                zone, lib.backButton(getConfig().getString("menus.challenges.back-command", "pass")));
+                zone, lib.backButton(getConfig().getString("menus.challenges.back-command", "menu progression")));
         pass.setChallengesMenu(challenges::open);
         challenges.start();
 
