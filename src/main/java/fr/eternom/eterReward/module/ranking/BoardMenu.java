@@ -45,7 +45,7 @@ class BoardMenu implements Menu {
         for (int place = 0; place < top.size() && place < SLOTS.length; place++) {
             Line line = top.get(place);
             Component title = text("ranking.entry.name", "place", String.valueOf(place + 1), "player", line.name());
-            List<Component> lore = List.of(text("ranking.unit." + board.id(), "value", format(line.value())));
+            List<Component> lore = List.of(text("ranking.unit." + board.id(), "value", board.display(line.value())));
             // Une ligne qui n'est pas un joueur (un clan) a son icône à la place d'une tête
             ItemStack head = line.icon() != null ? Items.item(line.icon(), title, lore)
                     : Items.head(Bukkit.createProfile(line.player(), line.name()), title, lore);
@@ -58,10 +58,10 @@ class BoardMenu implements Menu {
 
         List<Component> lore = new ArrayList<>();
         lore.add(mine[0] > 0 ? text("ranking.mine.place", "place", String.valueOf(mine[0])) : text("ranking.mine.none"));
-        lore.add(text("ranking.unit." + board.id(), "value", format(mine[1])));
+        lore.add(text("ranking.unit." + board.id(), "value", board.display(mine[1])));
         inventory.setItem(MINE, Items.head(viewer.getPlayerProfile(), text("ranking.mine.name", "player", viewer.getName()), lore));
 
-        if (board.monthly()) {
+        if (service.rewarded(board)) {
             List<Component> rewards = new ArrayList<>();
             rewards.add(text("ranking.rewards.ends", "time", service.timeLeft(viewer)));
             for (int place = 0; place < service.rewards().size(); place++) {

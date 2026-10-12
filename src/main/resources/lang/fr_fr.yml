@@ -148,27 +148,30 @@ ranking:
     title: "<primary>Classements"
     info: "<accent>Classements du réseau"
     ends: "<dark_gray>▸ <info>Fin du mois dans <accent><time>"
-    rule: "<dark_gray>Le top 3 des classements du mois est récompensé."
-    monthly: "<accent>Ce mois-ci</accent> <dark_gray>· top 3 récompensé"
+    rule: "<dark_gray>Le top 3 du classement général est récompensé."
+    rewarded: "<accent>Ce mois-ci</accent> <dark_gray>· top 3 récompensé"
+    monthly: "<accent>Ce mois-ci"
     forever: "<info>Depuis toujours"
     line: "<accent><place>.</accent> <info><player> <dark_gray>· <accent><value>"
     empty-line: "<dark_gray><place>. personne"
     open: "<accent>Clic <dark_gray>· <info>voir le top 10"
   board:
+    general: "<primary>Classement général"
     pass: "<primary>XP du pass"
     challenges: "<primary>Défis du mois"
     success: "<primary>Points de succès"
     wealth: "<primary>Fortune"
-    quests: "<primary>Quêtes de métier"
+    quests: "<primary>Quêtes du mois"
     clans: "<primary>Clans"
   board-title: "<primary>Classement <dark_gray>·</dark_gray> <board>"
   # La valeur de chaque classement (<value>)
   unit:
+    general: "<info><accent><value></accent> points ce mois-ci <dark_gray>(pass, défis, quêtes)"
     pass: "<info><accent><value></accent> XP de pass ce mois-ci"
     challenges: "<info><accent><value></accent> défis réussis ce mois-ci"
     success: "<info><accent><value></accent> points de succès"
     wealth: "<info><accent><value></accent> Heloks"
-    quests: "<info><accent><value></accent> quêtes validées"
+    quests: "<info><accent><value></accent> quêtes validées ce mois-ci"
     clans: "<info><accent><value></accent> chunks de territoire"
   entry:
     name: "<accent><place>. <player>"
@@ -183,8 +186,17 @@ ranking:
     line: "<accent><place>.</accent> <info><money>, <accent><keys></accent> clés de ressource, <accent><xp> XP</accent> de pass"
   back: "<accent>« Classements"
   winner:
+    general: "<success>Bravo !</success> <info>Tu finis <accent><place>e</accent> du <accent>classement général</accent> du mois : <accent><money></accent> et <accent><keys></accent> clés de ressource !"
     pass: "<success>Bravo !</success> <info>Tu finis <accent><place>e</accent> du classement <accent>XP du pass</accent> du mois : <accent><money></accent> et <accent><keys></accent> clés de ressource !"
     challenges: "<success>Bravo !</success> <info>Tu finis <accent><place>e</accent> du classement <accent>Défis du mois</accent> : <accent><money></accent> et <accent><keys></accent> clés de ressource !"
   announce:
+    general: "<info>Classement général du mois : <accent>1. <first></accent>, <accent>2. <second></accent>, <accent>3. <third></accent>. Bravo !"
     pass: "<info>Classement <accent>XP du pass</accent> du mois : <accent>1. <first></accent>, <accent>2. <second></accent>, <accent>3. <third></accent>. Bravo !"
     challenges: "<info>Classement <accent>Défis du mois</accent> : <accent>1. <first></accent>, <accent>2. <second></accent>, <accent>3. <third></accent>. Bravo !"
+  podium:
+    name: "<primary>#<place> <accent><player>"
+    empty: "<primary>#<place> <dark_gray>???"
+    score: "<info><accent><value></accent> points ce mois-ci"
+    placed: "<info>Place <accent><place></accent> du podium posée ici. <dark_gray>(retirer : /eternpc remove)"
+    usage: '<error>Utilisation : <accent>/eterreward podium \<1-5>'
+    no-npc: "<error>Le podium a besoin d'EterNpc sur ce serveur."

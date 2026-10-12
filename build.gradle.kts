@@ -14,6 +14,8 @@ repositories {
         metadataSources { artifact() }
         content { includeGroup("com.github.Eternom") }
     }
+    // PlaceholderAPI (placeholders du classement général)
+    maven("https://repo.extendedclip.com/releases/") { content { includeGroup("me.clip") } }
     // Autres dépendances publiées sur JitPack (VaultAPI...)
     maven("https://jitpack.io") { content { excludeGroup("com.github.Eternom") } }
     // Repli : EterLib publié sur cette machine (`gradlew publishToMavenLocal` dans EterLib), pour tester avant de pousser
@@ -25,6 +27,9 @@ dependencies {
 
     // Socle commun : base, langues, menus (plugin EterLib installé sur le serveur)
     compileOnly("com.github.Eternom:EterLib:1.13.0")
+    // Podium du classement général (PNJ) et placeholders, facultatifs
+    compileOnly("com.github.Eternom:EterNpc:1.0.0")
+    compileOnly("me.clip:placeholderapi:2.11.6")
     // Argent : l'API d'EterEconomy (chaque mouvement avec sa source)
     compileOnly("com.github.Eternom:EterEconomy:2.3.0")
     // XP du pass pour les quêtes de métier : l'événement d'EterMarket (softdepend)

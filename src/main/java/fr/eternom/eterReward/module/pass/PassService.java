@@ -152,6 +152,11 @@ public class PassService {
     // ---------- XP ----------
 
     /** Palier atteint avec cette XP (0 à 30). */
+    /** Palier atteint avec cette XP dans le pass du mois (classement général). Bloquant (base, au premier besoin). */
+    public long tierFromXp(long xp) {
+        return enabled() ? Math.min(season().pass().tiers().size(), xp / Math.max(1, settings.xpPerTier())) : 0;
+    }
+
     int tier(Season season, int xp) {
         return Math.min(season.pass().tiers().size(), xp / Math.max(1, settings.xpPerTier()));
     }

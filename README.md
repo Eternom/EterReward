@@ -8,9 +8,11 @@ Les récompenses du réseau : la **récompense quotidienne** (`/daily`), le **pa
 - **EterLib 1.12.0+** (`depend`, textes communs, cadre des menus, bus réseau, `Money`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
 - **EterEconomy 2.2.2+** (`depend`, son API `EconomyApi`) pour les récompenses en argent.
 - Facultatifs (`softdepend`), chacun dans une classe à part chargée seulement s'il est là :
-  - **EterMarket 1.5.0+** : son événement `JobQuestCompleteEvent` donne l'XP du pass des quêtes de métier ;
+  - **EterMarket 1.5.0+** : son événement `JobQuestCompleteEvent` donne l'XP du pass des quêtes de métier et compte les quêtes du mois ;
   - **EterResource** : son API `ResourceApi` pour les clés et le temps de monde ressource ;
-  - **LuckPerms** : les permissions temporaires (récompenses, premium).
+  - **LuckPerms** : les permissions temporaires (récompenses, premium) ;
+  - **EterNpc 1.0.0+** : le podium du classement général ;
+  - **PlaceholderAPI** : les placeholders du classement général (hologramme, scoreboard).
 
 ## Récompense quotidienne
 
@@ -90,18 +92,31 @@ restant. Les textes de chaque défi : `challenges.list.<id>` dans `lang/`.
 
 ## Classements
 
-`/classement` (`RankingService`) : 5 classements. **Du mois** (remis à zéro chaque mois, top 3 récompensé) : XP du pass
-(`eterreward_pass_progress`) et défis réussis (`eterreward_challenge_monthly`, compté à chaque défi validé). **Depuis
+`/classement` (`RankingService`) : 7 classements. **Du mois** (remis à zéro chaque mois : un nouveau joueur part à
+égalité) : XP du pass (`eterreward_pass_progress`), défis réussis (`eterreward_challenge_monthly`), quêtes de métier
+réussies (`eterreward_ranking_monthly`, comptées à chaque `JobQuestCompleteEvent`) et le **général** (`GeneralRanking`) :
+dans chacun des trois classements (paliers du pass au lieu de l'XP, premium ou non), une note sur 100 selon la PLACE
+(1er sur N = 100, dernier = 100/N, absent = 0, ex aequo à la même place), puis la moyenne des trois notes, gardée en
+dixièmes (875 = 87,5 points). La place plutôt que la valeur : aucun classement n'écrase les autres. **Depuis
 toujours** : points de succès (source `success` d'EterSuccess, lue par EterLib `RankingSource` : EterReward ne dépend pas
-d'EterSuccess, qui dépend déjà de lui), fortune (`EconomyApi#richest`), quêtes de métier (`MarketApi#topQuests`), clans par territoire (source `clans`
-d'EterClan : la ligne affiche le nom du clan et une bannière).
-Les tops (10) sont recalculés toutes les 5 minutes en tâche de fond et gardés en mémoire ; la place du joueur est lue à
-l'ouverture d'un classement.
+d'EterSuccess, qui dépend déjà de lui), fortune (`EconomyApi#richest`), clans par territoire (source `clans` d'EterClan :
+la ligne affiche le nom du clan et une bannière ; un vrai classement de clans viendra plus tard, hors de la moyenne).
+Les tops (10) sont recalculés toutes les 5 minutes en tâche de fond et gardés en mémoire ; le général est calculé en
+entier (toutes les places, en mémoire) ; la place du joueur dans les autres est lue à l'ouverture d'un classement.
+
+**Podium** (`Podium`, avec EterNpc) : les 5 premiers du général en PNJ (`eterreward:podium_<1-5>`), avec le skin, le nom
+et le score du joueur, mis à jour à chaque calcul ; une place vide montre « ??? ». `/eterreward podium <1-5>` pose une
+place là où est le staff (sur un lobby : pour tous les lobbys), `/eternpc remove` la retire.
+
+**Placeholders** (`RankingPlaceholders`, avec PlaceholderAPI), lus en mémoire : `%eterreward_general_rank%` et
+`%eterreward_general_score%` (celui qui regarde, `-` s'il n'est pas classé : pour un hologramme « ta place » au milieu
+du podium), `%eterreward_general_top_<1-10>_name%` / `_score%`, `%eterreward_general_players%`,
+`%eterreward_general_timeleft%`.
 
 **Fin du mois** : le premier serveur qui voit le nouveau mois et qui a EterResource réserve les récompenses de chaque
-classement du mois (`INSERT IGNORE` dans `eterreward_ranking_rewards`) et donne au top 3 du mois fini `ranking.rewards`
-(argent, clés de ressource, XP du pass du nouveau mois) ; chaque gagnant est prévenu où qu'il soit, et les gagnants sont
-annoncés sur tout le réseau (bus `eterreward`, message `ranking-winners`).
+classement de `ranking.rewarded` (le général par défaut ; `INSERT IGNORE` dans `eterreward_ranking_rewards`) et donne au
+top 3 du mois fini `ranking.rewards` (argent, clés de ressource, XP du pass du nouveau mois) ; chaque gagnant est
+prévenu où qu'il soit, et les gagnants sont annoncés sur tout le réseau (bus `eterreward`, message `ranking-winners`).
 
 ## Commandes et permissions
 
@@ -111,7 +126,7 @@ annoncés sur tout le réseau (bus `eterreward`, message `ranking-winners`).
 | `/pass` (`battlepass`, `saison`) | `eterreward.pass` ; premium : `eterreward.pass.premium.<pass>` | tous / personne |
 | `/defis` (`challenges`, `defi`) | `eterreward.challenges` | tous |
 | `/classement` (`ranking`, `top`) | `eterreward.ranking` | tous |
-| `/eterreward pass premium <joueur>` | `set <pass>` | `xp <joueur> <montant>` (aussi depuis la console) | `eterreward.admin` | op |
+| `/eterreward pass premium <joueur>` | `set <pass>` | `xp <joueur> <montant>` (aussi depuis la console) ; `/eterreward podium <1-5>` | `eterreward.admin` | op |
 
 `eterreward.admin` regroupe tout.
 
@@ -135,4 +150,5 @@ annoncés sur tout le réseau (bus `eterreward`, message `ranking-winners`).
 - `eterreward_challenge_periods` : `period`, `challenges` (identifiants tirés, séparés par des virgules).
 - `eterreward_challenge_progress` : `uuid`, `period`, `challenge`, `progress`, `done`.
 - `eterreward_challenge_monthly` : `uuid`, `season`, `completed` (défis réussis du mois, pour le classement).
+- `eterreward_ranking_monthly` : `uuid`, `season`, `board`, `amount` (autres valeurs du mois : quêtes de métier).
 - `eterreward_ranking_rewards` : `season`, `board`, `given_at` (récompenses de fin de mois déjà données).

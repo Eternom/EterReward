@@ -21,7 +21,8 @@ import java.util.Map;
 class RankingMenu implements Menu {
 
     private static final int INFO = 4;
-    private static final int[] SLOTS = {20, 21, 22, 23, 24, 31};
+    /** Le général en haut, au centre ; les autres en dessous. */
+    private static final int[] SLOTS = {13, 20, 21, 22, 23, 24, 31};
     private static final int BACK = 49;
 
     private final RankingService service;
@@ -42,13 +43,13 @@ class RankingMenu implements Menu {
                 continue;
             }
             List<Component> lore = new ArrayList<>();
-            lore.add(text(board.monthly() ? "ranking.menu.monthly" : "ranking.menu.forever"));
+            lore.add(text(service.rewarded(board) ? "ranking.menu.rewarded" : board.monthly() ? "ranking.menu.monthly" : "ranking.menu.forever"));
             lore.add(Component.empty());
             List<Line> top = service.top(board);
             for (int place = 0; place < 3; place++) {
                 lore.add(place < top.size()
                         ? text("ranking.menu.line", "place", String.valueOf(place + 1), "player", top.get(place).name(),
-                        "value", BoardMenu.format(top.get(place).value()))
+                        "value", board.display(top.get(place).value()))
                         : text("ranking.menu.empty-line", "place", String.valueOf(place + 1)));
             }
             lore.add(Component.empty());

@@ -20,7 +20,9 @@ public class Events {
 
         // Quêtes de métier : seulement si EterMarket est là (sa classe d'événement n'existe pas sinon)
         if (main.getServer().getPluginManager().isPluginEnabled("EterMarket")) {
-            main.getServer().getPluginManager().registerEvents(new MarketQuestListener(main.getPass(), challenges), main);
+            main.getServer().getPluginManager().registerEvents(new MarketQuestListener(main.getPass(), challenges,
+                    uuid -> fr.eternom.eterLib.helper.task.Tasks.async(main, () -> main.getRanking().questCompleted(uuid),
+                            "Quête non comptée au classement")), main);
         }
     }
 }

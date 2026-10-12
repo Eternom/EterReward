@@ -1,7 +1,6 @@
 package fr.eternom.eterReward.module.ranking;
 
 import fr.eternom.eterEconomy.api.EconomyApi;
-import fr.eternom.eterMarket.api.MarketApi;
 import fr.eternom.eterReward.module.ranking.RankingStore.Entry;
 import fr.eternom.eterLib.helper.ranking.RankingSource;
 import org.bukkit.Bukkit;
@@ -11,16 +10,18 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Les classements. Les mensuels (pass, défis) sont à EterReward ; les autres demandent leur classement au plugin qui
+ * Les classements. Les mensuels (général, pass, défis, quêtes) sont à EterReward ; les autres demandent leur classement au plugin qui
  * possède les données, par son API (chaque plugin facultatif dans sa propre classe : sinon NoClassDefFoundError).
  */
 public enum Boards {
 
+    /** Moyenne du mois (GeneralRanking), calculée par RankingService. */
+    GENERAL(Material.NETHERITE_HELMET, true),
     PASS(Material.NETHER_STAR, true),
     CHALLENGES(Material.TARGET, true),
     SUCCESS(Material.GOLDEN_APPLE, false),
     WEALTH(Material.GOLD_BLOCK, false),
-    QUESTS(Material.WRITABLE_BOOK, false),
+    QUESTS(Material.WRITABLE_BOOK, true),
     CLANS(Material.WHITE_BANNER, false);
 
     private final Material icon;
@@ -35,7 +36,7 @@ public enum Boards {
         return icon;
     }
 
-    /** Remis à zéro chaque mois, avec des récompenses pour le top 3. */
+    /** Remis à zéro chaque mois. */
     public boolean monthly() {
         return monthly;
     }
@@ -48,7 +49,6 @@ public enum Boards {
     boolean available() {
         return switch (this) {
             case SUCCESS -> RankingSource.find("success").isPresent();
-            case QUESTS -> Bukkit.getPluginManager().isPluginEnabled("EterMarket");
             case CLANS -> RankingSource.find("clans").isPresent();
             default -> true;
         };
@@ -62,7 +62,8 @@ public enum Boards {
             case SUCCESS -> Success.top(limit);
             case WEALTH -> EconomyApi.get().map(api -> api.richest(limit).stream()
                     .map(ranked -> new Entry(ranked.player(), (long) Math.floor(ranked.value()))).toList()).orElse(List.of());
-            case QUESTS -> Market.top(limit);
+            case QUESTS -> store.topMonthly(id(), season, limit);
+            case GENERAL -> List.of(); // RankingService
             case CLANS -> Source.top("clans", limit);
         };
     }
@@ -75,9 +76,15 @@ public enum Boards {
             case SUCCESS -> Success.of(player);
             case WEALTH -> EconomyApi.get().map(api -> new long[]{api.wealthRank(player), (long) Math.floor(api.balance(player))})
                     .orElse(new long[]{0, 0});
-            case QUESTS -> Market.of(player);
+            case QUESTS -> store.monthlyOf(player, id(), season);
+            case GENERAL -> new long[]{0, 0}; // RankingService
             case CLANS -> Source.of("clans", player);
         };
+    }
+
+    /** Valeur affichée : le général est gardé en dixièmes (875 -> 87,5). */
+    String display(long value) {
+        return this == GENERAL ? String.format(java.util.Locale.FRANCE, "%.1f", value / 10.0) : BoardMenu.format(value);
     }
 
     /** Nom affiché d'une ligne (ex : le nom du clan), null pour le pseudo du joueur. */
@@ -115,18 +122,4 @@ public enum Boards {
         }
     }
 
-    private static final class Market {
-        static List<Entry> top(int limit) {
-            return MarketApi.get().map(api -> api.topQuests(limit).stream().map(ranked -> new Entry(ranked.player(), ranked.value())).toList())
-                    .orElse(List.of());
-        }
-
-        static long[] of(UUID player) {
-            return MarketApi.get().map(api -> {
-                int rank = api.questRank(player);
-                long value = rank == 0 ? 0 : api.topQuests(rank).getLast().value();
-                return new long[]{rank, value};
-            }).orElse(new long[]{0, 0});
-        }
-    }
 }

@@ -21,6 +21,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -43,7 +46,7 @@ public class RankingService {
     }
 
     /** Une ligne d'un classement : joueur, pseudo, valeur. */
-    record Line(UUID player, String name, long value, org.bukkit.Material icon) {
+    public record Line(UUID player, String name, long value, org.bukkit.Material icon) {
     }
 
     private final JavaPlugin plugin;
@@ -54,10 +57,16 @@ public class RankingService {
     private final BackButton backButton;
     private final List<Reward> rewards;
     private final NetworkBus bus;
+    private final Set<Boards> rewarded;
     private volatile Map<Boards, List<Line>> cache = new EnumMap<>(Boards.class);
+    /** Classement général du mois : joueur -> {place, valeur en dixièmes}. */
+    private volatile Map<UUID, long[]> standings = new HashMap<>();
+    /** Le top du général à chaque calcul (podium d'EterNpc), thread principal. */
+    private Consumer<List<Line>> onGeneral = top -> { };
 
     public RankingService(JavaPlugin plugin, RankingStore store, PassService pass, Messages messages, ZoneId zone,
-                          BackButton backButton, List<Reward> rewards) {
+                          BackButton backButton, List<Reward> rewards, Set<Boards> rewarded) {
+        this.rewarded = rewarded;
         this.plugin = plugin;
         this.store = store;
         this.pass = pass;
@@ -83,9 +92,18 @@ public class RankingService {
     private void refresh() {
         String season = season();
         Map<Boards, List<Line>> fresh = new EnumMap<>(Boards.class);
+        try {
+            List<Entry> general = general(season);
+            List<Line> top = lines(Boards.GENERAL, general.subList(0, Math.min(SIZE, general.size())));
+            fresh.put(Boards.GENERAL, top);
+            standings = GeneralRanking.standings(general);
+            Bukkit.getScheduler().runTask(plugin, () -> onGeneral.accept(top));
+        } catch (RuntimeException e) {
+            plugin.getLogger().warning("Classement général illisible : " + e);
+        }
         for (Boards board : Boards.values()) {
             try {
-                if (board.available()) {
+                if (board != Boards.GENERAL && board.available()) {
                     fresh.put(board, lines(board, board.top(store, season, SIZE)));
                 }
             } catch (RuntimeException | LinkageError e) {
@@ -99,6 +117,11 @@ public class RankingService {
         } catch (RuntimeException e) {
             plugin.getLogger().warning("Récompenses des classements non données : " + e.getMessage());
         }
+    }
+
+    /** Tout le classement général d'un mois (bloquant). */
+    private List<Entry> general(String season) {
+        return GeneralRanking.compute(store, season, pass::tierFromXp);
     }
 
     private List<Line> lines(Boards board, List<Entry> entries) {
@@ -123,10 +146,11 @@ public class RankingService {
         }
         String previous = YearMonth.now(zone).minusMonths(1).format(SEASON);
         for (Boards board : Boards.values()) {
-            if (!board.monthly() || !store.claimRewards(previous, board.id())) {
+            if (!rewarded.contains(board) || !store.claimRewards(previous, board.id())) {
                 continue;
             }
-            List<Entry> top = board.top(store, previous, rewards.size());
+            List<Entry> top = board == Boards.GENERAL ? general(previous).stream().limit(rewards.size()).toList()
+                    : board.top(store, previous, rewards.size());
             String[] names = {"-", "-", "-"};
             for (int place = 0; place < top.size() && place < rewards.size(); place++) {
                 UUID winner = top.get(place).player();
@@ -180,6 +204,10 @@ public class RankingService {
     void openBoard(Player player, Boards board) {
         UUID uuid = player.getUniqueId();
         String season = season();
+        if (board == Boards.GENERAL) {
+            player.openInventory(new BoardMenu(this, player, board, standing(uuid)).getInventory());
+            return;
+        }
         Tasks.async(plugin, player, () -> {
                     try {
                         return board.of(store, season, uuid);
@@ -191,7 +219,7 @@ public class RankingService {
                 () -> messages.send(player, "error.generic"));
     }
 
-    String timeLeft(Player viewer) {
+    public String timeLeft(org.bukkit.command.CommandSender viewer) {
         ZonedDateTime end = YearMonth.now(zone).plusMonths(1).atDay(1).atStartOfDay(zone);
         return EterLib.get().formatDuration(viewer, Math.max(0, Duration.between(ZonedDateTime.now(zone), end).toSeconds()));
     }
@@ -206,6 +234,36 @@ public class RankingService {
 
     BackButton backButton() {
         return backButton;
+    }
+
+    /** Une quête de métier réussie (tâche de fond) : comptée pour le classement du mois. */
+    public void questCompleted(UUID player) {
+        store.addMonthly(player, season(), Boards.QUESTS.id());
+    }
+
+    /** Récompensé en fin de mois (config.yml > ranking.rewarded). */
+    boolean rewarded(Boards board) {
+        return rewarded.contains(board);
+    }
+
+    /** {place (0 si absent), valeur en dixièmes} du joueur dans le classement général du mois. */
+    public long[] standing(UUID player) {
+        return standings.getOrDefault(player, new long[]{0, 0});
+    }
+
+    /** Nombre de joueurs classés au général ce mois-ci. */
+    public int generalPlayers() {
+        return standings.size();
+    }
+
+    /** Le top 10 du classement général du mois (en mémoire). */
+    public List<Line> generalTop() {
+        return top(Boards.GENERAL);
+    }
+
+    /** Appelé à chaque calcul du général avec son top, sur le thread principal (podium). */
+    public void onGeneral(Consumer<List<Line>> listener) {
+        this.onGeneral = listener;
     }
 
     /** Un défi réussi (tâche de fond de ChallengeService) : compté pour le classement du mois. */
