@@ -35,6 +35,8 @@ daily:
 
 pass:
   none: "<error>Aucun pass de saison n'est disponible pour l'instant."
+  # Ligne de la sidebar (EterTab, <tag_pass>), <tier> = palier atteint, <max> = nombre de paliers
+  sidebar: "  <info>Pass <accent>palier <tier></accent><info>/<max>"
   tier-reached: "<info>Palier <accent><tier></accent> du pass atteint ! Une récompense t'attend."
   button: "<accent><bold>[Ouvrir le pass]</bold></accent>"
   button-hover: "<info>Ouvrir <accent>/pass"
@@ -158,6 +160,7 @@ ranking:
     success: "<primary>Points de succès"
     wealth: "<primary>Fortune"
     quests: "<primary>Quêtes de métier"
+    clans: "<primary>Clans"
   board-title: "<primary>Classement <dark_gray>·</dark_gray> <board>"
   # La valeur de chaque classement (<value>)
   unit:
@@ -166,6 +169,7 @@ ranking:
     success: "<info><accent><value></accent> points de succès"
     wealth: "<info><accent><value></accent> Heloks"
     quests: "<info><accent><value></accent> quêtes validées"
+    clans: "<info><accent><value></accent> chunks de territoire"
   entry:
     name: "<accent><place>. <player>"
     none: "<error>Personne pour l'instant"

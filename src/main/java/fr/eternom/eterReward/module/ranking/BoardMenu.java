@@ -44,9 +44,11 @@ class BoardMenu implements Menu {
         List<Line> top = service.top(board);
         for (int place = 0; place < top.size() && place < SLOTS.length; place++) {
             Line line = top.get(place);
-            ItemStack head = Items.head(Bukkit.createProfile(line.player(), line.name()),
-                    text("ranking.entry.name", "place", String.valueOf(place + 1), "player", line.name()),
-                    List.of(text("ranking.unit." + board.id(), "value", format(line.value()))));
+            Component title = text("ranking.entry.name", "place", String.valueOf(place + 1), "player", line.name());
+            List<Component> lore = List.of(text("ranking.unit." + board.id(), "value", format(line.value())));
+            // Une ligne qui n'est pas un joueur (un clan) a son icône à la place d'une tête
+            ItemStack head = line.icon() != null ? Items.item(line.icon(), title, lore)
+                    : Items.head(Bukkit.createProfile(line.player(), line.name()), title, lore);
             head.setAmount(place + 1);
             inventory.setItem(SLOTS[place], head);
         }

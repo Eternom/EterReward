@@ -43,7 +43,7 @@ public class RankingService {
     }
 
     /** Une ligne d'un classement : joueur, pseudo, valeur. */
-    record Line(UUID player, String name, long value) {
+    record Line(UUID player, String name, long value, org.bukkit.Material icon) {
     }
 
     private final JavaPlugin plugin;
@@ -86,7 +86,7 @@ public class RankingService {
         for (Boards board : Boards.values()) {
             try {
                 if (board.available()) {
-                    fresh.put(board, lines(board.top(store, season, SIZE)));
+                    fresh.put(board, lines(board, board.top(store, season, SIZE)));
                 }
             } catch (RuntimeException | LinkageError e) {
                 // LinkageError : le plugin qui possède les données est trop ancien (son API n'a pas encore le classement)
@@ -101,8 +101,11 @@ public class RankingService {
         }
     }
 
-    private List<Line> lines(List<Entry> entries) {
-        return entries.stream().map(entry -> new Line(entry.player(), name(entry.player()), entry.value())).toList();
+    private List<Line> lines(Boards board, List<Entry> entries) {
+        return entries.stream().map(entry -> {
+            String label = board.label(entry);
+            return new Line(entry.player(), label != null ? label : name(entry.player()), entry.value(), board.lineIcon(entry));
+        }).toList();
     }
 
     private static String name(UUID uuid) {

@@ -35,6 +35,8 @@ daily:
 
 pass:
   none: "<error>No season pass is available right now."
+  # Sidebar line (EterTab, <tag_pass>), <tier> = tier reached, <max> = number of tiers
+  sidebar: "  <info>Pass <accent>tier <tier></accent><info>/<max>"
   tier-reached: "<info>Pass tier <accent><tier></accent> reached! A reward is waiting for you."
   button: "<accent><bold>[Open the pass]</bold></accent>"
   button-hover: "<info>Open <accent>/pass"
@@ -158,6 +160,7 @@ ranking:
     success: "<primary>Achievement points"
     wealth: "<primary>Fortune"
     quests: "<primary>Job quests"
+    clans: "<primary>Clans"
   board-title: "<primary>Leaderboard <dark_gray>·</dark_gray> <board>"
   unit:
     pass: "<info><accent><value></accent> pass XP this month"
@@ -165,6 +168,7 @@ ranking:
     success: "<info><accent><value></accent> achievement points"
     wealth: "<info><accent><value></accent> Heloks"
     quests: "<info><accent><value></accent> quests completed"
+    clans: "<info><accent><value></accent> chunks of land"
   entry:
     name: "<accent><place>. <player>"
     none: "<error>Nobody yet"

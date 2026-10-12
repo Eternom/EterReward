@@ -75,6 +75,17 @@ public class PassActivity implements Listener {
         lastActive.put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
     }
 
+    /** Le palier du pass dans la sidebar, peu après l'arrivée. */
+    @EventHandler
+    public void onJoin(org.bukkit.event.player.PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        Bukkit.getScheduler().runTaskLater(pass.plugin(), () -> {
+            if (player.isOnline()) {
+                pass.publishTag(player);
+            }
+        }, 40);
+    }
+
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         lastActive.remove(event.getPlayer().getUniqueId());

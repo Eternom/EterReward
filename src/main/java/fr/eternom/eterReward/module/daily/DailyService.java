@@ -125,6 +125,7 @@ public class DailyService {
                 return;
             }
             give(player, rewards.day(claimed), rewards.day(claimed).pick());
+            Bukkit.getPluginManager().callEvent(new fr.eternom.eterReward.api.DailyClaimEvent(player, claimed));
             open(player);
         }, () -> messages.send(player, "error.generic"));
     }

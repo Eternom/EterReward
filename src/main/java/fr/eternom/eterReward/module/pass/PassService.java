@@ -220,7 +220,31 @@ public class PassService {
                     .hoverEvent(HoverEvent.showText(messages.get(player, "pass.button-hover")));
             player.sendMessage(messages.prefix().append(button));
             player.playSound(player, Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.6f, 1.4f);
+            publishTag(player);
         });
+    }
+
+    // ---------- Sidebar ----------
+
+    /**
+     * Ligne du pass dans la sidebar d'EterTab (étiquette <tag_pass> d'EterLib), dans la langue du joueur : son palier.
+     * À l'arrivée et à chaque palier atteint.
+     */
+    public void publishTag(Player player) {
+        if (!enabled()) {
+            return;
+        }
+        UUID uuid = player.getUniqueId();
+        Tasks.async(plugin, player, () -> {
+            Season season = season();
+            return new int[]{tier(season, store.xp(uuid, season.key())), season.pass().tiers().size()};
+        }, tier -> {
+            String format = messages.raw(player, "pass.sidebar");
+            if (format != null) {
+                EterLib.get().getPlayerTags().set(player, "pass", format.replace("<tier>", String.valueOf(tier[0]))
+                        .replace("<max>", String.valueOf(tier[1])));
+            }
+        }, () -> { });
     }
 
     // ---------- Menu et réclamations ----------

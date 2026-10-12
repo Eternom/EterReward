@@ -53,7 +53,8 @@ les autres le lisent : le même pour tout le réseau. `/eterreward pass set <pas
 - **`/daily`** réclamé : `daily-xp` (dans la même tâche que la réclamation) ;
 - **quêtes de métier** (EterMarket) : `quest-xp` selon la difficulté (bonus = la quête bonus du jour) ;
 - `RewardApi#addPassXp` (autres plugins) et `/eterreward pass xp`.
-Un palier atteint prévient le joueur (bouton `/pass`).
+Un palier atteint prévient le joueur (bouton `/pass`). Le palier est aussi affiché dans la sidebar d'EterTab (étiquette `pass`,
+lang `pass.sidebar`), à l'arrivée et à chaque palier.
 
 **Réclamer** (`PassMenu` : 6 lignes, 7 paliers par page ; gratuit en haut, paliers au milieu, premium en bas) : la base
 enregistre d'abord (`INSERT IGNORE` dans `eterreward_pass_claims`, une seule fois même sur deux serveurs), puis on donne.
@@ -92,7 +93,8 @@ restant. Les textes de chaque défi : `challenges.list.<id>` dans `lang/`.
 `/classement` (`RankingService`) : 5 classements. **Du mois** (remis à zéro chaque mois, top 3 récompensé) : XP du pass
 (`eterreward_pass_progress`) et défis réussis (`eterreward_challenge_monthly`, compté à chaque défi validé). **Depuis
 toujours** : points de succès (source `success` d'EterSuccess, lue par EterLib `RankingSource` : EterReward ne dépend pas
-d'EterSuccess, qui dépend déjà de lui), fortune (`EconomyApi#richest`), quêtes de métier (`MarketApi#topQuests`).
+d'EterSuccess, qui dépend déjà de lui), fortune (`EconomyApi#richest`), quêtes de métier (`MarketApi#topQuests`), clans par territoire (source `clans`
+d'EterClan : la ligne affiche le nom du clan et une bannière).
 Les tops (10) sont recalculés toutes les 5 minutes en tâche de fond et gardés en mémoire ; la place du joueur est lue à
 l'ouverture d'un classement.
 
@@ -120,6 +122,7 @@ annoncés sur tout le réseau (bus `eterreward`, message `ranking-winners`).
 - `streak(uuid)` : jours réclamés de la série en cours (0 si perdue), `claimedToday(uuid)` (bloquant) ;
 - `openMenu(joueur)` : le menu `/daily` ;
 - `addPassXp(uuid, xp)` : XP du pass en cours, `passTier(uuid)` : palier atteint (bloquants) ; `openPass(joueur)` : le menu `/pass` ;
+- événement `DailyClaimEvent` (joueur, jour de la série, 7 = série complète) à chaque `/daily` réclamé ;
 - `openChallenges(joueur)` : le menu `/defis` ; événement `ChallengeCompleteEvent` (joueur, défi, semaine ou jour) à chaque
   défi validé.
 

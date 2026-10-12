@@ -21,7 +21,7 @@ import java.util.Map;
 class RankingMenu implements Menu {
 
     private static final int INFO = 4;
-    private static final int[] SLOTS = {20, 21, 22, 23, 24};
+    private static final int[] SLOTS = {20, 21, 22, 23, 24, 31};
     private static final int BACK = 49;
 
     private final RankingService service;

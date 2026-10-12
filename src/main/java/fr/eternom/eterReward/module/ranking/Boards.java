@@ -20,7 +20,8 @@ public enum Boards {
     CHALLENGES(Material.TARGET, true),
     SUCCESS(Material.GOLDEN_APPLE, false),
     WEALTH(Material.GOLD_BLOCK, false),
-    QUESTS(Material.WRITABLE_BOOK, false);
+    QUESTS(Material.WRITABLE_BOOK, false),
+    CLANS(Material.WHITE_BANNER, false);
 
     private final Material icon;
     private final boolean monthly;
@@ -48,6 +49,7 @@ public enum Boards {
         return switch (this) {
             case SUCCESS -> RankingSource.find("success").isPresent();
             case QUESTS -> Bukkit.getPluginManager().isPluginEnabled("EterMarket");
+            case CLANS -> RankingSource.find("clans").isPresent();
             default -> true;
         };
     }
@@ -61,6 +63,7 @@ public enum Boards {
             case WEALTH -> EconomyApi.get().map(api -> api.richest(limit).stream()
                     .map(ranked -> new Entry(ranked.player(), (long) Math.floor(ranked.value()))).toList()).orElse(List.of());
             case QUESTS -> Market.top(limit);
+            case CLANS -> Source.top("clans", limit);
         };
     }
 
@@ -73,7 +76,31 @@ public enum Boards {
             case WEALTH -> EconomyApi.get().map(api -> new long[]{api.wealthRank(player), (long) Math.floor(api.balance(player))})
                     .orElse(new long[]{0, 0});
             case QUESTS -> Market.of(player);
+            case CLANS -> Source.of("clans", player);
         };
+    }
+
+    /** Nom affiché d'une ligne (ex : le nom du clan), null pour le pseudo du joueur. */
+    String label(Entry entry) {
+        return this == CLANS ? RankingSource.find("clans").map(source -> source.label(new RankingSource.Ranked(entry.player(), entry.value())))
+                .orElse(null) : null;
+    }
+
+    /** Icône d'une ligne à la place de la tête, null pour la tête. */
+    Material lineIcon(Entry entry) {
+        return this == CLANS ? Material.WHITE_BANNER : null;
+    }
+
+    /** Une source de classement d'EterLib (fournie par un autre plugin). */
+    private static final class Source {
+        static List<Entry> top(String id, int limit) {
+            return RankingSource.find(id).map(source -> source.top(limit).stream()
+                    .map(ranked -> new Entry(ranked.player(), ranked.value())).toList()).orElse(List.of());
+        }
+
+        static long[] of(String id, UUID player) {
+            return RankingSource.find(id).map(source -> source.of(player)).orElse(new long[]{0, 0});
+        }
     }
 
     /** Points de succès : la source de classement d'EterSuccess (EterLib), sans dépendre d'EterSuccess. */
