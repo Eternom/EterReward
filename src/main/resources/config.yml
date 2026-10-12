@@ -83,8 +83,32 @@ daily:
         #   label: "<accent>Clé de caisse rare"
         #   commands: [ "crate give {player} rare 1" ]
 
+# Pass de saison (/pass) : chaque mois (dans le fuseau daily.time-zone), un des pass de passes/ est tiré au hasard,
+# jamais celui du mois d'avant, le même pour tout le réseau. 30 paliers, une ligne gratuite et une premium
+# (permission eterreward.pass.premium.<pass>, ex : /eterreward pass premium <joueur>, jusqu'à la fin du mois).
+# Les récompenses non réclamées à la fin du mois sont perdues. Un pass = un fichier de passes/ (le nom du fichier
+# est son identifiant) ; les 8 fournis sont copiés au premier démarrage.
+pass:
+  # XP pour passer un palier. Repères (valeurs ci-dessous) : un joueur qui joue 1 h et fait une quête par jour
+  # (~1 000 XP) atteint le palier 25 en fin de mois ; un joueur régulier finit vers le 20e jour.
+  xp-per-tier: 1200
+  # Temps de jeu ACTIF (le joueur a bougé, agi ou parlé dans la minute) : XP par minute, et plafond par jour
+  # (100 minutes) : l'AFK ne suffit pas, il faut faire les quêtes pour finir le pass.
+  playtime-xp-per-minute: 5
+  playtime-daily-cap: 500
+  # Récompense du jour (/daily) réclamée.
+  daily-xp: 300
+  # Quête de métier validée (EterMarket), selon sa difficulté ; bonus = la quête bonus du jour.
+  quest-xp:
+    easy: 200
+    normal: 400
+    hard: 800
+    bonus: 1000
+
 # Menus : bouton en bas du menu. Avec une commande (sans le /), il la lance pour le joueur et relie
 # les menus entre eux (ex : "profile" pour revenir au menu du profil) ; vide, il ferme le menu.
 menus:
   daily:
+    back-command: ""
+  pass:
     back-command: ""

@@ -1,0 +1,184 @@
+# Pass « chasse » : un des pass tirés au hasard chaque mois (voir config.yml > pass).
+# Chaque palier (1 à 30) a une ligne gratuite (free) et une ligne premium (premium), chacune facultative.
+# Une récompense peut donner, ensemble :
+#   money            : de l'argent (EterEconomy)
+#   keys             : des clés de monde ressource (EterResource)
+#   resource-minutes : du temps de monde ressource (EterResource)
+#   items            : des objets, "MATIÈRE quantité" ; ce qui ne rentre pas est posé au sol
+#   permissions      : "permission durée" (d, h, m), par LuckPerms, sur tout le réseau. La durée est la sienne,
+#                      même après la fin du pass. Seulement des commandes d'usage (/craft, /back...), jamais
+#                      ce que le joueur garde (homes, annonces) : il le perdrait à la fin.
+#   commands         : lancées par la console, {player} = le pseudo
+#   label            : texte affiché à la place du détail (MiniMessage)
+
+name: "<primary>La Chasse sauvage"
+icon: IRON_SWORD
+description:
+  - "<info>Les bêtes rôdent, à toi de les traquer."
+  - "<info>Quêtes de <accent>chasseur</accent> : <accent>×2 XP</accent>."
+
+# Bonus du mois : quest-job / quest-multiplier (XP des quêtes), daily-multiplier (XP de /daily),
+# playtime-cap (plafond d'XP de temps de jeu par jour).
+bonus:
+  quest-job: chasseur
+  quest-multiplier: 2.0
+
+tiers:
+  1:
+    free:
+      money: 44
+    premium:
+      items: [ "SPECTRAL_ARROW 16" ]
+  2:
+    free:
+      items: [ "ARROW 16" ]
+    premium:
+      money: 96
+  3:
+    free:
+      money: 52
+    premium:
+      items: [ "ENDER_PEARL 2" ]
+  4:
+    free:
+      items: [ "BONE 16" ]
+    premium:
+      money: 112
+  5:
+    free:
+      permissions: [ "eteressential.back.death 3d" ]
+    premium:
+      permissions: [ "eteressential.back.death 7d" ]
+  6:
+    free:
+      items: [ "STRING 16" ]
+    premium:
+      money: 128
+  7:
+    free:
+      money: 68
+    premium:
+      items: [ "GUNPOWDER 16" ]
+  8:
+    free:
+      items: [ "LEATHER 8" ]
+    premium:
+      money: 144
+  9:
+    free:
+      money: 76
+    premium:
+      items: [ "LEATHER 16" ]
+  10:
+    free:
+      money: 100
+      keys: 1
+    premium:
+      money: 200
+      keys: 2
+  11:
+    free:
+      money: 84
+    premium:
+      items: [ "BLAZE_ROD 2" ]
+  12:
+    free:
+      items: [ "GUNPOWDER 8" ]
+    premium:
+      money: 176
+  13:
+    free:
+      money: 92
+    premium:
+      items: [ "ENDER_PEARL 4" ]
+  14:
+    free:
+      items: [ "ROTTEN_FLESH 16" ]
+    premium:
+      money: 192
+  15:
+    free:
+      permissions: [ "eteressential.grindstone 3d" ]
+    premium:
+      permissions: [ "eteressential.grindstone 7d" ]
+  16:
+    free:
+      items: [ "ARROW 32" ]
+    premium:
+      money: 208
+  17:
+    free:
+      money: 108
+    premium:
+      items: [ "SPECTRAL_ARROW 16" ]
+  18:
+    free:
+      items: [ "ARROW 16" ]
+    premium:
+      money: 224
+  19:
+    free:
+      money: 116
+    premium:
+      items: [ "ENDER_PEARL 2" ]
+  20:
+    free:
+      money: 100
+      keys: 1
+    premium:
+      money: 200
+      keys: 2
+  21:
+    free:
+      money: 124
+    premium:
+      items: [ "GUNPOWDER 16" ]
+  22:
+    free:
+      items: [ "BONE 16" ]
+    premium:
+      money: 256
+  23:
+    free:
+      money: 132
+    premium:
+      items: [ "LEATHER 16" ]
+  24:
+    free:
+      items: [ "STRING 16" ]
+    premium:
+      money: 272
+  25:
+    free:
+      permissions: [ "eteressential.back.death 3d" ]
+    premium:
+      permissions: [ "eteressential.anvil 7d" ]
+  26:
+    free:
+      items: [ "LEATHER 8" ]
+    premium:
+      money: 288
+  27:
+    free:
+      money: 148
+    premium:
+      items: [ "BLAZE_ROD 2" ]
+  28:
+    free:
+      items: [ "GUNPOWDER 8" ]
+    premium:
+      money: 304
+  29:
+    free:
+      money: 156
+    premium:
+      items: [ "ENDER_PEARL 4" ]
+  30:
+    free:
+      money: 150
+      keys: 1
+    premium:
+      money: 500
+      keys: 3
+      permissions: [ "eteressential.back.death 30d" ]
+      items: [ "TOTEM_OF_UNDYING 1" ]

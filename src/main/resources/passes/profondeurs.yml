@@ -1,0 +1,184 @@
+# Pass « profondeurs » : un des pass tirés au hasard chaque mois (voir config.yml > pass).
+# Chaque palier (1 à 30) a une ligne gratuite (free) et une ligne premium (premium), chacune facultative.
+# Une récompense peut donner, ensemble :
+#   money            : de l'argent (EterEconomy)
+#   keys             : des clés de monde ressource (EterResource)
+#   resource-minutes : du temps de monde ressource (EterResource)
+#   items            : des objets, "MATIÈRE quantité" ; ce qui ne rentre pas est posé au sol
+#   permissions      : "permission durée" (d, h, m), par LuckPerms, sur tout le réseau. La durée est la sienne,
+#                      même après la fin du pass. Seulement des commandes d'usage (/craft, /back...), jamais
+#                      ce que le joueur garde (homes, annonces) : il le perdrait à la fin.
+#   commands         : lancées par la console, {player} = le pseudo
+#   label            : texte affiché à la place du détail (MiniMessage)
+
+name: "<primary>Les Profondeurs"
+icon: IRON_PICKAXE
+description:
+  - "<info>Ce mois-ci, la mine rapporte gros."
+  - "<info>Quêtes de <accent>mineur</accent> : <accent>×2 XP</accent>."
+
+# Bonus du mois : quest-job / quest-multiplier (XP des quêtes), daily-multiplier (XP de /daily),
+# playtime-cap (plafond d'XP de temps de jeu par jour).
+bonus:
+  quest-job: mineur
+  quest-multiplier: 2.0
+
+tiers:
+  1:
+    free:
+      money: 44
+    premium:
+      items: [ "IRON_INGOT 16" ]
+  2:
+    free:
+      items: [ "TORCH 32" ]
+    premium:
+      money: 96
+  3:
+    free:
+      money: 52
+    premium:
+      items: [ "GOLD_INGOT 8" ]
+  4:
+    free:
+      items: [ "COAL 32" ]
+    premium:
+      money: 112
+  5:
+    free:
+      permissions: [ "eteressential.furnace 3d" ]
+    premium:
+      permissions: [ "eteressential.furnace 7d" ]
+  6:
+    free:
+      items: [ "IRON_INGOT 8" ]
+    premium:
+      money: 128
+  7:
+    free:
+      money: 68
+    premium:
+      items: [ "REDSTONE 64" ]
+  8:
+    free:
+      items: [ "REDSTONE 32" ]
+    premium:
+      money: 144
+  9:
+    free:
+      money: 76
+    premium:
+      items: [ "LAPIS_LAZULI 32" ]
+  10:
+    free:
+      money: 100
+      keys: 1
+    premium:
+      money: 200
+      keys: 2
+  11:
+    free:
+      money: 84
+    premium:
+      items: [ "DIAMOND 1" ]
+  12:
+    free:
+      items: [ "LAPIS_LAZULI 16" ]
+    premium:
+      money: 176
+  13:
+    free:
+      money: 92
+    premium:
+      items: [ "EMERALD 4" ]
+  14:
+    free:
+      items: [ "GOLD_INGOT 4" ]
+    premium:
+      money: 192
+  15:
+    free:
+      permissions: [ "eteressential.back 3d" ]
+    premium:
+      permissions: [ "eteressential.back 7d" ]
+  16:
+    free:
+      items: [ "IRON_INGOT 12" ]
+    premium:
+      money: 208
+  17:
+    free:
+      money: 108
+    premium:
+      items: [ "IRON_INGOT 16" ]
+  18:
+    free:
+      items: [ "TORCH 32" ]
+    premium:
+      money: 224
+  19:
+    free:
+      money: 116
+    premium:
+      items: [ "GOLD_INGOT 8" ]
+  20:
+    free:
+      money: 100
+      keys: 1
+    premium:
+      money: 200
+      keys: 2
+  21:
+    free:
+      money: 124
+    premium:
+      items: [ "REDSTONE 64" ]
+  22:
+    free:
+      items: [ "COAL 32" ]
+    premium:
+      money: 256
+  23:
+    free:
+      money: 132
+    premium:
+      items: [ "LAPIS_LAZULI 32" ]
+  24:
+    free:
+      items: [ "IRON_INGOT 8" ]
+    premium:
+      money: 272
+  25:
+    free:
+      permissions: [ "eteressential.furnace 3d" ]
+    premium:
+      permissions: [ "eteressential.anvil 7d" ]
+  26:
+    free:
+      items: [ "REDSTONE 32" ]
+    premium:
+      money: 288
+  27:
+    free:
+      money: 148
+    premium:
+      items: [ "DIAMOND 1" ]
+  28:
+    free:
+      items: [ "LAPIS_LAZULI 16" ]
+    premium:
+      money: 304
+  29:
+    free:
+      money: 156
+    premium:
+      items: [ "EMERALD 4" ]
+  30:
+    free:
+      money: 150
+      keys: 1
+    premium:
+      money: 500
+      keys: 3
+      permissions: [ "eteressential.furnace 30d" ]
+      items: [ "DIAMOND 2" ]

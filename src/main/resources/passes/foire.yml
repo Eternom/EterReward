@@ -1,0 +1,183 @@
+# Pass « foire » : un des pass tirés au hasard chaque mois (voir config.yml > pass).
+# Chaque palier (1 à 30) a une ligne gratuite (free) et une ligne premium (premium), chacune facultative.
+# Une récompense peut donner, ensemble :
+#   money            : de l'argent (EterEconomy)
+#   keys             : des clés de monde ressource (EterResource)
+#   resource-minutes : du temps de monde ressource (EterResource)
+#   items            : des objets, "MATIÈRE quantité" ; ce qui ne rentre pas est posé au sol
+#   permissions      : "permission durée" (d, h, m), par LuckPerms, sur tout le réseau. La durée est la sienne,
+#                      même après la fin du pass. Seulement des commandes d'usage (/craft, /back...), jamais
+#                      ce que le joueur garde (homes, annonces) : il le perdrait à la fin.
+#   commands         : lancées par la console, {player} = le pseudo
+#   label            : texte affiché à la place du détail (MiniMessage)
+
+name: "<primary>La Foire marchande"
+icon: EMERALD
+description:
+  - "<info>Les marchands sont en ville."
+  - "<info>Toutes les quêtes : <accent>×1,5 XP</accent>."
+
+# Bonus du mois : quest-job / quest-multiplier (XP des quêtes), daily-multiplier (XP de /daily),
+# playtime-cap (plafond d'XP de temps de jeu par jour).
+bonus:
+  quest-multiplier: 1.5
+
+tiers:
+  1:
+    free:
+      money: 66
+    premium:
+      items: [ "EMERALD 6" ]
+  2:
+    free:
+      items: [ "EMERALD 2" ]
+    premium:
+      money: 144
+  3:
+    free:
+      money: 78
+    premium:
+      items: [ "GOLD_INGOT 8" ]
+  4:
+    free:
+      items: [ "GOLD_NUGGET 16" ]
+    premium:
+      money: 168
+  5:
+    free:
+      permissions: [ "eteressential.enderchest 3d" ]
+    premium:
+      permissions: [ "eteressential.enderchest 7d" ]
+  6:
+    free:
+      items: [ "PAPER 16" ]
+    premium:
+      money: 192
+  7:
+    free:
+      money: 102
+    premium:
+      items: [ "EMERALD 8" ]
+  8:
+    free:
+      items: [ "EMERALD 3" ]
+    premium:
+      money: 216
+  9:
+    free:
+      money: 114
+    premium:
+      items: [ "GOLD_BLOCK 1" ]
+  10:
+    free:
+      money: 150
+      keys: 1
+    premium:
+      money: 300
+      keys: 2
+  11:
+    free:
+      money: 126
+    premium:
+      items: [ "EMERALD 10" ]
+  12:
+    free:
+      items: [ "BOOK 4" ]
+    premium:
+      money: 264
+  13:
+    free:
+      money: 138
+    premium:
+      items: [ "EMERALD_BLOCK 1" ]
+  14:
+    free:
+      items: [ "GOLD_INGOT 2" ]
+    premium:
+      money: 288
+  15:
+    free:
+      permissions: [ "eteressential.anvil 3d" ]
+    premium:
+      permissions: [ "eteressential.anvil 7d" ]
+  16:
+    free:
+      items: [ "EMERALD 4" ]
+    premium:
+      money: 312
+  17:
+    free:
+      money: 162
+    premium:
+      items: [ "EMERALD 6" ]
+  18:
+    free:
+      items: [ "EMERALD 2" ]
+    premium:
+      money: 336
+  19:
+    free:
+      money: 174
+    premium:
+      items: [ "GOLD_INGOT 8" ]
+  20:
+    free:
+      money: 150
+      keys: 1
+    premium:
+      money: 300
+      keys: 2
+  21:
+    free:
+      money: 186
+    premium:
+      items: [ "EMERALD 8" ]
+  22:
+    free:
+      items: [ "GOLD_NUGGET 16" ]
+    premium:
+      money: 384
+  23:
+    free:
+      money: 198
+    premium:
+      items: [ "GOLD_BLOCK 1" ]
+  24:
+    free:
+      items: [ "PAPER 16" ]
+    premium:
+      money: 408
+  25:
+    free:
+      permissions: [ "eteressential.enderchest 3d" ]
+    premium:
+      permissions: [ "eteressential.craft 7d" ]
+  26:
+    free:
+      items: [ "EMERALD 3" ]
+    premium:
+      money: 432
+  27:
+    free:
+      money: 222
+    premium:
+      items: [ "EMERALD 10" ]
+  28:
+    free:
+      items: [ "BOOK 4" ]
+    premium:
+      money: 456
+  29:
+    free:
+      money: 234
+    premium:
+      items: [ "EMERALD_BLOCK 1" ]
+  30:
+    free:
+      money: 225
+      keys: 1
+    premium:
+      money: 750
+      keys: 3
+      permissions: [ "eteressential.enderchest 30d" ]
+      items: [ "EMERALD 16" ]

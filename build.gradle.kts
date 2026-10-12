@@ -27,6 +27,12 @@ dependencies {
     compileOnly("com.github.Eternom:EterLib:1.10.3")
     // Argent : l'API d'EterEconomy (chaque mouvement avec sa source)
     compileOnly("com.github.Eternom:EterEconomy:2.2.2")
+    // XP du pass pour les quêtes de métier : l'événement d'EterMarket (softdepend)
+    compileOnly("com.github.Eternom:EterMarket:1.5.0")
+    // Clés et temps de monde ressource : l'API d'EterResource (softdepend)
+    compileOnly("com.github.Eternom:EterResource:1.1.0")
+    // Permissions temporaires (récompenses, premium) : l'API de LuckPerms (softdepend)
+    compileOnly("net.luckperms:api:5.4")
 }
 
 java {

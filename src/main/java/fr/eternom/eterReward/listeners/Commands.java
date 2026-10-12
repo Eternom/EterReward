@@ -2,6 +2,7 @@ package fr.eternom.eterReward.listeners;
 
 import fr.eternom.eterReward.Main;
 import fr.eternom.eterReward.module.daily.DailyCommand;
+import fr.eternom.eterReward.module.pass.PassCommand;
 import org.bukkit.command.PluginCommand;
 
 import java.util.List;
@@ -10,8 +11,19 @@ import java.util.Objects;
 public class Commands {
 
     public Commands(Main main) {
-        PluginCommand daily = Objects.requireNonNull(main.getCommand("daily"), "Commande absente du plugin.yml : daily");
+        PluginCommand daily = command(main, "daily");
         daily.setExecutor(new DailyCommand(main.getDaily(), main.getMessages()));
         daily.setTabCompleter((sender, command, label, args) -> List.of());
+
+        PassCommand pass = new PassCommand(main.getPass(), main.getMessages(), false);
+        command(main, "pass").setExecutor(pass);
+        command(main, "pass").setTabCompleter(pass);
+        PassCommand admin = new PassCommand(main.getPass(), main.getMessages(), true);
+        command(main, "eterreward").setExecutor(admin);
+        command(main, "eterreward").setTabCompleter(admin);
+    }
+
+    private static PluginCommand command(Main main, String name) {
+        return Objects.requireNonNull(main.getCommand(name), "Commande absente du plugin.yml : " + name);
     }
 }

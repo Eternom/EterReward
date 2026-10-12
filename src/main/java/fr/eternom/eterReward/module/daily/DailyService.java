@@ -5,7 +5,7 @@ import fr.eternom.eterLib.EterLib;
 import fr.eternom.eterLib.helper.gui.BackButton;
 import fr.eternom.eterLib.helper.message.Messages;
 import fr.eternom.eterLib.helper.task.Tasks;
-import fr.eternom.eterReward.api.RewardApi;
+import fr.eternom.eterReward.module.pass.PassService;
 import fr.eternom.eterReward.module.daily.DailyRewards.Day;
 import fr.eternom.eterReward.module.daily.DailyRewards.Loot;
 import fr.eternom.eterReward.module.daily.DailyRewards.Reward;
@@ -39,7 +39,7 @@ import java.util.UUID;
  * Réclamer : la base enregistre d'abord (une seule réclamation possible, même sur deux serveurs à la fois), puis le
  * tirage est donné. Objets qui ne rentrent pas : posés au sol devant le joueur. Argent : par Vault, en tâche de fond.
  */
-public class DailyService implements RewardApi {
+public class DailyService {
 
     public static final String PERMISSION = "eterreward.daily";
 
@@ -49,9 +49,11 @@ public class DailyService implements RewardApi {
     private final Messages messages;
     private final ZoneId zone;
     private final BackButton backButton;
+    private final PassService pass;
 
     public DailyService(JavaPlugin plugin, DailyStore store, DailyRewards rewards, Messages messages, ZoneId zone,
-                        BackButton backButton) {
+                        BackButton backButton, PassService pass) {
+        this.pass = pass;
         this.plugin = plugin;
         this.store = store;
         this.rewards = rewards;
@@ -61,21 +63,14 @@ public class DailyService implements RewardApi {
     }
 
     /** /daily : ouvre le menu avec l'état du joueur. */
-    @Override
     public int streak(UUID player) {
         long today = today();
         DailyState state = DailyState.of(store.get(player), today);
         return state.streakLost(today) ? 0 : state.claimed();
     }
 
-    @Override
     public boolean claimedToday(UUID player) {
         return store.get(player).lastClaim() == today();
-    }
-
-    @Override
-    public void openMenu(Player player) {
-        open(player);
     }
 
     public void open(Player player) {
@@ -114,7 +109,15 @@ public class DailyService implements RewardApi {
         long today = today();
         Tasks.async(plugin, player, () -> {
             DailyState state = DailyState.of(store.get(uuid), today);
-            return state.canClaim() && store.claim(uuid, state.progress(), state.claimable(), today) ? state.claimable() : 0;
+            if (!state.canClaim() || !store.claim(uuid, state.progress(), state.claimable(), today)) {
+                return 0;
+            }
+            try {
+                pass.dailyClaimed(uuid); // XP du pass de saison
+            } catch (RuntimeException e) {
+                plugin.getLogger().warning("XP du pass non donnée pour /daily : " + e.getMessage());
+            }
+            return state.claimable();
         }, claimed -> {
             if (claimed == 0) {
                 messages.send(player, "daily.already", "time", timeUntilTomorrow(player));
