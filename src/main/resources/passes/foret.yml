@@ -15,13 +15,13 @@ name: "<primary>La Forêt ancienne"
 icon: IRON_AXE
 description:
   - "<info>Les vieux arbres ont des choses à donner."
-  - "<info>Quêtes de <accent>bûcheron</accent> : <accent>×2 XP</accent>."
+  - "<info>Quêtes de <accent>bûcheron</accent> : <accent>×1,5 XP</accent>."
 
 # Bonus du mois : quest-job / quest-multiplier (XP des quêtes), daily-multiplier (XP de /daily),
 # playtime-cap (plafond d'XP de temps de jeu par jour).
 bonus:
   quest-job: bucheron
-  quest-multiplier: 2.0
+  quest-multiplier: 1.5
 
 tiers:
   1:

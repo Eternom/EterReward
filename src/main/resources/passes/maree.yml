@@ -15,13 +15,13 @@ name: "<primary>La Marée haute"
 icon: FISHING_ROD
 description:
   - "<info>La mer est généreuse ce mois-ci."
-  - "<info>Quêtes de <accent>pêcheur</accent> : <accent>×2 XP</accent>."
+  - "<info>Quêtes de <accent>pêcheur</accent> : <accent>×1,5 XP</accent>."
 
 # Bonus du mois : quest-job / quest-multiplier (XP des quêtes), daily-multiplier (XP de /daily),
 # playtime-cap (plafond d'XP de temps de jeu par jour).
 bonus:
   quest-job: pecheur
-  quest-multiplier: 2.0
+  quest-multiplier: 1.5
 
 tiers:
   1:

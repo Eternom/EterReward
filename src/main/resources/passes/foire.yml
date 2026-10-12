@@ -15,12 +15,12 @@ name: "<primary>La Foire marchande"
 icon: EMERALD
 description:
   - "<info>Les marchands sont en ville."
-  - "<info>Toutes les quêtes : <accent>×1,5 XP</accent>."
+  - "<info>Toutes les quêtes : <accent>×1,25 XP</accent>."
 
 # Bonus du mois : quest-job / quest-multiplier (XP des quêtes), daily-multiplier (XP de /daily),
 # playtime-cap (plafond d'XP de temps de jeu par jour).
 bonus:
-  quest-multiplier: 1.5
+  quest-multiplier: 1.25
 
 tiers:
   1:

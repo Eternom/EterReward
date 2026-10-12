@@ -76,7 +76,7 @@ public final class Main extends JavaPlugin {
             questXp.put(tier, Math.max(0, getConfig().getInt("pass.quest-xp." + tier)));
         }
         return new PassService.Settings(
-                Math.max(1, section == null ? 1200 : section.getInt("xp-per-tier", 1200)),
+                Math.max(1, section == null ? 1000 : section.getInt("xp-per-tier", 1000)),
                 Math.max(0, section == null ? 5 : section.getInt("playtime-xp-per-minute", 5)),
                 Math.max(0, section == null ? 500 : section.getInt("playtime-daily-cap", 500)),
                 Math.max(0, section == null ? 300 : section.getInt("daily-xp", 300)),

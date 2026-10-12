@@ -15,13 +15,13 @@ name: "<primary>La Moisson"
 icon: WHEAT
 description:
   - "<info>Les champs débordent."
-  - "<info>Quêtes de <accent>fermier</accent> : <accent>×2 XP</accent>."
+  - "<info>Quêtes de <accent>fermier</accent> : <accent>×1,5 XP</accent>."
 
 # Bonus du mois : quest-job / quest-multiplier (XP des quêtes), daily-multiplier (XP de /daily),
 # playtime-cap (plafond d'XP de temps de jeu par jour).
 bonus:
   quest-job: fermier
-  quest-multiplier: 2.0
+  quest-multiplier: 1.5
 
 tiers:
   1:

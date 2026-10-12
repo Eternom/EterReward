@@ -15,13 +15,13 @@ name: "<primary>La Chasse sauvage"
 icon: IRON_SWORD
 description:
   - "<info>Les bêtes rôdent, à toi de les traquer."
-  - "<info>Quêtes de <accent>chasseur</accent> : <accent>×2 XP</accent>."
+  - "<info>Quêtes de <accent>chasseur</accent> : <accent>×1,5 XP</accent>."
 
 # Bonus du mois : quest-job / quest-multiplier (XP des quêtes), daily-multiplier (XP de /daily),
 # playtime-cap (plafond d'XP de temps de jeu par jour).
 bonus:
   quest-job: chasseur
-  quest-multiplier: 2.0
+  quest-multiplier: 1.5
 
 tiers:
   1:

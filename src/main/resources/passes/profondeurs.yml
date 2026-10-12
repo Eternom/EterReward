@@ -15,13 +15,13 @@ name: "<primary>Les Profondeurs"
 icon: IRON_PICKAXE
 description:
   - "<info>Ce mois-ci, la mine rapporte gros."
-  - "<info>Quêtes de <accent>mineur</accent> : <accent>×2 XP</accent>."
+  - "<info>Quêtes de <accent>mineur</accent> : <accent>×1,5 XP</accent>."
 
 # Bonus du mois : quest-job / quest-multiplier (XP des quêtes), daily-multiplier (XP de /daily),
 # playtime-cap (plafond d'XP de temps de jeu par jour).
 bonus:
   quest-job: mineur
-  quest-multiplier: 2.0
+  quest-multiplier: 1.5
 
 tiers:
   1:
