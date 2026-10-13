@@ -1,6 +1,7 @@
 package fr.eternom.eterReward.module.challenge;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.Tag;
 import org.bukkit.configuration.ConfigurationSection;
@@ -76,7 +77,7 @@ public record ChallengeDefinition(String id, Kind kind, Set<Material> blocks, Se
                 GROUPS.getOrDefault(name, List.of()).forEach(tag -> blocks.addAll(tag.getValues()));
                 blocks.addAll(EXTRA.getOrDefault(name, Set.of()));
             } else if (kind == Kind.KILL) {
-                org.bukkit.NamespacedKey entityKey = org.bukkit.NamespacedKey.fromString(name);
+                NamespacedKey entityKey = NamespacedKey.fromString(name);
                 EntityType type = entityKey == null ? null : Registry.ENTITY_TYPE.get(entityKey);
                 if (type == null) {
                     logger.warning("challenges.yml : " + id + " : créature inconnue ignorée : " + entry);

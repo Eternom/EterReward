@@ -1,25 +1,19 @@
 package fr.eternom.eterReward.module.pass;
 
-import fr.eternom.eterEconomy.api.EconomyApi;
 import fr.eternom.eterLib.EterLib;
 import fr.eternom.eterLib.helper.gui.BackButton;
 import fr.eternom.eterLib.helper.message.Messages;
 import fr.eternom.eterLib.helper.task.Tasks;
-import fr.eternom.eterReward.module.pass.PassDefinition.ItemReward;
-import fr.eternom.eterReward.module.pass.PassDefinition.PermissionReward;
 import fr.eternom.eterReward.module.pass.PassDefinition.Reward;
 import fr.eternom.eterReward.module.pass.PassDefinition.Tier;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.time.Duration;
@@ -29,11 +23,13 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 
 /**
  * Le pass de saison : chaque mois, un des pass de passes/ est tiré au hasard (jamais celui du mois d'avant), le même pour
@@ -53,6 +49,18 @@ public class PassService {
 
     /** Réglages (config.yml > pass). questXp : easy, normal, hard, bonus. */
     public record Settings(int xpPerTier, int playtimeXpPerMinute, int playtimeCap, int dailyXp, Map<String, Integer> questXp) {
+
+        public static Settings load(ConfigurationSection config) {
+            Map<String, Integer> questXp = new HashMap<>();
+            for (String tier : List.of("easy", "normal", "hard", "bonus")) {
+                questXp.put(tier, Math.max(0, config.getInt("pass.quest-xp." + tier)));
+            }
+            return new Settings(Math.max(1, config.getInt("pass.xp-per-tier", 1200)),
+                    Math.max(0, config.getInt("pass.playtime-xp-per-minute", 5)),
+                    Math.max(0, config.getInt("pass.playtime-daily-cap", 500)),
+                    Math.max(0, config.getInt("pass.daily-xp", 300)),
+                    Map.copyOf(questXp));
+        }
     }
 
     /** La saison en cours : le mois ("2026-10"), son pass et sa fin. */
@@ -70,9 +78,10 @@ public class PassService {
     private final Messages messages;
     private final ZoneId zone;
     private final BackButton backButton;
+    private final PassRewards rewards;
     private volatile Season current;
     /** Le menu /defis, pour le bouton du menu du pass (null tant qu'il n'est pas branché). */
-    private java.util.function.Consumer<Player> challengesMenu;
+    private Consumer<Player> challengesMenu;
 
     public PassService(JavaPlugin plugin, PassStore store, Map<String, PassDefinition> passes, Settings settings,
                        Messages messages, ZoneId zone, BackButton backButton) {
@@ -83,9 +92,10 @@ public class PassService {
         this.messages = messages;
         this.zone = zone;
         this.backButton = backButton;
+        this.rewards = new PassRewards(plugin, messages);
     }
 
-    public void setChallengesMenu(java.util.function.Consumer<Player> challengesMenu) {
+    public void setChallengesMenu(Consumer<Player> challengesMenu) {
         this.challengesMenu = challengesMenu;
     }
 
@@ -259,17 +269,11 @@ public class PassService {
             messages.send(player, "pass.none");
             return;
         }
-        UUID uuid = player.getUniqueId();
-        Tasks.async(plugin, player, () -> {
-            Season season = season();
-            return new View(season, store.xp(uuid, season.key()), store.claims(uuid, season.key()), false);
-        }, view -> {
-            View shown = new View(view.season(), view.xp(), view.claimed(), isPremium(player, view.season()));
-            player.openInventory(new PassMenu(this, player, shown, 0).getInventory());
-        }, () -> messages.send(player, "error.generic"));
+        open(player, 0);
     }
 
-    void reopen(Player player, int page) {
+    /** La page page du menu, relu en base (XP, paliers réclamés). */
+    void open(Player player, int page) {
         UUID uuid = player.getUniqueId();
         Tasks.async(plugin, player, () -> {
             Season season = season();
@@ -313,54 +317,17 @@ public class PassService {
             if (!store.claim(uuid, season.key(), tierNumber, premium)) {
                 return "pass.already";
             }
-            giveRemote(uuid, name, reward);
+            rewards.giveRemote(uuid, name, reward);
             return null;
         }, error -> {
             if (error != null) {
                 messages.send(player, error);
                 player.playSound(player, Sound.ENTITY_VILLAGER_NO, 0.6f, 1f);
             } else {
-                giveLocal(player, reward, tierNumber);
+                rewards.giveLocal(player, reward, tierNumber);
             }
-            reopen(player, page);
+            open(player, page);
         }, () -> messages.send(player, "error.generic"));
-    }
-
-    /** Tâche de fond, juste après l'enregistrement : ce qui ne demande pas le joueur connecté. */
-    private void giveRemote(UUID uuid, String name, Reward reward) {
-        if (reward.money() > 0) {
-            EconomyApi.get().ifPresent(economy -> economy.deposit(uuid, reward.money(), "EterReward · pass"));
-        }
-        if ((reward.keys() > 0 || reward.resourceMinutes() > 0) && !ResourceRewards.give(uuid, reward.keys(), reward.resourceMinutes())) {
-            plugin.getLogger().warning("Pass : clés de ressource non données à " + name + " (EterResource absent)");
-        }
-        for (PermissionReward permission : reward.permissions()) {
-            try {
-                LuckPermsGrants.grantFor(uuid, permission.permission(), permission.duration());
-            } catch (RuntimeException | LinkageError e) {
-                plugin.getLogger().severe("Pass : permission " + permission.permission() + " non donnée à " + name + " : " + e.getMessage());
-            }
-        }
-    }
-
-    /** Thread principal : objets (ce qui ne rentre pas est posé au sol), commandes, message. */
-    private void giveLocal(Player player, Reward reward, int tier) {
-        boolean dropped = false;
-        for (ItemReward item : reward.items()) {
-            for (ItemStack left : player.getInventory().addItem(ItemStack.of(item.material(), item.amount())).values()) {
-                player.getWorld().dropItem(player.getLocation(), left);
-                dropped = true;
-            }
-        }
-        for (String command : reward.commands()) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
-        }
-        player.sendMessage(messages.prefix().append(messages.render(raw(player, "pass.claimed"),
-                Placeholder.component("content", describe(player, reward)), "tier", String.valueOf(tier))));
-        if (dropped) {
-            messages.send(player, "pass.dropped");
-        }
-        player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 0.8f, 1.2f);
     }
 
     // ---------- Premium (staff, boutique) ----------
@@ -387,47 +354,14 @@ public class PassService {
         }, "Premium du pass non donné à " + targetName);
     }
 
-    // ---------- Textes ----------
-
-    /** « 100 Heloks, 2 clés de ressource, /craft (7 j) » ou le label. */
-    Component describe(Player viewer, Reward reward) {
-        if (reward.label() != null) {
-            return messages.render(reward.label(), TagResolver.empty());
-        }
-        List<Component> parts = new ArrayList<>();
-        if (reward.money() > 0) {
-            parts.add(Component.text(fr.eternom.eterLib.helper.economy.Money.format(reward.money())));
-        }
-        if (reward.keys() > 0) {
-            parts.add(messages.get(viewer, "pass.reward.keys", "count", String.valueOf(reward.keys())));
-        }
-        if (reward.resourceMinutes() > 0) {
-            parts.add(messages.get(viewer, "pass.reward.minutes", "count", String.valueOf(reward.resourceMinutes())));
-        }
-        for (ItemReward item : reward.items()) {
-            parts.add(Component.text(item.amount() + "× ").append(Component.translatable(item.material().translationKey())));
-        }
-        for (PermissionReward permission : reward.permissions()) {
-            parts.add(messages.get(viewer, "pass.reward.permission",
-                    "permission", permissionLabel(viewer, permission.permission()),
-                    "duration", EterLib.get().formatDuration(viewer, permission.duration().toSeconds())));
-        }
-        if (!reward.commands().isEmpty() && parts.isEmpty()) {
-            parts.add(messages.get(viewer, "pass.reward.surprise"));
-        }
-        return Component.join(JoinConfiguration.commas(true), parts);
-    }
-
-    /** Nom lisible d'une permission (lang : pass.permission.<permission>), sinon la permission elle-même. */
-    private String permissionLabel(Player viewer, String permission) {
-        String label = messages.raw(viewer, "pass.permission." + permission.replace('.', '_'));
-        return label == null ? permission : messages.plain(viewer, "pass.permission." + permission.replace('.', '_'));
-    }
-
     /** Temps avant la fin de la saison, mis en forme. */
     String timeLeft(Player viewer, Season season) {
         long seconds = Duration.between(ZonedDateTime.now(zone), season.end()).toSeconds();
         return EterLib.get().formatDuration(viewer, Math.max(0, seconds));
+    }
+
+    PassRewards rewards() {
+        return rewards;
     }
 
     Settings settings() {

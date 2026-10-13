@@ -2,6 +2,7 @@ package fr.eternom.eterReward.module.challenge;
 
 import fr.eternom.eterEconomy.api.EconomyApi;
 import fr.eternom.eterLib.EterLib;
+import fr.eternom.eterLib.helper.economy.Money;
 import fr.eternom.eterLib.helper.gui.BackButton;
 import fr.eternom.eterLib.helper.message.Messages;
 import fr.eternom.eterLib.helper.task.Tasks;
@@ -27,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Défis du jour et de la semaine : les mêmes pour tout le réseau, tirés au hasard dans challenges.yml (le premier
@@ -56,7 +59,7 @@ public class ChallengeService {
     /** La période d'avant : les actions faites juste avant minuit, enregistrées après, la valident encore. */
     private final Map<Period, Active> previous = new ConcurrentHashMap<>();
     /** Appelé en tâche de fond à chaque défi validé (classement du mois). */
-    private java.util.function.Consumer<UUID> onComplete = uuid -> { };
+    private Consumer<UUID> onComplete = uuid -> { };
     /** Avancée pas encore enregistrée : joueur -> "période|défi" -> quantité. */
     private final Map<UUID, Map<String, Integer>> pending = new ConcurrentHashMap<>();
 
@@ -76,7 +79,7 @@ public class ChallengeService {
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this::flushAll, 20 * 15, 20 * 15);
     }
 
-    public void setOnComplete(java.util.function.Consumer<UUID> onComplete) {
+    public void setOnComplete(Consumer<UUID> onComplete) {
         this.onComplete = onComplete;
     }
 
@@ -136,7 +139,7 @@ public class ChallengeService {
      * cours sont ceux déjà connus de ce serveur : au tout début d'une période, rien n'est compté avant que quelqu'un les
      * ait demandés (au plus 15 s).
      */
-    void count(Player player, Kind kind, java.util.function.Predicate<ChallengeDefinition> matches) {
+    void count(Player player, Kind kind, Predicate<ChallengeDefinition> matches) {
         for (Active active : current.values()) {
             if (!active.key().equals(key(active.period()))) {
                 continue; // période finie, les nouveaux défis arrivent au prochain enregistrement
@@ -228,7 +231,7 @@ public class ChallengeService {
             }
             messages.send(player, period == Period.DAILY ? "challenges.done-daily" : "challenges.done-weekly",
                     "challenge", messages.plain(player, "challenges.list." + challenge.id(), "target", String.valueOf(challenge.target())),
-                    "xp", String.valueOf(challenge.xp()), "money", fr.eternom.eterLib.helper.economy.Money.format(challenge.money()));
+                    "xp", String.valueOf(challenge.xp()), "money", Money.format(challenge.money()));
             player.playSound(player, Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.7f, 1.2f);
             Bukkit.getPluginManager().callEvent(new ChallengeCompleteEvent(player, challenge.id(), period == Period.WEEKLY));
         });

@@ -1,5 +1,6 @@
 package fr.eternom.eterReward.listeners;
 
+import fr.eternom.eterLib.helper.task.Tasks;
 import fr.eternom.eterReward.Main;
 import fr.eternom.eterReward.module.challenge.ChallengeListener;
 import fr.eternom.eterReward.module.daily.DailyListener;
@@ -21,7 +22,7 @@ public class Events {
         // Quêtes de métier : seulement si EterMarket est là (sa classe d'événement n'existe pas sinon)
         if (main.getServer().getPluginManager().isPluginEnabled("EterMarket")) {
             main.getServer().getPluginManager().registerEvents(new MarketQuestListener(main.getPass(), challenges,
-                    uuid -> fr.eternom.eterLib.helper.task.Tasks.async(main, () -> main.getRanking().questCompleted(uuid),
+                    uuid -> Tasks.async(main, () -> main.getRanking().questCompleted(uuid),
                             "Quête non comptée au classement")), main);
         }
     }

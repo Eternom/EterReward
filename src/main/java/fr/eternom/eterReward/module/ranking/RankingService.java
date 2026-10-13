@@ -11,7 +11,10 @@ import fr.eternom.eterLib.helper.task.Tasks;
 import fr.eternom.eterReward.module.pass.PassService;
 import fr.eternom.eterReward.module.ranking.RankingStore.Entry;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,13 +23,17 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.function.Consumer;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 /**
  * Les classements (/classement). Les tops sont recalculés toutes les 5 minutes en tâche de fond et gardés en mémoire :
@@ -45,8 +52,31 @@ public class RankingService {
     public record Reward(double money, int keys, int passXp) {
     }
 
+    /**
+     * Réglages (config.yml > ranking) : les récompenses du top 3, et les classements du mois récompensés (rewarded,
+     * le général si absent : une ancienne config ne doit pas couper les récompenses).
+     */
+    public record Settings(List<Reward> rewards, Set<Boards> rewarded) {
+
+        public static Settings load(ConfigurationSection config, Logger logger) {
+            List<Reward> rewards = new ArrayList<>();
+            for (int place = 1; place <= 3; place++) {
+                String path = "ranking.rewards." + place + ".";
+                rewards.add(new Reward(Math.max(0, config.getDouble(path + "money")), Math.max(0, config.getInt(path + "keys")),
+                        Math.max(0, config.getInt(path + "pass-xp"))));
+            }
+            Set<Boards> rewarded = EnumSet.noneOf(Boards.class);
+            List<String> ids = config.isSet("ranking.rewarded") ? config.getStringList("ranking.rewarded") : List.of(Boards.GENERAL.id());
+            for (String id : ids) {
+                Arrays.stream(Boards.values()).filter(board -> board.monthly() && board.id().equalsIgnoreCase(id)).findFirst()
+                        .ifPresentOrElse(rewarded::add, () -> logger.warning("ranking.rewarded : classement du mois inconnu " + id));
+            }
+            return new Settings(List.copyOf(rewards), rewarded);
+        }
+    }
+
     /** Une ligne d'un classement : joueur, pseudo, valeur. */
-    public record Line(UUID player, String name, long value, org.bukkit.Material icon) {
+    public record Line(UUID player, String name, long value, Material icon) {
     }
 
     private final JavaPlugin plugin;
@@ -65,15 +95,15 @@ public class RankingService {
     private Consumer<List<Line>> onGeneral = top -> { };
 
     public RankingService(JavaPlugin plugin, RankingStore store, PassService pass, Messages messages, ZoneId zone,
-                          BackButton backButton, List<Reward> rewards, Set<Boards> rewarded) {
-        this.rewarded = rewarded;
+                          BackButton backButton, Settings settings) {
         this.plugin = plugin;
         this.store = store;
         this.pass = pass;
         this.messages = messages;
         this.zone = zone;
         this.backButton = backButton;
-        this.rewards = rewards;
+        this.rewards = settings.rewards();
+        this.rewarded = settings.rewarded();
         this.bus = EterLib.get().network(plugin, "eterreward", messages);
         // Annonce des gagnants du mois, envoyée par le serveur qui donne les récompenses
         bus.on("ranking-winners", data -> announce(data.get("key").getAsString(), data.get("first").getAsString(),
@@ -88,23 +118,14 @@ public class RankingService {
         return YearMonth.now(zone).format(SEASON);
     }
 
-    /** Toutes les 5 minutes (tâche de fond) : les tops, puis les récompenses du mois fini si besoin. */
+    /** Toutes les 5 minutes (tâche de fond) : les tops, les places du général, puis les récompenses du mois fini. */
     private void refresh() {
-        String season = season();
+        Boards.Context context = context(season());
         Map<Boards, List<Line>> fresh = new EnumMap<>(Boards.class);
-        try {
-            List<Entry> general = general(season);
-            List<Line> top = lines(Boards.GENERAL, general.subList(0, Math.min(SIZE, general.size())));
-            fresh.put(Boards.GENERAL, top);
-            standings = GeneralRanking.standings(general);
-            Bukkit.getScheduler().runTask(plugin, () -> onGeneral.accept(top));
-        } catch (RuntimeException e) {
-            plugin.getLogger().warning("Classement général illisible : " + e);
-        }
         for (Boards board : Boards.values()) {
             try {
-                if (board != Boards.GENERAL && board.available()) {
-                    fresh.put(board, lines(board, board.top(store, season, SIZE)));
+                if (board.available()) {
+                    fresh.put(board, lines(board, board.top(context, SIZE)));
                 }
             } catch (RuntimeException | LinkageError e) {
                 // LinkageError : le plugin qui possède les données est trop ancien (son API n'a pas encore le classement)
@@ -112,6 +133,7 @@ public class RankingService {
             }
         }
         cache = fresh;
+        refreshGeneral(context, fresh.getOrDefault(Boards.GENERAL, List.of()));
         try {
             giveMonthlyRewards();
         } catch (RuntimeException e) {
@@ -119,9 +141,21 @@ public class RankingService {
         }
     }
 
-    /** Tout le classement général d'un mois (bloquant). */
-    private List<Entry> general(String season) {
-        return GeneralRanking.compute(store, season, pass::tierFromXp);
+    /**
+     * Le général a aussi besoin de TOUTES les places (placeholder « ta place », pour n'importe quel joueur) : gardées en
+     * mémoire, et le top donné au podium.
+     */
+    private void refreshGeneral(Boards.Context context, List<Line> top) {
+        try {
+            standings = GeneralRanking.standings(GeneralRanking.compute(context));
+        } catch (RuntimeException e) {
+            plugin.getLogger().warning("Places du classement général illisibles : " + e);
+        }
+        Bukkit.getScheduler().runTask(plugin, () -> onGeneral.accept(top));
+    }
+
+    private Boards.Context context(String season) {
+        return new Boards.Context(store, season, pass::tierFromXp);
     }
 
     private List<Line> lines(Boards board, List<Entry> entries) {
@@ -144,13 +178,12 @@ public class RankingService {
         if (!Bukkit.getPluginManager().isPluginEnabled("EterResource")) {
             return;
         }
-        String previous = YearMonth.now(zone).minusMonths(1).format(SEASON);
+        Boards.Context previous = context(YearMonth.now(zone).minusMonths(1).format(SEASON));
         for (Boards board : Boards.values()) {
-            if (!rewarded.contains(board) || !store.claimRewards(previous, board.id())) {
+            if (!rewarded.contains(board) || !store.claimRewards(previous.season(), board.id())) {
                 continue;
             }
-            List<Entry> top = board == Boards.GENERAL ? general(previous).stream().limit(rewards.size()).toList()
-                    : board.top(store, previous, rewards.size());
+            List<Entry> top = board.top(previous, rewards.size());
             String[] names = {"-", "-", "-"};
             for (int place = 0; place < top.size() && place < rewards.size(); place++) {
                 UUID winner = top.get(place).player();
@@ -203,14 +236,10 @@ public class RankingService {
 
     void openBoard(Player player, Boards board) {
         UUID uuid = player.getUniqueId();
-        String season = season();
-        if (board == Boards.GENERAL) {
-            player.openInventory(new BoardMenu(this, player, board, standing(uuid)).getInventory());
-            return;
-        }
+        Boards.Context context = context(season());
         Tasks.async(plugin, player, () -> {
                     try {
-                        return board.of(store, season, uuid);
+                        return board.of(context, uuid);
                     } catch (LinkageError tooOld) {
                         return new long[]{0, 0}; // plugin des données trop ancien : pas de place
                     }
@@ -219,7 +248,7 @@ public class RankingService {
                 () -> messages.send(player, "error.generic"));
     }
 
-    public String timeLeft(org.bukkit.command.CommandSender viewer) {
+    public String timeLeft(CommandSender viewer) {
         ZonedDateTime end = YearMonth.now(zone).plusMonths(1).atDay(1).atStartOfDay(zone);
         return EterLib.get().formatDuration(viewer, Math.max(0, Duration.between(ZonedDateTime.now(zone), end).toSeconds()));
     }

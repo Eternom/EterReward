@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.LongUnaryOperator;
 
 /**
  * Le classement général du mois : seulement ce qui est fait dans le mois (un nouveau joueur part à égalité), sur trois
@@ -21,9 +20,11 @@ final class GeneralRanking {
     private GeneralRanking() {
     }
 
-    /** Tout le classement, du premier au dernier (bloquant). tierOf : XP du pass -> palier. */
-    static List<Entry> compute(RankingStore store, String season, LongUnaryOperator tierOf) {
-        List<Entry> tiers = store.allPass(season).stream().map(entry -> new Entry(entry.player(), tierOf.applyAsLong(entry.value())))
+    /** Tout le classement du mois de context, du premier au dernier (bloquant). */
+    static List<Entry> compute(Boards.Context context) {
+        RankingStore store = context.store();
+        String season = context.season();
+        List<Entry> tiers = store.allPass(season).stream().map(entry -> new Entry(entry.player(), context.tierOf().applyAsLong(entry.value())))
                 .filter(entry -> entry.value() > 0).toList();
         List<List<Entry>> boards = List.of(tiers, store.allChallenges(season), store.allMonthly(Boards.QUESTS.id(), season));
         Map<UUID, Double> total = new HashMap<>();

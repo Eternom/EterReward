@@ -5,7 +5,7 @@ Les récompenses du réseau : la **récompense quotidienne** (`/daily`), le **pa
 
 ## Prérequis
 
-- **EterLib 1.12.0+** (`depend`, textes communs, cadre des menus, bus réseau, `Money`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
+- **EterLib 1.14.0+** (`depend`, textes communs, cadre des menus, bus réseau, `Money`, `Numbers`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
 - **EterEconomy 2.2.2+** (`depend`, son API `EconomyApi`) pour les récompenses en argent.
 - Facultatifs (`softdepend`), chacun dans une classe à part chargée seulement s'il est là :
   - **EterMarket 1.5.0+** : son événement `JobQuestCompleteEvent` donne l'XP du pass des quêtes de métier et compte les quêtes du mois ;
@@ -114,7 +114,7 @@ du podium), `%eterreward_general_top_<1-10>_name%` / `_score%`, `%eterreward_gen
 `%eterreward_general_timeleft%`.
 
 **Fin du mois** : le premier serveur qui voit le nouveau mois et qui a EterResource réserve les récompenses de chaque
-classement de `ranking.rewarded` (le général par défaut ; `INSERT IGNORE` dans `eterreward_ranking_rewards`) et donne au
+classement de `ranking.rewarded` (le général par défaut, aussi quand la ligne manque dans une ancienne config ; `INSERT IGNORE` dans `eterreward_ranking_rewards`) et donne au
 top 3 du mois fini `ranking.rewards` (argent, clés de ressource, XP du pass du nouveau mois) ; chaque gagnant est
 prévenu où qu'il soit, et les gagnants sont annoncés sur tout le réseau (bus `eterreward`, message `ranking-winners`).
 

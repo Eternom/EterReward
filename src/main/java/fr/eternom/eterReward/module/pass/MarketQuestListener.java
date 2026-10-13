@@ -5,6 +5,9 @@ import fr.eternom.eterReward.module.challenge.ChallengeListener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.util.UUID;
+import java.util.function.Consumer;
+
 /**
  * Quêtes de métier d'EterMarket : XP du pass et défis « quêtes ». Classe à part, enregistrée seulement si EterMarket
  * est présent (sinon NoClassDefFoundError).
@@ -14,10 +17,10 @@ public class MarketQuestListener implements Listener {
     private final PassService pass;
     private final ChallengeListener challenges;
 
-    private final java.util.function.Consumer<java.util.UUID> onQuest;
+    private final Consumer<UUID> onQuest;
 
     /** onQuest : en tâche de fond, le classement des quêtes du mois. */
-    public MarketQuestListener(PassService pass, ChallengeListener challenges, java.util.function.Consumer<java.util.UUID> onQuest) {
+    public MarketQuestListener(PassService pass, ChallengeListener challenges, Consumer<UUID> onQuest) {
         this.onQuest = onQuest;
         this.pass = pass;
         this.challenges = challenges;

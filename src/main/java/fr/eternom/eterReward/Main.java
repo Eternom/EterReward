@@ -16,22 +16,23 @@ import fr.eternom.eterReward.module.daily.DailyStore;
 import fr.eternom.eterReward.module.pass.PassCatalog;
 import fr.eternom.eterReward.module.pass.PassService;
 import fr.eternom.eterReward.module.pass.PassStore;
+import fr.eternom.eterReward.module.ranking.Podium;
+import fr.eternom.eterReward.module.ranking.PodiumCommand;
+import fr.eternom.eterReward.module.ranking.RankingPlaceholders;
 import fr.eternom.eterReward.module.ranking.RankingService;
 import fr.eternom.eterReward.module.ranking.RankingStore;
-import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.time.DateTimeException;
 import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.Map;
 
 /** Récompenses du réseau : la récompense quotidienne (/daily) et le pass de saison (/pass) ; plus tard celles des votes. */
 public final class Main extends JavaPlugin {
 
     /** Version minimale d'EterLib : textes communs et outils partagés (Frame, Money, NetworkBus) depuis 1.6.0. */
-    private static final String REQUIRED_ETERLIB = "1.13.0";
+    private static final String REQUIRED_ETERLIB = "1.14.0";
 
     /** Préfixe des tables d'EterReward dans la base commune : eterreward_daily, eterreward_pass_... */
     private static final String TABLE_PREFIX = "eterreward_";
@@ -44,8 +45,8 @@ public final class Main extends JavaPlugin {
     private PassService pass;
     private ChallengeService challenges;
     private RankingService ranking;
-    /** Podium du classement général, null sans EterNpc (type Object : sa classe dépend d'EterNpc). */
-    private Object podium;
+    /** /eterreward podium, null sans EterNpc. */
+    private TabExecutor podiumCommand;
 
     @Override
     public void onEnable() {
@@ -65,8 +66,8 @@ public final class Main extends JavaPlugin {
         Database database = lib.database(TABLE_PREFIX);
         ZoneId zone = zone();
 
-        pass = new PassService(this, new PassStore(database), PassCatalog.load(this, PASS_TIERS), passSettings(), messages, zone,
-                lib.backButton(getConfig().getString("menus.pass.back-command", "")));
+        pass = new PassService(this, new PassStore(database), PassCatalog.load(this, PASS_TIERS), PassService.Settings.load(getConfig()),
+                messages, zone, lib.backButton(getConfig().getString("menus.pass.back-command", "")));
         daily = new DailyService(this, new DailyStore(database),
                 DailyRewards.load(getConfig().getConfigurationSection("daily.days"), getLogger()), messages, zone,
                 lib.backButton(getConfig().getString("menus.daily.back-command", "")), pass);
@@ -76,16 +77,17 @@ public final class Main extends JavaPlugin {
         pass.setChallengesMenu(challenges::open);
         challenges.start();
         ranking = new RankingService(this, new RankingStore(database), pass, messages, zone,
-                lib.backButton(getConfig().getString("menus.ranking.back-command", "menu progression")), rankingRewards(), rewardedBoards());
+                lib.backButton(getConfig().getString("menus.ranking.back-command", "menu progression")),
+                RankingService.Settings.load(getConfig(), getLogger()));
         challenges.setOnComplete(ranking::challengeCompleted);
         // Podium du classement général (PNJ d'EterNpc) et placeholders (PlaceholderAPI) : seulement s'ils tournent ici
         if (getServer().getPluginManager().isPluginEnabled("EterNpc")) {
-            fr.eternom.eterReward.module.ranking.Podium places = new fr.eternom.eterReward.module.ranking.Podium(this, messages);
-            ranking.onGeneral(places::update);
-            podium = places;
+            Podium podium = new Podium(this, messages);
+            ranking.onGeneral(podium::update);
+            podiumCommand = new PodiumCommand(podium, messages);
         }
         if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            new fr.eternom.eterReward.module.ranking.RankingPlaceholders(this, ranking).register();
+            new RankingPlaceholders(this, ranking).register();
         }
         ranking.start();
 
@@ -94,42 +96,6 @@ public final class Main extends JavaPlugin {
 
         new Commands(this);
         new Events(this);
-    }
-
-    private PassService.Settings passSettings() {
-        ConfigurationSection section = getConfig().getConfigurationSection("pass");
-        Map<String, Integer> questXp = new HashMap<>();
-        for (String tier : new String[]{"easy", "normal", "hard", "bonus"}) {
-            questXp.put(tier, Math.max(0, getConfig().getInt("pass.quest-xp." + tier)));
-        }
-        return new PassService.Settings(
-                Math.max(1, section == null ? 1200 : section.getInt("xp-per-tier", 1200)),
-                Math.max(0, section == null ? 5 : section.getInt("playtime-xp-per-minute", 5)),
-                Math.max(0, section == null ? 500 : section.getInt("playtime-daily-cap", 500)),
-                Math.max(0, section == null ? 300 : section.getInt("daily-xp", 300)),
-                Map.copyOf(questXp));
-    }
-
-    /** Récompenses du top 3 des classements du mois (config.yml > ranking.rewards.1 à 3). */
-    private java.util.List<RankingService.Reward> rankingRewards() {
-        java.util.List<RankingService.Reward> rewards = new java.util.ArrayList<>();
-        for (int place = 1; place <= 3; place++) {
-            String path = "ranking.rewards." + place + ".";
-            rewards.add(new RankingService.Reward(Math.max(0, getConfig().getDouble(path + "money")),
-                    Math.max(0, getConfig().getInt(path + "keys")), Math.max(0, getConfig().getInt(path + "pass-xp"))));
-        }
-        return java.util.List.copyOf(rewards);
-    }
-
-    /** Classements récompensés en fin de mois (config.yml > ranking.rewarded), le général par défaut. */
-    private java.util.Set<fr.eternom.eterReward.module.ranking.Boards> rewardedBoards() {
-        java.util.Set<fr.eternom.eterReward.module.ranking.Boards> boards = java.util.EnumSet.noneOf(fr.eternom.eterReward.module.ranking.Boards.class);
-        for (String id : getConfig().getStringList("ranking.rewarded")) {
-            java.util.Arrays.stream(fr.eternom.eterReward.module.ranking.Boards.values())
-                    .filter(board -> board.monthly() && board.id().equalsIgnoreCase(id)).findFirst()
-                    .ifPresentOrElse(boards::add, () -> getLogger().warning("ranking.rewarded : classement du mois inconnu " + id));
-        }
-        return boards;
     }
 
     /** Fuseau du changement de jour et de mois (daily.time-zone), Europe/Paris si invalide. */
@@ -159,9 +125,9 @@ public final class Main extends JavaPlugin {
         return challenges;
     }
 
-    /** Le podium (classe Podium), null sans EterNpc. */
-    public Object getPodium() {
-        return podium;
+    /** /eterreward podium, null sans EterNpc. */
+    public TabExecutor getPodiumCommand() {
+        return podiumCommand;
     }
 
     public RankingService getRanking() {

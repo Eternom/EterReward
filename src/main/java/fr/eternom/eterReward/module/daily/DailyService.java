@@ -1,21 +1,22 @@
 package fr.eternom.eterReward.module.daily;
 
-import fr.eternom.eterLib.helper.economy.Money;
+import fr.eternom.eterEconomy.api.EconomyApi;
 import fr.eternom.eterLib.EterLib;
+import fr.eternom.eterLib.helper.economy.Money;
 import fr.eternom.eterLib.helper.gui.BackButton;
 import fr.eternom.eterLib.helper.message.Messages;
 import fr.eternom.eterLib.helper.task.Tasks;
-import fr.eternom.eterReward.module.pass.PassService;
+import fr.eternom.eterReward.api.DailyClaimEvent;
 import fr.eternom.eterReward.module.daily.DailyRewards.Day;
 import fr.eternom.eterReward.module.daily.DailyRewards.Loot;
 import fr.eternom.eterReward.module.daily.DailyRewards.Reward;
+import fr.eternom.eterReward.module.pass.PassService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import fr.eternom.eterEconomy.api.EconomyApi;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -125,7 +126,7 @@ public class DailyService {
                 return;
             }
             give(player, rewards.day(claimed), rewards.day(claimed).pick());
-            Bukkit.getPluginManager().callEvent(new fr.eternom.eterReward.api.DailyClaimEvent(player, claimed));
+            Bukkit.getPluginManager().callEvent(new DailyClaimEvent(player, claimed));
             open(player);
         }, () -> messages.send(player, "error.generic"));
     }

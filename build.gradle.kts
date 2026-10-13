@@ -26,7 +26,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:26.2.build.129-stable")
 
     // Socle commun : base, langues, menus (plugin EterLib installé sur le serveur)
-    compileOnly("com.github.Eternom:EterLib:1.13.0")
+    compileOnly("com.github.Eternom:EterLib:1.14.0")
     // Podium du classement général (PNJ) et placeholders, facultatifs
     compileOnly("com.github.Eternom:EterNpc:1.0.0")
     compileOnly("me.clip:placeholderapi:2.11.6")

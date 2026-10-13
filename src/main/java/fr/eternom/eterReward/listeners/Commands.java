@@ -1,12 +1,18 @@
 package fr.eternom.eterReward.listeners;
 
 import fr.eternom.eterReward.Main;
+import fr.eternom.eterReward.module.AdminCommand;
 import fr.eternom.eterReward.module.daily.DailyCommand;
 import fr.eternom.eterReward.module.pass.PassCommand;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class Commands {
 
@@ -15,73 +21,37 @@ public class Commands {
         daily.setExecutor(new DailyCommand(main.getDaily(), main.getMessages()));
         daily.setTabCompleter((sender, command, label, args) -> List.of());
 
-        PassCommand pass = new PassCommand(main.getPass(), main.getMessages(), false);
-        command(main, "pass").setExecutor(pass);
-        command(main, "pass").setTabCompleter(pass);
-        PassCommand admin = new PassCommand(main.getPass(), main.getMessages(), true);
-        // /eterreward podium <1-5> (podium du classement général, avec EterNpc) ; le reste : administration du pass
-        command(main, "eterreward").setExecutor((sender, command, label, args) -> {
-            if (args.length > 0 && args[0].equalsIgnoreCase("podium")) {
-                podium(main, sender, args);
-                return true;
-            }
-            return admin.onCommand(sender, command, label, args);
-        });
-        command(main, "eterreward").setTabCompleter((sender, command, label, args) -> {
-            if (args.length == 1) {
-                java.util.List<String> all = new java.util.ArrayList<>(admin.onTabComplete(sender, command, label, args));
-                if ("podium".startsWith(args[0].toLowerCase())) {
-                    all.add("podium");
-                }
-                return all;
-            }
-            if (args[0].equalsIgnoreCase("podium")) {
-                return args.length == 2 ? java.util.List.of("1", "2", "3", "4", "5") : List.of();
-            }
-            return admin.onTabComplete(sender, command, label, args);
-        });
+        register(main, "pass", new PassCommand(main.getPass(), main.getMessages(), false));
+        register(main, "eterreward", new AdminCommand(new PassCommand(main.getPass(), main.getMessages(), true),
+                main.getPodiumCommand(), main.getMessages()));
 
-        command(main, "defis").setExecutor((sender, command, label, args) -> {
-            if (sender instanceof org.bukkit.entity.Player player) {
-                main.getChallenges().open(player);
-            } else {
-                main.getMessages().send(sender, "command.players-only");
-            }
-            return true;
-        });
-        command(main, "defis").setTabCompleter((sender, command, label, args) -> List.of());
-
-        command(main, "classement").setExecutor((sender, command, label, args) -> {
-            if (sender instanceof org.bukkit.entity.Player player) {
-                main.getRanking().open(player);
-            } else {
-                main.getMessages().send(sender, "command.players-only");
-            }
-            return true;
-        });
-        command(main, "classement").setTabCompleter((sender, command, label, args) -> List.of());
+        register(main, "defis", menu(main, main.getChallenges()::open));
+        register(main, "classement", menu(main, main.getRanking()::open));
     }
 
-    private static void podium(Main main, org.bukkit.command.CommandSender sender, String[] args) {
-        if (!(sender instanceof org.bukkit.entity.Player player)) {
-            main.getMessages().send(sender, "command.players-only");
-            return;
-        }
-        if (main.getPodium() == null) {
-            main.getMessages().send(player, "ranking.podium.no-npc");
-            return;
-        }
-        int place;
-        try {
-            place = Integer.parseInt(args.length > 1 ? args[1] : "");
-        } catch (NumberFormatException e) {
-            place = 0;
-        }
-        if (place < 1 || place > fr.eternom.eterReward.module.ranking.Podium.PLACES) {
-            main.getMessages().send(player, "ranking.podium.usage");
-            return;
-        }
-        ((fr.eternom.eterReward.module.ranking.Podium) main.getPodium()).place(player, place);
+    /** Une commande sans argument qui ouvre un menu au joueur. */
+    private static TabExecutor menu(Main main, Consumer<Player> open) {
+        return new TabExecutor() {
+            @Override
+            public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+                if (sender instanceof Player player) {
+                    open.accept(player);
+                } else {
+                    main.getMessages().send(sender, "command.players-only");
+                }
+                return true;
+            }
+
+            @Override
+            public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+                return List.of();
+            }
+        };
+    }
+
+    private static void register(Main main, String name, TabExecutor executor) {
+        command(main, name).setExecutor(executor);
+        command(main, name).setTabCompleter(executor);
     }
 
     private static PluginCommand command(Main main, String name) {

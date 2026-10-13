@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -77,7 +78,7 @@ public class PassActivity implements Listener {
 
     /** Le palier du pass dans la sidebar, peu après l'arrivée. */
     @EventHandler
-    public void onJoin(org.bukkit.event.player.PlayerJoinEvent event) {
+    public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTaskLater(pass.plugin(), () -> {
             if (player.isOnline()) {

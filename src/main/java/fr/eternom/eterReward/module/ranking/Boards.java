@@ -1,21 +1,23 @@
 package fr.eternom.eterReward.module.ranking;
 
 import fr.eternom.eterEconomy.api.EconomyApi;
-import fr.eternom.eterReward.module.ranking.RankingStore.Entry;
+import fr.eternom.eterLib.helper.message.Numbers;
 import fr.eternom.eterLib.helper.ranking.RankingSource;
-import org.bukkit.Bukkit;
+import fr.eternom.eterReward.module.ranking.RankingStore.Entry;
 import org.bukkit.Material;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import java.util.function.LongUnaryOperator;
 
 /**
- * Les classements. Les mensuels (général, pass, défis, quêtes) sont à EterReward ; les autres demandent leur classement au plugin qui
- * possède les données, par son API (chaque plugin facultatif dans sa propre classe : sinon NoClassDefFoundError).
+ * Les classements. Les mensuels (général, pass, défis, quêtes) sont à EterReward ; les autres demandent leur classement
+ * au plugin qui possède les données, par son API ou une source d'EterLib (RankingSource).
  */
 public enum Boards {
 
-    /** Moyenne du mois (GeneralRanking), calculée par RankingService. */
+    /** Moyenne des classements du mois (GeneralRanking). */
     GENERAL(Material.NETHERITE_HELMET, true),
     PASS(Material.NETHER_STAR, true),
     CHALLENGES(Material.TARGET, true),
@@ -30,6 +32,10 @@ public enum Boards {
     Boards(Material icon, boolean monthly) {
         this.icon = icon;
         this.monthly = monthly;
+    }
+
+    /** Ce qu'il faut pour lire un classement : la base, le mois, et le palier du pass d'une XP (général). */
+    record Context(RankingStore store, String season, LongUnaryOperator tierOf) {
     }
 
     public Material icon() {
@@ -55,36 +61,40 @@ public enum Boards {
     }
 
     /** Le top (bloquant). */
-    List<Entry> top(RankingStore store, String season, int limit) {
+    List<Entry> top(Context context, int limit) {
+        RankingStore store = context.store();
+        String season = context.season();
         return switch (this) {
             case PASS -> store.topPass(season, limit);
             case CHALLENGES -> store.topChallenges(season, limit);
-            case SUCCESS -> Success.top(limit);
+            case SUCCESS -> Source.top("success", limit);
             case WEALTH -> EconomyApi.get().map(api -> api.richest(limit).stream()
                     .map(ranked -> new Entry(ranked.player(), (long) Math.floor(ranked.value()))).toList()).orElse(List.of());
             case QUESTS -> store.topMonthly(id(), season, limit);
-            case GENERAL -> List.of(); // RankingService
+            case GENERAL -> GeneralRanking.compute(context).stream().limit(limit).toList();
             case CLANS -> Source.top("clans", limit);
         };
     }
 
     /** {place (0 si absent), valeur} du joueur (bloquant). */
-    long[] of(RankingStore store, String season, UUID player) {
+    long[] of(Context context, UUID player) {
+        RankingStore store = context.store();
+        String season = context.season();
         return switch (this) {
             case PASS -> store.passOf(player, season);
             case CHALLENGES -> store.challengesOf(player, season);
-            case SUCCESS -> Success.of(player);
+            case SUCCESS -> Source.of("success", player);
             case WEALTH -> EconomyApi.get().map(api -> new long[]{api.wealthRank(player), (long) Math.floor(api.balance(player))})
                     .orElse(new long[]{0, 0});
             case QUESTS -> store.monthlyOf(player, id(), season);
-            case GENERAL -> new long[]{0, 0}; // RankingService
+            case GENERAL -> GeneralRanking.standings(GeneralRanking.compute(context)).getOrDefault(player, new long[]{0, 0});
             case CLANS -> Source.of("clans", player);
         };
     }
 
     /** Valeur affichée : le général est gardé en dixièmes (875 -> 87,5). */
     String display(long value) {
-        return this == GENERAL ? String.format(java.util.Locale.FRANCE, "%.1f", value / 10.0) : BoardMenu.format(value);
+        return this == GENERAL ? String.format(Locale.FRANCE, "%.1f", value / 10.0) : Numbers.format(value);
     }
 
     /** Nom affiché d'une ligne (ex : le nom du clan), null pour le pseudo du joueur. */
@@ -98,7 +108,7 @@ public enum Boards {
         return this == CLANS ? Material.WHITE_BANNER : null;
     }
 
-    /** Une source de classement d'EterLib (fournie par un autre plugin). */
+    /** Une source de classement d'EterLib, fournie par un autre plugin (succès, clans) sans qu'on dépende de lui. */
     private static final class Source {
         static List<Entry> top(String id, int limit) {
             return RankingSource.find(id).map(source -> source.top(limit).stream()
@@ -109,17 +119,4 @@ public enum Boards {
             return RankingSource.find(id).map(source -> source.of(player)).orElse(new long[]{0, 0});
         }
     }
-
-    /** Points de succès : la source de classement d'EterSuccess (EterLib), sans dépendre d'EterSuccess. */
-    private static final class Success {
-        static List<Entry> top(int limit) {
-            return RankingSource.find("success").map(source -> source.top(limit).stream()
-                    .map(ranked -> new Entry(ranked.player(), ranked.value())).toList()).orElse(List.of());
-        }
-
-        static long[] of(UUID player) {
-            return RankingSource.find("success").map(source -> source.of(player)).orElse(new long[]{0, 0});
-        }
-    }
-
 }

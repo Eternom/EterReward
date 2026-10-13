@@ -17,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Un classement : le top 10 (têtes des joueurs, la pile = la place), ta place et ta valeur, et pour un classement du
@@ -85,11 +84,6 @@ class BoardMenu implements Menu {
     @Override
     public Inventory getInventory() {
         return inventory;
-    }
-
-    /** 1 234 567 */
-    static String format(long value) {
-        return String.format(Locale.FRANCE, "%,d", value).replace(' ', ' ').replace(' ', ' ');
     }
 
     private Component text(String key, String... placeholders) {

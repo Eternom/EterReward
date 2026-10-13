@@ -159,7 +159,7 @@ class PassMenu implements Menu {
         }
         List<Component> lore = new ArrayList<>();
         lore.add(service.messages().render(service.raw(viewer, "pass.menu.reward"),
-                Placeholder.component("content", service.describe(viewer, reward))));
+                Placeholder.component("content", service.rewards().describe(viewer, reward))));
         lore.add(Component.empty());
         lore.add(text(switch (state) {
             case READY -> "pass.menu.claim";
