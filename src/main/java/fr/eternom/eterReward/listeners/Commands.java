@@ -23,7 +23,7 @@ public class Commands {
 
         register(main, "pass", new PassCommand(main.getPass(), main.getMessages(), false));
         register(main, "eterreward", new AdminCommand(new PassCommand(main.getPass(), main.getMessages(), true),
-                main.getPodiumCommand(), main.getMessages()));
+                main.getPodiumCommand(), main.getVotes(), main.getMessages()));
 
         register(main, "defis", menu(main, main.getChallenges()::open));
         register(main, "classement", menu(main, main.getRanking()::open));

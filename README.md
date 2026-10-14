@@ -92,11 +92,12 @@ restant. Les textes de chaque défi : `challenges.list.<id>` dans `lang/`.
 
 ## Classements
 
-`/classement` (`RankingService`) : 7 classements. **Du mois** (remis à zéro chaque mois : un nouveau joueur part à
+`/classement` (`RankingService`) : 8 classements. **Du mois** (remis à zéro chaque mois : un nouveau joueur part à
 égalité) : XP du pass (`eterreward_pass_progress`), défis réussis (`eterreward_challenge_monthly`), quêtes de métier
-réussies (`eterreward_ranking_monthly`, comptées à chaque `JobQuestCompleteEvent`) et le **général** (`GeneralRanking`) :
-dans chacun des trois classements (paliers du pass au lieu de l'XP, premium ou non), une note sur 100 selon la PLACE
-(1er sur N = 100, dernier = 100/N, absent = 0, ex aequo à la même place), puis la moyenne des trois notes, gardée en
+réussies (`eterreward_ranking_monthly`, comptées à chaque `JobQuestCompleteEvent`), votes (même table, voir Votes) et le
+**général** (`GeneralRanking`) : dans chacun des quatre classements (paliers du pass au lieu de l'XP, premium ou non),
+une note sur 100 selon la PLACE (1er sur N = 100, dernier = 100/N, absent = 0, ex aequo à la même place), puis la
+moyenne des quatre notes, gardée en
 dixièmes (875 = 87,5 points). La place plutôt que la valeur : aucun classement n'écrase les autres. **Depuis
 toujours** : points de succès (source `success` d'EterSuccess, lue par EterLib `RankingSource` : EterReward ne dépend pas
 d'EterSuccess, qui dépend déjà de lui), fortune (`EconomyApi#richest`), clans par territoire (source `clans` d'EterClan :
@@ -118,6 +119,23 @@ classement de `ranking.rewarded` (le général par défaut, aussi quand la ligne
 top 3 du mois fini `ranking.rewards` (argent, clés de ressource, XP du pass du nouveau mois) ; chaque gagnant est
 prévenu où qu'il soit, et les gagnants sont annoncés sur tout le réseau (bus `eterreward`, message `ranking-winners`).
 
+## Votes
+
+`eterreward vote <joueur>` (`VoteService`) : un vote validé sur un site de vote. C'est le plugin Vote du site (Azuriom)
+qui la lance, par AzLink, comme **seule récompense** de chaque site, « joueur en ligne requis » décoché. Le joueur peut
+être hors ligne ou sur un autre serveur : il est retrouvé dans l'annuaire d'EterLib et tout passe par la base (argent
+par EterEconomy, XP du pass, clés par EterResource) ; il n'y a donc pas d'objets dans les récompenses de vote.
+
+- **Série** (`VoteStore`, table `eterreward_votes`) : jours de vote d'affilée, dans le fuseau de `daily.time-zone`. Le
+  premier vote du jour la fait avancer (+1 si le dernier vote date d'hier, sinon 1) ; la condition est dans la requête,
+  deux votes au même instant ne comptent qu'une fois la journée.
+- **Récompense** (`VoteRewards`, `votes.loots`) : UN tirage par vote, selon les poids (argent, XP du pass ou clé), et le
+  bonus `votes.streak.<jours>` au premier vote du jour qui atteint ce nombre de jours (3, 7, 14 par défaut).
+- **Classement** : chaque vote compte au classement « votes » du mois (`eterreward_ranking_monthly`, board `votes`) et
+  au général (4e critère). `ranking.rewarded` récompense par défaut le général et les votes.
+- **Messages** : le joueur est prévenu dans sa langue là où il est (bus `eterreward-votes`, message `received` avec le
+  détail, rédigé par son serveur), et un merci est annoncé sur tout le réseau (`votes.announce`, message `thanks`).
+
 ## Commandes et permissions
 
 | Commande | Permission | Par défaut |
@@ -126,7 +144,7 @@ prévenu où qu'il soit, et les gagnants sont annoncés sur tout le réseau (bus
 | `/pass` (`battlepass`, `saison`) | `eterreward.pass` ; premium : `eterreward.pass.premium.<pass>` | tous / personne |
 | `/defis` (`challenges`, `defi`) | `eterreward.challenges` | tous |
 | `/classement` (`ranking`, `top`) | `eterreward.ranking` | tous |
-| `/eterreward pass premium <joueur>` | `set <pass>` | `xp <joueur> <montant>` (aussi depuis la console) ; `/eterreward podium <1-5>` | `eterreward.admin` | op |
+| `/eterreward pass premium <joueur>` | `set <pass>` | `xp <joueur> <montant>` (aussi depuis la console) ; `/eterreward podium <1-5>` ; `/eterreward vote <joueur>` (console, lancée par le site) | `eterreward.admin` | op |
 
 `eterreward.admin` regroupe tout.
 
@@ -150,5 +168,6 @@ prévenu où qu'il soit, et les gagnants sont annoncés sur tout le réseau (bus
 - `eterreward_challenge_periods` : `period`, `challenges` (identifiants tirés, séparés par des virgules).
 - `eterreward_challenge_progress` : `uuid`, `period`, `challenge`, `progress`, `done`.
 - `eterreward_challenge_monthly` : `uuid`, `season`, `completed` (défis réussis du mois, pour le classement).
-- `eterreward_ranking_monthly` : `uuid`, `season`, `board`, `amount` (autres valeurs du mois : quêtes de métier).
+- `eterreward_ranking_monthly` : `uuid`, `season`, `board`, `amount` (autres valeurs du mois : quêtes de métier, votes).
 - `eterreward_ranking_rewards` : `season`, `board`, `given_at` (récompenses de fin de mois déjà données).
+- `eterreward_votes` : `uuid`, `streak` (jours de vote d'affilée), `last_day` (jour julien du dernier vote).

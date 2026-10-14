@@ -32,8 +32,8 @@ commands:
     aliases: [ranking, leaderboard, top]
     permission: eterreward.ranking
   eterreward:
-    description: Gérer le pass et poser le podium du classement général (staff).
-    usage: /eterreward <pass <premium|set|xp> ... | podium <1-5>>
+    description: Gérer le pass, poser le podium du classement général, enregistrer un vote (staff, console).
+    usage: /eterreward <pass <premium|set|xp> ... | podium <1-5> | vote <joueur>>
     permission: eterreward.admin
 
 permissions:

@@ -110,13 +110,13 @@ pass:
     bonus: 300
 
 # Classements (/classement), recalculés toutes les 5 minutes. Du mois (remis à zéro chaque mois) : XP du pass, défis
-# et quêtes de métier réussis, et le GÉNÉRAL (moyenne des trois : une note sur 100 selon la place dans chacun ; les
-# paliers du pass comptent, premium ou non). Depuis toujours : points de succès, fortune, clans.
+# et quêtes de métier réussis, votes, et le GÉNÉRAL (moyenne des quatre : une note sur 100 selon la place dans
+# chacun ; les paliers du pass comptent, premium ou non). Depuis toujours : points de succès, fortune, clans.
 # Le général a son podium (5 PNJ, EterNpc : /eterreward podium <1-5>) et ses placeholders (PlaceholderAPI).
 # rewarded : classements du mois dont le top 3 gagne à la fin du mois (une seule fois, sur un serveur avec EterResource) :
 #   money : argent ; keys : clés de monde ressource ; pass-xp : XP du pass du nouveau mois
 ranking:
-  rewarded: [general]
+  rewarded: [general, votes]
   rewards:
     1:
       money: 1500
@@ -129,6 +129,34 @@ ranking:
     3:
       money: 500
       keys: 1
+      pass-xp: 400
+
+# Votes : le plugin Vote du site lance « eterreward vote {player} » dans la console (par AzLink, « joueur en ligne
+# requis » décoché) à chaque vote validé. Le joueur peut être hors ligne ou sur un autre serveur : pas d'objets ici,
+# seulement ce qui passe par la base. Chaque vote compte au classement « votes » du mois et au général.
+# loots : UN tirage par vote, au hasard selon weight ; money (Heloks), pass-xp, keys (clés de monde ressource),
+# commands (console, {player}), label (texte affiché à la place du détail).
+# streak : bonus au premier vote du jour quand la série atteint ce nombre de jours (un jour sans vote la remet à 1).
+# Repères : en votant sur 4 sites par jour, un joueur reçoit en moyenne ~180 Heloks, ~160 XP de pass et ~0,6 clé par
+# jour, plus les bonus de série (grille d'EterEconomy : les gains gratuits restent une petite part du revenu).
+votes:
+  # Merci annoncé sur tout le réseau à chaque vote.
+  announce: true
+  loots:
+    - weight: 45
+      money: 100
+    - weight: 40
+      pass-xp: 100
+    - weight: 15
+      keys: 1
+  streak:
+    3:
+      money: 250
+    7:
+      keys: 1
+      pass-xp: 200
+    14:
+      keys: 2
       pass-xp: 400
 
 # Menus : bouton en bas du menu. Avec une commande (sans le /), il la lance pour le joueur et relie les menus entre

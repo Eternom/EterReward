@@ -4,6 +4,7 @@ import fr.eternom.eterEconomy.api.EconomyApi;
 import fr.eternom.eterLib.EterLib;
 import fr.eternom.eterLib.helper.economy.Money;
 import fr.eternom.eterLib.helper.message.Messages;
+import fr.eternom.eterReward.module.ResourceRewards;
 import fr.eternom.eterReward.module.pass.PassDefinition.ItemReward;
 import fr.eternom.eterReward.module.pass.PassDefinition.PermissionReward;
 import fr.eternom.eterReward.module.pass.PassDefinition.Reward;

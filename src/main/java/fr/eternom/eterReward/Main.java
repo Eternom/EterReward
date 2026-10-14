@@ -21,6 +21,9 @@ import fr.eternom.eterReward.module.ranking.PodiumCommand;
 import fr.eternom.eterReward.module.ranking.RankingPlaceholders;
 import fr.eternom.eterReward.module.ranking.RankingService;
 import fr.eternom.eterReward.module.ranking.RankingStore;
+import fr.eternom.eterReward.module.vote.VoteRewards;
+import fr.eternom.eterReward.module.vote.VoteService;
+import fr.eternom.eterReward.module.vote.VoteStore;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,7 +31,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.time.DateTimeException;
 import java.time.ZoneId;
 
-/** Récompenses du réseau : la récompense quotidienne (/daily) et le pass de saison (/pass) ; plus tard celles des votes. */
+/** Récompenses du réseau : la récompense quotidienne (/daily), le pass de saison (/pass), les défis, les classements et les votes. */
 public final class Main extends JavaPlugin {
 
     /** Version minimale d'EterLib : textes communs et outils partagés (Frame, Money, NetworkBus) depuis 1.6.0. */
@@ -45,6 +48,7 @@ public final class Main extends JavaPlugin {
     private PassService pass;
     private ChallengeService challenges;
     private RankingService ranking;
+    private VoteService votes;
     /** /eterreward podium, null sans EterNpc. */
     private TabExecutor podiumCommand;
 
@@ -90,6 +94,8 @@ public final class Main extends JavaPlugin {
             new RankingPlaceholders(this, ranking).register();
         }
         ranking.start();
+        votes = new VoteService(this, new VoteStore(database), VoteRewards.load(getConfig().getConfigurationSection("votes"), getLogger()),
+                pass, ranking, messages, zone, getConfig().getBoolean("votes.announce", true));
 
         // API pour les autres plugins (RewardApi.get())
         getServer().getServicesManager().register(RewardApi.class, new RewardApiService(daily, pass, challenges), this, ServicePriority.Normal);
@@ -132,5 +138,9 @@ public final class Main extends JavaPlugin {
 
     public RankingService getRanking() {
         return ranking;
+    }
+
+    public VoteService getVotes() {
+        return votes;
     }
 }

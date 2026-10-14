@@ -12,7 +12,7 @@ import java.util.UUID;
 import java.util.function.LongUnaryOperator;
 
 /**
- * Les classements. Les mensuels (général, pass, défis, quêtes) sont à EterReward ; les autres demandent leur classement
+ * Les classements. Les mensuels (général, pass, défis, quêtes, votes) sont à EterReward ; les autres demandent leur classement
  * au plugin qui possède les données, par son API ou une source d'EterLib (RankingSource).
  */
 public enum Boards {
@@ -21,9 +21,11 @@ public enum Boards {
     GENERAL(Material.NETHERITE_HELMET, true),
     PASS(Material.NETHER_STAR, true),
     CHALLENGES(Material.TARGET, true),
+    QUESTS(Material.WRITABLE_BOOK, true),
+    /** Votes validés sur les sites de vote (plugin Vote du site, commande eterreward vote). */
+    VOTES(Material.PAPER, true),
     SUCCESS(Material.GOLDEN_APPLE, false),
     WEALTH(Material.GOLD_BLOCK, false),
-    QUESTS(Material.WRITABLE_BOOK, true),
     CLANS(Material.WHITE_BANNER, false);
 
     private final Material icon;
@@ -70,7 +72,7 @@ public enum Boards {
             case SUCCESS -> Source.top("success", limit);
             case WEALTH -> EconomyApi.get().map(api -> api.richest(limit).stream()
                     .map(ranked -> new Entry(ranked.player(), (long) Math.floor(ranked.value()))).toList()).orElse(List.of());
-            case QUESTS -> store.topMonthly(id(), season, limit);
+            case QUESTS, VOTES -> store.topMonthly(id(), season, limit);
             case GENERAL -> GeneralRanking.compute(context).stream().limit(limit).toList();
             case CLANS -> Source.top("clans", limit);
         };
@@ -86,7 +88,7 @@ public enum Boards {
             case SUCCESS -> Source.of("success", player);
             case WEALTH -> EconomyApi.get().map(api -> new long[]{api.wealthRank(player), (long) Math.floor(api.balance(player))})
                     .orElse(new long[]{0, 0});
-            case QUESTS -> store.monthlyOf(player, id(), season);
+            case QUESTS, VOTES -> store.monthlyOf(player, id(), season);
             case GENERAL -> GeneralRanking.standings(GeneralRanking.compute(context)).getOrDefault(player, new long[]{0, 0});
             case CLANS -> Source.of("clans", player);
         };

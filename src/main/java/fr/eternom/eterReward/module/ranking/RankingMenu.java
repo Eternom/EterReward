@@ -21,8 +21,8 @@ import java.util.Map;
 class RankingMenu implements Menu {
 
     private static final int INFO = 4;
-    /** Le général en haut, au centre ; les autres en dessous. */
-    private static final int[] SLOTS = {13, 20, 21, 22, 23, 24, 31};
+    /** Le général en haut, au centre ; les autres en dessous (ordre de Boards). */
+    private static final int[] SLOTS = {13, 20, 21, 22, 23, 24, 30, 32};
     private static final int BACK = 49;
 
     private final RankingService service;

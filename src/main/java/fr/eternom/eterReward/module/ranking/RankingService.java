@@ -8,6 +8,7 @@ import fr.eternom.eterLib.helper.economy.Money;
 import fr.eternom.eterLib.helper.gui.BackButton;
 import fr.eternom.eterLib.helper.message.Messages;
 import fr.eternom.eterLib.helper.task.Tasks;
+import fr.eternom.eterReward.module.ResourceRewards;
 import fr.eternom.eterReward.module.pass.PassService;
 import fr.eternom.eterReward.module.ranking.RankingStore.Entry;
 import org.bukkit.Bukkit;
@@ -192,7 +193,7 @@ public class RankingService {
                     EconomyApi.get().ifPresent(economy -> economy.deposit(winner, reward.money(), "EterReward · classement"));
                 }
                 if (reward.keys() > 0) {
-                    ResourceKeys.give(winner, reward.keys());
+                    ResourceRewards.give(winner, reward.keys(), 0);
                 }
                 if (reward.passXp() > 0) {
                     pass.addXp(winner, reward.passXp());
@@ -268,6 +269,11 @@ public class RankingService {
     /** Une quête de métier réussie (tâche de fond) : comptée pour le classement du mois. */
     public void questCompleted(UUID player) {
         store.addMonthly(player, season(), Boards.QUESTS.id());
+    }
+
+    /** Un vote validé (tâche de fond de VoteService) : compté pour le classement du mois. */
+    public void voted(UUID player) {
+        store.addMonthly(player, season(), Boards.VOTES.id());
     }
 
     /** Récompensé en fin de mois (config.yml > ranking.rewarded). */

@@ -162,16 +162,18 @@ ranking:
     success: "<primary>Points de succès"
     wealth: "<primary>Fortune"
     quests: "<primary>Quêtes du mois"
+    votes: "<primary>Votes du mois"
     clans: "<primary>Clans"
   board-title: "<primary>Classement <dark_gray>·</dark_gray> <board>"
   # La valeur de chaque classement (<value>)
   unit:
-    general: "<info><accent><value></accent> points ce mois-ci <dark_gray>(pass, défis, quêtes)"
+    general: "<info><accent><value></accent> points ce mois-ci <dark_gray>(pass, défis, quêtes, votes)"
     pass: "<info><accent><value></accent> XP de pass ce mois-ci"
     challenges: "<info><accent><value></accent> défis réussis ce mois-ci"
     success: "<info><accent><value></accent> points de succès"
     wealth: "<info><accent><value></accent> Heloks"
     quests: "<info><accent><value></accent> quêtes validées ce mois-ci"
+    votes: "<info><accent><value></accent> votes ce mois-ci"
     clans: "<info><accent><value></accent> chunks de territoire"
   entry:
     name: "<accent><place>. <player>"
@@ -189,10 +191,12 @@ ranking:
     general: "<success>Bravo !</success> <info>Tu finis <accent><place>e</accent> du <accent>classement général</accent> du mois : <accent><money></accent> et <accent><keys></accent> clés de ressource !"
     pass: "<success>Bravo !</success> <info>Tu finis <accent><place>e</accent> du classement <accent>XP du pass</accent> du mois : <accent><money></accent> et <accent><keys></accent> clés de ressource !"
     challenges: "<success>Bravo !</success> <info>Tu finis <accent><place>e</accent> du classement <accent>Défis du mois</accent> : <accent><money></accent> et <accent><keys></accent> clés de ressource !"
+    votes: "<success>Bravo !</success> <info>Tu finis <accent><place>e</accent> du classement <accent>Votes du mois</accent> : <accent><money></accent> et <accent><keys></accent> clés de ressource !"
   announce:
     general: "<info>Classement général du mois : <accent>1. <first></accent>, <accent>2. <second></accent>, <accent>3. <third></accent>. Bravo !"
     pass: "<info>Classement <accent>XP du pass</accent> du mois : <accent>1. <first></accent>, <accent>2. <second></accent>, <accent>3. <third></accent>. Bravo !"
     challenges: "<info>Classement <accent>Défis du mois</accent> : <accent>1. <first></accent>, <accent>2. <second></accent>, <accent>3. <third></accent>. Bravo !"
+    votes: "<info>Classement <accent>Votes du mois</accent> : <accent>1. <first></accent>, <accent>2. <second></accent>, <accent>3. <third></accent>. Merci pour vos votes !"
   podium:
     name: "<primary>#<place> <accent><player>"
     empty: "<primary>#<place> <dark_gray>???"
@@ -200,3 +204,16 @@ ranking:
     placed: "<info>Place <accent><place></accent> du podium posée ici. <dark_gray>(retirer : /eternpc remove)"
     usage: '<error>Utilisation : <accent>/eterreward podium \<1-5>'
     no-npc: "<error>Le podium a besoin d'EterNpc sur ce serveur."
+
+# Votes sur les sites de vote (commande eterreward vote, lancée par le site)
+vote:
+  received: "<success>Merci pour ton vote !</success> <info>Tu reçois <accent><content></accent>. <dark_gray>(série : <streak> jour(s))"
+  streak-bonus: "<success>Série de <streak> jours !</success> <info>Bonus : <accent><content></accent>"
+  thanks: "<info>Merci à <accent><player></accent> pour son vote ! <dark_gray>(/vote sur le site)"
+  nothing: "rien cette fois"
+  part:
+    pass-xp: "<amount> XP de pass"
+    keys: "<amount> clé(s) de monde ressource"
+  done: "<info>Vote de <accent><player></accent> enregistré <dark_gray>(série : <streak> jour(s))"
+  unknown: "<error>Joueur inconnu : <accent><player></accent> <dark_gray>(jamais venu sur le serveur)"
+  usage: '<error>Utilisation : <accent>/eterreward vote \<joueur>'

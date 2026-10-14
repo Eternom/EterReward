@@ -162,15 +162,17 @@ ranking:
     success: "<primary>Achievement points"
     wealth: "<primary>Fortune"
     quests: "<primary>Monthly quests"
+    votes: "<primary>Monthly votes"
     clans: "<primary>Clans"
   board-title: "<primary>Leaderboard <dark_gray>·</dark_gray> <board>"
   unit:
-    general: "<info><accent><value></accent> points this month <dark_gray>(pass, challenges, quests)"
+    general: "<info><accent><value></accent> points this month <dark_gray>(pass, challenges, quests, votes)"
     pass: "<info><accent><value></accent> pass XP this month"
     challenges: "<info><accent><value></accent> challenges completed this month"
     success: "<info><accent><value></accent> achievement points"
     wealth: "<info><accent><value></accent> Heloks"
     quests: "<info><accent><value></accent> quests completed this month"
+    votes: "<info><accent><value></accent> votes this month"
     clans: "<info><accent><value></accent> chunks of land"
   entry:
     name: "<accent><place>. <player>"
@@ -188,10 +190,12 @@ ranking:
     general: "<success>Well done!</success> <info>You finished <accent>#<place></accent> in this month's <accent>overall ranking</accent>: <accent><money></accent> and <accent><keys></accent> resource keys!"
     pass: "<success>Well done!</success> <info>You finished <accent>#<place></accent> in this month's <accent>Pass XP</accent> board: <accent><money></accent> and <accent><keys></accent> resource keys!"
     challenges: "<success>Well done!</success> <info>You finished <accent>#<place></accent> in the <accent>Monthly challenges</accent> board: <accent><money></accent> and <accent><keys></accent> resource keys!"
+    votes: "<success>Well done!</success> <info>You finished <accent>#<place></accent> in the <accent>Monthly votes</accent> board: <accent><money></accent> and <accent><keys></accent> resource keys!"
   announce:
     general: "<info>This month's overall ranking: <accent>1. <first></accent>, <accent>2. <second></accent>, <accent>3. <third></accent>. Well done!"
     pass: "<info>This month's <accent>Pass XP</accent> board: <accent>1. <first></accent>, <accent>2. <second></accent>, <accent>3. <third></accent>. Well done!"
     challenges: "<info><accent>Monthly challenges</accent> board: <accent>1. <first></accent>, <accent>2. <second></accent>, <accent>3. <third></accent>. Well done!"
+    votes: "<info><accent>Monthly votes</accent> board: <accent>1. <first></accent>, <accent>2. <second></accent>, <accent>3. <third></accent>. Thanks for voting!"
   podium:
     name: "<primary>#<place> <accent><player>"
     empty: "<primary>#<place> <dark_gray>???"
@@ -199,3 +203,16 @@ ranking:
     placed: "<info>Podium place <accent><place></accent> set here. <dark_gray>(remove: /eternpc remove)"
     usage: '<error>Usage: <accent>/eterreward podium \<1-5>'
     no-npc: "<error>The podium needs EterNpc on this server."
+
+# Votes on voting sites (eterreward vote command, run by the website)
+vote:
+  received: "<success>Thanks for voting!</success> <info>You get <accent><content></accent>. <dark_gray>(streak: <streak> day(s))"
+  streak-bonus: "<success><streak>-day streak!</success> <info>Bonus: <accent><content></accent>"
+  thanks: "<info>Thanks to <accent><player></accent> for voting! <dark_gray>(/vote on the website)"
+  nothing: "nothing this time"
+  part:
+    pass-xp: "<amount> pass XP"
+    keys: "<amount> resource world key(s)"
+  done: "<info>Vote from <accent><player></accent> recorded <dark_gray>(streak: <streak> day(s))"
+  unknown: "<error>Unknown player: <accent><player></accent> <dark_gray>(never joined the server)"
+  usage: '<error>Usage: <accent>/eterreward vote \<player>'
