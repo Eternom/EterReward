@@ -3,6 +3,7 @@ package fr.eternom.eterReward.module.pass;
 import fr.eternom.eterLib.EterLib;
 import fr.eternom.eterLib.helper.gui.BackButton;
 import fr.eternom.eterLib.helper.message.Messages;
+import fr.eternom.eterLib.helper.gui.Sounds;
 import fr.eternom.eterLib.helper.task.Tasks;
 import fr.eternom.eterReward.module.pass.PassDefinition.Reward;
 import fr.eternom.eterReward.module.pass.PassDefinition.Tier;
@@ -306,7 +307,7 @@ public class PassService {
         }
         if (premium && !isPremium(player, shown)) {
             messages.send(player, "pass.premium-required");
-            player.playSound(player, Sound.ENTITY_VILLAGER_NO, 0.6f, 1f);
+            Sounds.refuse(player);
             return;
         }
         if ((reward.keys() > 0 || reward.resourceMinutes() > 0) && !Bukkit.getPluginManager().isPluginEnabled("EterResource")
@@ -332,7 +333,7 @@ public class PassService {
         }, error -> {
             if (error != null) {
                 messages.send(player, error);
-                player.playSound(player, Sound.ENTITY_VILLAGER_NO, 0.6f, 1f);
+                Sounds.refuse(player);
             } else {
                 rewards.giveLocal(player, reward, tierNumber);
             }

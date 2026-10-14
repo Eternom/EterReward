@@ -13,7 +13,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
@@ -97,7 +96,7 @@ class PassMenu implements Menu {
             Sounds.click(player);
             service.claim(player, view.season(), number, premium, page);
         } else {
-            player.playSound(player, Sound.ENTITY_VILLAGER_NO, 0.6f, 1f);
+            Sounds.refuse(player);
         }
     }
 

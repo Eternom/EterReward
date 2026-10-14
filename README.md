@@ -5,7 +5,7 @@ Les récompenses du réseau : la **récompense quotidienne** (`/daily`), le **pa
 
 ## Prérequis
 
-- **EterLib 1.14.0+** (`depend`, textes communs, cadre des menus, bus réseau, `Money`, `Numbers`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
+- **EterLib 1.15.0+** (`depend`, textes communs, cadre des menus, bus réseau, `Money`, `Numbers`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
 - **EterEconomy 2.2.2+** (`depend`, son API `EconomyApi`) pour les récompenses en argent.
 - Facultatifs (`softdepend`), chacun dans une classe à part chargée seulement s'il est là :
   - **EterMarket 1.5.0+** : son événement `JobQuestCompleteEvent` donne l'XP du pass des quêtes de métier et compte les quêtes du mois ;
