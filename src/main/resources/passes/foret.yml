@@ -18,7 +18,8 @@ description:
   - "<info>Quêtes de <accent>bûcheron</accent> : <accent>×1,5 XP</accent>."
 
 # Bonus du mois : quest-job / quest-multiplier (XP des quêtes), daily-multiplier (XP de /daily),
-# playtime-cap (plafond d'XP de temps de jeu par jour).
+# playtime-cap (plafond d'XP de temps de jeu par jour), challenge-multiplier (XP des défis), vote-multiplier (XP de pass
+# des votes).
 bonus:
   quest-job: bucheron
   quest-multiplier: 1.5
@@ -57,6 +58,7 @@ tiers:
   7:
     free:
       money: 68
+      permissions: [ "eterkit.kit.aventurier 3d" ]
     premium:
       items: [ "MANGROVE_LOG 32" ]
   8:
@@ -86,6 +88,7 @@ tiers:
       items: [ "JUNGLE_LOG 16" ]
     premium:
       money: 176
+      permissions: [ "eterkit.kit.heros 7d" ]
   13:
     free:
       money: 92
@@ -136,6 +139,7 @@ tiers:
   22:
     free:
       items: [ "SPRUCE_LOG 16" ]
+      permissions: [ "eterkit.kit.aventurier 3d" ]
     premium:
       money: 256
   23:
@@ -163,6 +167,7 @@ tiers:
       money: 148
     premium:
       items: [ "GOLDEN_APPLE 1" ]
+      permissions: [ "eterkit.kit.heros 7d" ]
   28:
     free:
       items: [ "JUNGLE_LOG 16" ]
@@ -180,5 +185,5 @@ tiers:
     premium:
       money: 500
       keys: 3
-      permissions: [ "eteressential.craft 30d" ]
+      permissions: [ "eteressential.craft 30d", "eterkit.kit.legende 7d" ]
       items: [ "EMERALD 4" ]

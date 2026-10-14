@@ -22,11 +22,12 @@ public record PassDefinition(String id, String name, Material icon, List<String>
     /**
      * Le bonus du mois. questJob : les quêtes de ce métier rapportent questMultiplier fois plus d'XP (vide : toutes les
      * quêtes) ; dailyMultiplier : l'XP de /daily ; playtimeCap : plafond d'XP de temps de jeu par jour (0 : celui de la
-     * config).
+     * config) ; challengeMultiplier : l'XP des défis ; voteMultiplier : l'XP de pass gagnée en votant.
      */
-    public record Bonus(String questJob, double questMultiplier, double dailyMultiplier, int playtimeCap) {
+    public record Bonus(String questJob, double questMultiplier, double dailyMultiplier, int playtimeCap,
+                        double challengeMultiplier, double voteMultiplier) {
 
-        static final Bonus NONE = new Bonus("", 1, 1, 0);
+        static final Bonus NONE = new Bonus("", 1, 1, 0, 1, 1);
     }
 
     /** Un objet donné : matière et quantité. */
@@ -78,13 +79,19 @@ public record PassDefinition(String id, String name, Material icon, List<String>
         String id = file.getName().replaceFirst("\\.yml$", "").toLowerCase(Locale.ROOT);
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
         String where = "passes/" + file.getName();
+        if (!yaml.getBoolean("enabled", true)) {
+            logger.info(where + " : désactivé (enabled: false)");
+            return null;
+        }
         Material icon = Material.matchMaterial(yaml.getString("icon", "NETHER_STAR"));
         ConfigurationSection bonusSection = yaml.getConfigurationSection("bonus");
         Bonus bonus = bonusSection == null ? Bonus.NONE : new Bonus(
                 bonusSection.getString("quest-job", "").toLowerCase(Locale.ROOT),
                 Math.max(0, bonusSection.getDouble("quest-multiplier", 1)),
                 Math.max(0, bonusSection.getDouble("daily-multiplier", 1)),
-                Math.max(0, bonusSection.getInt("playtime-cap", 0)));
+                Math.max(0, bonusSection.getInt("playtime-cap", 0)),
+                Math.max(0, bonusSection.getDouble("challenge-multiplier", 1)),
+                Math.max(0, bonusSection.getDouble("vote-multiplier", 1)));
 
         List<Tier> tiers = new ArrayList<>();
         ConfigurationSection tierSection = yaml.getConfigurationSection("tiers");

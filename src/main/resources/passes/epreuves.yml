@@ -1,0 +1,188 @@
+# Pass « epreuves » : un des pass tirés au hasard chaque mois (voir config.yml > pass).
+# Chaque palier (1 à 30) a une ligne gratuite (free) et une ligne premium (premium), chacune facultative.
+# Une récompense peut donner, ensemble :
+#   money            : de l'argent (EterEconomy)
+#   keys             : des clés de monde ressource (EterResource)
+#   resource-minutes : du temps de monde ressource (EterResource)
+#   items            : des objets, "MATIÈRE quantité" ; ce qui ne rentre pas est posé au sol
+#   permissions      : "permission durée" (d, h, m), par LuckPerms, sur tout le réseau. La durée est la sienne,
+#                      même après la fin du pass. Seulement des commandes d'usage (/craft, /back...), jamais
+#                      ce que le joueur garde (homes, annonces) : il le perdrait à la fin.
+#   commands         : lancées par la console, {player} = le pseudo
+#   label            : texte affiché à la place du détail (MiniMessage)
+
+name: "<primary>Les Épreuves"
+icon: TARGET
+description:
+  - "<info>Chaque défi relevé te rapproche du sommet."
+  - "<info>Défis du jour et de la semaine : <accent>×1,5 XP</accent>."
+
+# Bonus du mois : quest-job / quest-multiplier (XP des quêtes), daily-multiplier (XP de /daily),
+# playtime-cap (plafond d'XP de temps de jeu par jour), challenge-multiplier (XP des défis), vote-multiplier (XP de pass
+# des votes).
+bonus:
+  challenge-multiplier: 1.5
+
+tiers:
+  1:
+    free:
+      money: 66
+    premium:
+      items: [ "ARROW 32" ]
+  2:
+    free:
+      items: [ "COOKED_BEEF 8" ]
+    premium:
+      money: 144
+  3:
+    free:
+      money: 78
+    premium:
+      items: [ "EXPERIENCE_BOTTLE 8" ]
+  4:
+    free:
+      items: [ "TORCH 32" ]
+    premium:
+      money: 168
+  5:
+    free:
+      permissions: [ "eteressential.grindstone 3d" ]
+    premium:
+      permissions: [ "eteressential.grindstone 7d" ]
+  6:
+    free:
+      items: [ "ARROW 16" ]
+    premium:
+      money: 192
+  7:
+    free:
+      money: 102
+      permissions: [ "eterkit.kit.aventurier 3d" ]
+    premium:
+      items: [ "GOLDEN_CARROT 16" ]
+  8:
+    free:
+      items: [ "IRON_INGOT 4" ]
+    premium:
+      money: 216
+  9:
+    free:
+      money: 114
+    premium:
+      items: [ "EXPERIENCE_BOTTLE 12" ]
+  10:
+    free:
+      money: 150
+      keys: 1
+    premium:
+      money: 300
+      keys: 2
+  11:
+    free:
+      money: 126
+    premium:
+      items: [ "SPECTRAL_ARROW 16" ]
+  12:
+    free:
+      items: [ "COOKED_PORKCHOP 8" ]
+    premium:
+      money: 264
+      permissions: [ "eterkit.kit.heros 7d" ]
+  13:
+    free:
+      money: 138
+    premium:
+      items: [ "GOLDEN_APPLE 1" ]
+  14:
+    free:
+      items: [ "IRON_INGOT 6" ]
+    premium:
+      money: 288
+  15:
+    free:
+      permissions: [ "eteressential.smithing 3d" ]
+    premium:
+      permissions: [ "eteressential.smithing 7d" ]
+  16:
+    free:
+      items: [ "ARROW 32" ]
+    premium:
+      money: 312
+  17:
+    free:
+      money: 162
+    premium:
+      items: [ "EXPERIENCE_BOTTLE 16" ]
+  18:
+    free:
+      items: [ "COOKED_BEEF 16" ]
+    premium:
+      money: 336
+  19:
+    free:
+      money: 174
+    premium:
+      items: [ "GOLDEN_CARROT 24" ]
+  20:
+    free:
+      money: 150
+      keys: 1
+    premium:
+      money: 300
+      keys: 2
+  21:
+    free:
+      money: 186
+    premium:
+      items: [ "SPECTRAL_ARROW 24" ]
+  22:
+    free:
+      items: [ "TORCH 32" ]
+      permissions: [ "eterkit.kit.aventurier 3d" ]
+    premium:
+      money: 384
+  23:
+    free:
+      money: 198
+    premium:
+      items: [ "GOLDEN_APPLE 2" ]
+  24:
+    free:
+      items: [ "IRON_INGOT 8" ]
+    premium:
+      money: 408
+  25:
+    free:
+      permissions: [ "eteressential.grindstone 3d" ]
+    premium:
+      permissions: [ "eteressential.anvil 7d" ]
+  26:
+    free:
+      items: [ "ARROW 32" ]
+    premium:
+      money: 432
+  27:
+    free:
+      money: 222
+    premium:
+      items: [ "EXPERIENCE_BOTTLE 24" ]
+      permissions: [ "eterkit.kit.heros 7d" ]
+  28:
+    free:
+      items: [ "COOKED_PORKCHOP 16" ]
+    premium:
+      money: 456
+  29:
+    free:
+      money: 234
+    premium:
+      items: [ "GOLDEN_APPLE 2" ]
+  30:
+    free:
+      money: 225
+      keys: 1
+    premium:
+      money: 750
+      keys: 3
+      permissions: [ "eteressential.smithing 30d", "eterkit.kit.legende 7d" ]
+      items: [ "EXPERIENCE_BOTTLE 32" ]

@@ -10,16 +10,20 @@ import java.util.Map;
 /** Les pass de plugins/EterReward/passes/ : un fichier par pass, son nom de fichier est son identifiant. */
 public final class PassCatalog {
 
-    /** Les 8 pass fournis, copiés au premier démarrage (dossier passes/ absent). */
-    private static final String[] DEFAULTS = {"profondeurs", "moisson", "foret", "maree", "chasse", "foire", "voyage", "lanternes"};
+    /**
+     * Les pass fournis : chacun est copié s'il manque dans passes/ (au premier démarrage, et quand une version en ajoute).
+     * Pour retirer un pass de la rotation, garder son fichier avec « enabled: false » : supprimé, il reviendrait.
+     */
+    private static final String[] DEFAULTS = {"profondeurs", "moisson", "foret", "maree", "chasse", "foire", "voyage", "lanternes",
+            "epreuves", "ravitaillement"};
 
     private PassCatalog() {
     }
 
     public static Map<String, PassDefinition> load(JavaPlugin plugin, int tiers) {
         File folder = new File(plugin.getDataFolder(), "passes");
-        if (!folder.exists()) {
-            for (String name : DEFAULTS) {
+        for (String name : DEFAULTS) {
+            if (!new File(folder, name + ".yml").exists()) {
                 plugin.saveResource("passes/" + name + ".yml", false);
             }
         }

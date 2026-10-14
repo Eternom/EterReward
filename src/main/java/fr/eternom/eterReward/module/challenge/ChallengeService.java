@@ -219,11 +219,14 @@ public class ChallengeService {
         } catch (RuntimeException e) {
             plugin.getLogger().warning("Défi non compté au classement : " + e.getMessage());
         }
+        int xp = challenge.xp();
         try {
-            pass.addXp(uuid, challenge.xp());
+            xp = pass.challengeXp(challenge.xp());
+            pass.addXp(uuid, xp);
         } catch (RuntimeException e) {
             plugin.getLogger().warning("XP du pass non donnée pour le défi " + challenge.id() + " : " + e.getMessage());
         }
+        int shownXp = xp;
         Bukkit.getScheduler().runTask(plugin, () -> {
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) {
@@ -231,7 +234,7 @@ public class ChallengeService {
             }
             messages.send(player, period == Period.DAILY ? "challenges.done-daily" : "challenges.done-weekly",
                     "challenge", messages.plain(player, "challenges.list." + challenge.id(), "target", String.valueOf(challenge.target())),
-                    "xp", String.valueOf(challenge.xp()), "money", Money.format(challenge.money()));
+                    "xp", String.valueOf(shownXp), "money", Money.format(challenge.money()));
             player.playSound(player, Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.7f, 1.2f);
             Bukkit.getPluginManager().callEvent(new ChallengeCompleteEvent(player, challenge.id(), period == Period.WEEKLY));
         });

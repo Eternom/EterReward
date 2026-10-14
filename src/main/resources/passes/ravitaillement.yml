@@ -1,0 +1,194 @@
+# Pass « ravitaillement » : un des pass tirés au hasard chaque mois (voir config.yml > pass).
+# Chaque palier (1 à 30) a une ligne gratuite (free) et une ligne premium (premium), chacune facultative.
+# Une récompense peut donner, ensemble :
+#   money            : de l'argent (EterEconomy)
+#   keys             : des clés de monde ressource (EterResource)
+#   resource-minutes : du temps de monde ressource (EterResource)
+#   items            : des objets, "MATIÈRE quantité" ; ce qui ne rentre pas est posé au sol
+#   permissions      : "permission durée" (d, h, m), par LuckPerms, sur tout le réseau. La durée est la sienne,
+#                      même après la fin du pass. Seulement des commandes d'usage (/craft, /back...), jamais
+#                      ce que le joueur garde (homes, annonces) : il le perdrait à la fin.
+#   commands         : lancées par la console, {player} = le pseudo
+#   label            : texte affiché à la place du détail (MiniMessage)
+
+name: "<primary>Le Ravitaillement"
+icon: BARREL
+description:
+  - "<info>Les convois arrivent : provisions et kits tout le mois."
+  - "<info>Votes : <accent>XP de pass doublée</accent>."
+
+# Bonus du mois : quest-job / quest-multiplier (XP des quêtes), daily-multiplier (XP de /daily),
+# playtime-cap (plafond d'XP de temps de jeu par jour), challenge-multiplier (XP des défis), vote-multiplier (XP de pass
+# des votes).
+bonus:
+  vote-multiplier: 2.0
+
+# Le pass des kits : accès aux kits de grade (eterkit.kit.<kit>, EterKit) tout au long des paliers. Un kit se
+# réclame une fois par semaine : 3 jours donnent une réclamation, 7 jours une ou deux.
+tiers:
+  1:
+    free:
+      money: 66
+    premium:
+      items: [ "BREAD 16" ]
+  2:
+    free:
+      items: [ "COOKED_BEEF 8" ]
+    premium:
+      money: 144
+  3:
+    free:
+      money: 78
+    premium:
+      items: [ "TORCH 64" ]
+  4:
+    free:
+      items: [ "COAL 16" ]
+    premium:
+      money: 168
+      permissions: [ "eterkit.kit.heros 7d" ]
+  5:
+    free:
+      permissions: [ "eteressential.furnace 3d" ]
+    premium:
+      permissions: [ "eteressential.furnace 7d" ]
+  6:
+    free:
+      items: [ "OAK_LOG 32" ]
+    premium:
+      money: 192
+  7:
+    free:
+      money: 102
+      permissions: [ "eterkit.kit.aventurier 3d" ]
+    premium:
+      items: [ "GOLDEN_CARROT 16" ]
+  8:
+    free:
+      items: [ "BREAD 16" ]
+    premium:
+      money: 216
+  9:
+    free:
+      money: 114
+    premium:
+      items: [ "COAL_BLOCK 4" ]
+  10:
+    free:
+      money: 150
+      keys: 1
+    premium:
+      money: 300
+      keys: 2
+  11:
+    free:
+      money: 126
+    premium:
+      items: [ "HAY_BLOCK 8" ]
+  12:
+    free:
+      items: [ "TORCH 32" ]
+    premium:
+      money: 264
+      permissions: [ "eterkit.kit.heros 7d" ]
+  13:
+    free:
+      money: 138
+    premium:
+      items: [ "COOKED_SALMON 32" ]
+  14:
+    free:
+      items: [ "COOKED_PORKCHOP 8" ]
+      permissions: [ "eterkit.kit.aventurier 3d" ]
+    premium:
+      money: 288
+  15:
+    free:
+      permissions: [ "eteressential.craft 3d" ]
+    premium:
+      permissions: [ "eterkit.kit.legende 7d" ]
+  16:
+    free:
+      items: [ "COAL 32" ]
+    premium:
+      money: 312
+  17:
+    free:
+      money: 162
+    premium:
+      items: [ "GOLDEN_CARROT 24" ]
+  18:
+    free:
+      items: [ "OAK_LOG 32" ]
+    premium:
+      money: 336
+  19:
+    free:
+      money: 174
+    premium:
+      items: [ "BREAD 32" ]
+      permissions: [ "eterkit.kit.heros 7d" ]
+  20:
+    free:
+      money: 150
+      keys: 1
+    premium:
+      money: 300
+      keys: 2
+  21:
+    free:
+      money: 186
+    premium:
+      items: [ "COAL_BLOCK 8" ]
+  22:
+    free:
+      items: [ "COOKED_BEEF 16" ]
+      permissions: [ "eterkit.kit.aventurier 3d" ]
+    premium:
+      money: 384
+  23:
+    free:
+      money: 198
+    premium:
+      items: [ "TORCH 64" ]
+  24:
+    free:
+      items: [ "BREAD 16" ]
+    premium:
+      money: 408
+  25:
+    free:
+      permissions: [ "eteressential.furnace 3d" ]
+    premium:
+      permissions: [ "eteressential.furnace 14d" ]
+  26:
+    free:
+      items: [ "OAK_LOG 64" ]
+    premium:
+      money: 432
+  27:
+    free:
+      money: 222
+    premium:
+      items: [ "GOLDEN_CARROT 32" ]
+      permissions: [ "eterkit.kit.heros 7d" ]
+  28:
+    free:
+      items: [ "COOKED_SALMON 16" ]
+      permissions: [ "eterkit.kit.aventurier 3d" ]
+    premium:
+      money: 456
+  29:
+    free:
+      money: 234
+    premium:
+      items: [ "HAY_BLOCK 16" ]
+  30:
+    free:
+      money: 225
+      keys: 1
+    premium:
+      money: 750
+      keys: 3
+      permissions: [ "eterkit.kit.legende 14d" ]
+      items: [ "GOLDEN_CARROT 32" ]

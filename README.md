@@ -46,7 +46,8 @@ bouton Retour/Fermer (`menus.daily.back-command`).
 jamais celui du mois d'avant. Le premier serveur qui en a besoin l'écrit (`INSERT IGNORE` dans `eterreward_pass_seasons`),
 les autres le lisent : le même pour tout le réseau. `/eterreward pass set <pass>` le force. Un pass = un fichier de
 `passes/` (`PassDefinition`) : nom, icône, description, **bonus du mois** (`quest-job`/`quest-multiplier`,
-`daily-multiplier`, `playtime-cap`) et 30 paliers ; les 8 fournis (`PassCatalog`) sont copiés au premier démarrage.
+`daily-multiplier`, `playtime-cap`, `challenge-multiplier`, `vote-multiplier`) et 30 paliers ; les 10 fournis (`PassCatalog`)
+sont copiés s'ils manquent (au démarrage) : pour en retirer un de la rotation, `enabled: false` dans son fichier.
 
 **XP** (`pass.*` de la config) : `xp-per-tier` par palier. Sources :
 - **temps de jeu actif** (`PassActivity`) : chaque minute, les joueurs qui ont bougé, tourné la tête, agi ou parlé gagnent
@@ -65,7 +66,7 @@ deux) ; objets (au sol s'ils ne rentrent pas) et commandes sur le thread princip
 permissions est refusée (« réclame-la ailleurs ») sur un serveur sans EterResource ou LuckPerms. Les récompenses
 non réclamées à la fin du mois sont **perdues**.
 
-**Récompenses** : `money`, `keys`, `resource-minutes`, `items`, `permissions` (`"eteressential.craft 7d"` : par
+**Récompenses** : `money`, `keys`, `resource-minutes`, `items`, `permissions` (`"eteressential.craft 7d"`, `"eterkit.kit.heros 7d"` : par
 LuckPerms, une durée déjà en cours s'allonge ; **sa propre durée, même après la fin du pass** ; seulement des commandes
 d'usage, jamais ce que le joueur garde comme des homes), `commands`, `label`.
 

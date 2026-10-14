@@ -69,6 +69,9 @@ pass:
     eteressential_furnace: "/furnace (four portatif)"
     eteressential_back: "/back"
     eteressential_back_death: "/back après une mort"
+    eterkit_kit_aventurier: "Kit Aventurier"
+    eterkit_kit_heros: "Kit Héros"
+    eterkit_kit_legende: "Kit Légende"
   menu:
     title: "<primary>Pass <dark_gray>·</dark_gray> <pass>"
     player: "<accent><player>"

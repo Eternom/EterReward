@@ -18,7 +18,8 @@ description:
   - "<info>Toutes les quêtes : <accent>×1,25 XP</accent>."
 
 # Bonus du mois : quest-job / quest-multiplier (XP des quêtes), daily-multiplier (XP de /daily),
-# playtime-cap (plafond d'XP de temps de jeu par jour).
+# playtime-cap (plafond d'XP de temps de jeu par jour), challenge-multiplier (XP des défis), vote-multiplier (XP de pass
+# des votes).
 bonus:
   quest-multiplier: 1.25
 
@@ -56,6 +57,7 @@ tiers:
   7:
     free:
       money: 102
+      permissions: [ "eterkit.kit.aventurier 3d" ]
     premium:
       items: [ "EMERALD 8" ]
   8:
@@ -85,6 +87,7 @@ tiers:
       items: [ "BOOK 4" ]
     premium:
       money: 264
+      permissions: [ "eterkit.kit.heros 7d" ]
   13:
     free:
       money: 138
@@ -135,6 +138,7 @@ tiers:
   22:
     free:
       items: [ "GOLD_NUGGET 16" ]
+      permissions: [ "eterkit.kit.aventurier 3d" ]
     premium:
       money: 384
   23:
@@ -162,6 +166,7 @@ tiers:
       money: 222
     premium:
       items: [ "EMERALD 10" ]
+      permissions: [ "eterkit.kit.heros 7d" ]
   28:
     free:
       items: [ "BOOK 4" ]
@@ -179,5 +184,5 @@ tiers:
     premium:
       money: 750
       keys: 3
-      permissions: [ "eteressential.enderchest 30d" ]
+      permissions: [ "eteressential.enderchest 30d", "eterkit.kit.legende 7d" ]
       items: [ "EMERALD 16" ]

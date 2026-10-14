@@ -87,7 +87,7 @@ daily:
 # jamais celui du mois d'avant, le même pour tout le réseau. 30 paliers, une ligne gratuite et une premium
 # (permission eterreward.pass.premium.<pass>, ex : /eterreward pass premium <joueur>, jusqu'à la fin du mois).
 # Les récompenses non réclamées à la fin du mois sont perdues. Un pass = un fichier de passes/ (le nom du fichier
-# est son identifiant) ; les 8 fournis sont copiés au premier démarrage.
+# est son identifiant) ; les 10 fournis sont copiés s'ils manquent. Pour retirer un pass : « enabled: false » dans son fichier.
 pass:
   # XP pour passer un palier (30 paliers). Repères avec les valeurs ci-dessous et les défis (challenges.yml) :
   # - joueur occasionnel (1 h de jeu, /daily, 1 quête normale, 1 défi du jour : ~900 XP/jour) : palier 22 environ

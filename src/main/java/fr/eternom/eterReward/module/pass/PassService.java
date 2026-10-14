@@ -202,6 +202,16 @@ public class PassService {
         }, "XP du pass non donnée à " + player.getName());
     }
 
+    /** XP de pass d'un défi réussi, avec le bonus du mois. Bloquant. */
+    public int challengeXp(int base) {
+        return enabled() ? (int) Math.round(base * season().pass().bonus().challengeMultiplier()) : base;
+    }
+
+    /** XP de pass d'un vote, avec le bonus du mois. Bloquant. */
+    public int voteXp(int base) {
+        return enabled() ? (int) Math.round(base * season().pass().bonus().voteMultiplier()) : base;
+    }
+
     /** XP donnée par un autre plugin ou le staff. Bloquant. */
     public void addXp(UUID player, int amount) {
         if (enabled()) {

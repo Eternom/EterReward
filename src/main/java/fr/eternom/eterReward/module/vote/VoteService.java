@@ -44,10 +44,6 @@ public class VoteService {
 
     /** Ce que le joueur a reçu, envoyé tel quel au serveur où il se trouve pour lui écrire dans sa langue. */
     private record Gift(double money, int passXp, int keys, String label) {
-
-        static Gift of(Loot loot) {
-            return loot == null ? null : new Gift(loot.money(), loot.passXp(), loot.keys(), loot.label());
-        }
     }
 
     private final JavaPlugin plugin;
@@ -92,11 +88,11 @@ public class VoteService {
             ranking.voted(player.uuid());
             Loot vote = rewards.pick();
             Loot bonus = day.first() ? rewards.streakBonus(day.streak()) : null;
-            give(player, vote);
-            give(player, bonus);
+            Gift voteGift = give(player, vote);
+            Gift bonusGift = give(player, bonus);
             Bukkit.getScheduler().runTask(plugin, () -> {
                 messages.send(sender, "vote.done", "player", player.name(), "streak", String.valueOf(day.streak()));
-                received(player.uuid(), day.streak(), Gift.of(vote), Gift.of(bonus));
+                received(player.uuid(), day.streak(), voteGift, bonusGift);
                 if (announce) {
                     thank(player.name());
                     JsonObject data = new JsonObject();
@@ -107,17 +103,18 @@ public class VoteService {
         }, "Vote non enregistré pour " + name);
     }
 
-    /** Bloquant. Une récompense absente (null) ne donne rien. */
-    private void give(NetworkPlayer player, Loot loot) {
+    /** Bloquant. Une récompense absente (null) ne donne rien. Renvoie ce qui a été donné (XP du pass avec le bonus du mois). */
+    private Gift give(NetworkPlayer player, Loot loot) {
         if (loot == null) {
-            return;
+            return null;
         }
         if (loot.money() > 0) {
             EconomyApi.get().ifPresentOrElse(economy -> economy.deposit(player.uuid(), loot.money(), "EterReward · vote"),
                     () -> plugin.getLogger().warning("Vote : argent non versé à " + player.name() + " (EterEconomy absent)"));
         }
-        if (loot.passXp() > 0) {
-            pass.addXp(player.uuid(), loot.passXp());
+        int passXp = loot.passXp() > 0 ? pass.voteXp(loot.passXp()) : 0;
+        if (passXp > 0) {
+            pass.addXp(player.uuid(), passXp);
         }
         if (loot.keys() > 0 && (!Bukkit.getPluginManager().isPluginEnabled("EterResource")
                 || !ResourceRewards.give(player.uuid(), loot.keys(), 0))) {
@@ -127,6 +124,7 @@ public class VoteService {
             Bukkit.getScheduler().runTask(plugin, () ->
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.name())));
         }
+        return new Gift(loot.money(), passXp, loot.keys(), loot.label());
     }
 
     /** Thread principal : prévient le joueur ici, ou sur le serveur où il se trouve. */

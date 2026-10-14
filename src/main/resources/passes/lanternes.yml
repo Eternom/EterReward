@@ -18,7 +18,8 @@ description:
   - "<info>Récompense du jour (<accent>/daily</accent>) : <accent>×2 XP</accent>."
 
 # Bonus du mois : quest-job / quest-multiplier (XP des quêtes), daily-multiplier (XP de /daily),
-# playtime-cap (plafond d'XP de temps de jeu par jour).
+# playtime-cap (plafond d'XP de temps de jeu par jour), challenge-multiplier (XP des défis), vote-multiplier (XP de pass
+# des votes).
 bonus:
   daily-multiplier: 2.0
 
@@ -56,6 +57,7 @@ tiers:
   7:
     free:
       money: 68
+      permissions: [ "eterkit.kit.aventurier 3d" ]
     premium:
       items: [ "GLOW_INK_SAC 8" ]
   8:
@@ -85,6 +87,7 @@ tiers:
       items: [ "TORCH 32" ]
     premium:
       money: 176
+      permissions: [ "eterkit.kit.heros 7d" ]
   13:
     free:
       money: 92
@@ -135,6 +138,7 @@ tiers:
   22:
     free:
       items: [ "CANDLE 4" ]
+      permissions: [ "eterkit.kit.aventurier 3d" ]
     premium:
       money: 256
   23:
@@ -162,6 +166,7 @@ tiers:
       money: 148
     premium:
       items: [ "JUKEBOX 1" ]
+      permissions: [ "eterkit.kit.heros 7d" ]
   28:
     free:
       items: [ "TORCH 32" ]
@@ -179,5 +184,5 @@ tiers:
     premium:
       money: 500
       keys: 3
-      permissions: [ "eteressential.back 30d" ]
+      permissions: [ "eteressential.back 30d", "eterkit.kit.legende 7d" ]
       items: [ "ENCHANTED_GOLDEN_APPLE 1" ]
