@@ -127,6 +127,14 @@ public final class Main extends JavaPlugin {
         return pass;
     }
 
+    /** Les défis en mémoire sont enregistrés avant l'arrêt. */
+    @Override
+    public void onDisable() {
+        if (challenges != null) {
+            challenges.stop();
+        }
+    }
+
     public ChallengeService getChallenges() {
         return challenges;
     }

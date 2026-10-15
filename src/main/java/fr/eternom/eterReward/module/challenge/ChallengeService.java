@@ -159,6 +159,11 @@ public class ChallengeService {
     }
 
     /** Toutes les 15 s (tâche de fond) : enregistre, valide ce qui est atteint, et tire les défis d'une nouvelle période. */
+    /** À l'arrêt du serveur, sur le thread principal : la progression en mémoire est enregistrée, rien ne se perd. */
+    public void stop() {
+        flushAll();
+    }
+
     private void flushAll() {
         try {
             for (Period period : Period.values()) {
