@@ -15,21 +15,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
  * Temps de jeu ACTIF pour l'XP du pass : chaque minute, seuls les joueurs qui ont tourné la tête, marché, agi ou parlé
  * pendant la minute gagnent de l'XP. Un AFK immobile ne gagne rien ; un AFK « malin » (bassin d'eau...) est arrêté par
  * le plafond par jour, qui oblige à faire les quêtes pour finir le pass.
+ * Les mêmes minutes, si le joueur a aussi regardé autour de lui ou parlé, comptent au classement du temps de jeu.
  */
 public class PassActivity implements Listener {
 
     private static final long MINUTE_MILLIS = 60_000;
 
     private final PassService pass;
+    /** Chaque minute active, aussi pour le classement du temps de jeu (tâche de fond, bloquant). */
+    private final Consumer<UUID> onActiveMinute;
     private final Map<UUID, Long> lastActive = new ConcurrentHashMap<>();
+    /**
+     * Dernier regard ou message : le classement du temps de jeu n'a pas de plafond, il ne compte donc que les minutes où
+     * le joueur a tourné la tête ou parlé (un courant d'eau ou un wagonnet en boucle déplace, mais ne fait pas regarder).
+     */
+    private final Map<UUID, Long> lastLook = new ConcurrentHashMap<>();
 
-    public PassActivity(PassService pass) {
+    public PassActivity(PassService pass, Consumer<UUID> onActiveMinute) {
         this.pass = pass;
+        this.onActiveMinute = onActiveMinute;
     }
 
     /** Toutes les minutes (thread principal). */
@@ -44,15 +54,22 @@ public class PassActivity implements Listener {
                 .map(Player::getUniqueId)
                 .filter(uuid -> lastActive.getOrDefault(uuid, 0L) >= since)
                 .toList();
-        if (active.isEmpty() || !pass.enabled()) {
+        if (active.isEmpty()) {
             return;
         }
+        boolean passEnabled = pass.enabled();
+        List<UUID> looking = active.stream().filter(uuid -> lastLook.getOrDefault(uuid, 0L) >= since).toList();
         Bukkit.getScheduler().runTaskAsynchronously(pass.plugin(), () -> {
             for (UUID uuid : active) {
                 try {
-                    pass.playtime(uuid);
+                    if (passEnabled) {
+                        pass.playtime(uuid);
+                    }
+                    if (looking.contains(uuid)) {
+                        onActiveMinute.accept(uuid);
+                    }
                 } catch (RuntimeException e) {
-                    pass.plugin().getLogger().warning("XP de temps de jeu non comptée pour " + uuid + " : " + e.getMessage());
+                    pass.plugin().getLogger().warning("Temps de jeu non compté pour " + uuid + " : " + e.getMessage());
                 }
             }
         });
@@ -64,6 +81,9 @@ public class PassActivity implements Listener {
         if (event.hasChangedBlock() || event.hasChangedOrientation()) {
             lastActive.put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
         }
+        if (event.hasChangedOrientation()) {
+            lastLook.put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -74,6 +94,7 @@ public class PassActivity implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChat(AsyncChatEvent event) {
         lastActive.put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
+        lastLook.put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
     }
 
     /** Le palier du pass dans la sidebar, peu après l'arrivée. */
@@ -90,5 +111,6 @@ public class PassActivity implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         lastActive.remove(event.getPlayer().getUniqueId());
+        lastLook.remove(event.getPlayer().getUniqueId());
     }
 }

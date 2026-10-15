@@ -93,18 +93,24 @@ restant. Les textes de chaque défi : `challenges.list.<id>` dans `lang/`.
 
 ## Classements
 
-`/classement` (`RankingService`) : 8 classements. **Du mois** (remis à zéro chaque mois : un nouveau joueur part à
+`/classement` (`RankingService`) : 10 classements. **Du mois** (remis à zéro chaque mois : un nouveau joueur part à
 égalité) : XP du pass (`eterreward_pass_progress`), défis réussis (`eterreward_challenge_monthly`), quêtes de métier
-réussies (`eterreward_ranking_monthly`, comptées à chaque `JobQuestCompleteEvent`), votes (même table, voir Votes) et le
-**général** (`GeneralRanking`) : dans chacun des quatre classements (paliers du pass au lieu de l'XP, premium ou non),
+réussies (`eterreward_ranking_monthly`, comptées à chaque `JobQuestCompleteEvent`), votes (même table, voir Votes), temps de jeu actif
+(même table, board `playtime`, une ligne par minute active, voir plus bas) et le
+**général** (`GeneralRanking`) : dans chacun des cinq classements (paliers du pass au lieu de l'XP, premium ou non),
 une note sur 100 selon la PLACE (1er sur N = 100, dernier = 100/N, absent = 0, ex aequo à la même place), puis la
-moyenne des quatre notes, gardée en
+moyenne des cinq notes, gardée en
 dixièmes (875 = 87,5 points). La place plutôt que la valeur : aucun classement n'écrase les autres. **Depuis
-toujours** : points de succès (source `success` d'EterSuccess, lue par EterLib `RankingSource` : EterReward ne dépend pas
+toujours** : temps de jeu total (même table, saison `all`), points de succès (source `success` d'EterSuccess, lue par EterLib `RankingSource` : EterReward ne dépend pas
 d'EterSuccess, qui dépend déjà de lui), fortune (`EconomyApi#richest`), clans par territoire (source `clans` d'EterClan :
 la ligne affiche le nom du clan et une bannière ; un vrai classement de clans viendra plus tard, hors de la moyenne).
 Les tops (10) sont recalculés toutes les 5 minutes en tâche de fond et gardés en mémoire ; le général est calculé en
 entier (toutes les places, en mémoire) ; la place du joueur dans les autres est lue à l'ouverture d'un classement.
+
+**Temps de jeu** (`PassActivity`) : chaque minute, un joueur qui a bougé, agi ou parlé gagne l'XP de temps de jeu du pass
+(plafonnée par jour) ; s'il a aussi **tourné la tête ou parlé**, la minute compte au temps du mois et au temps total
+(`RankingStore#addMinute`, une requête pour les deux). Ces classements n'ont pas de plafond : un courant d'eau ou un
+wagonnet en boucle déplace le joueur sans le faire regarder, l'AFK n'y compte donc pas. Affichage en heures (`12 h 34`).
 
 **Podium** (`Podium`, avec EterNpc) : les 5 premiers du général en PNJ (`eterreward:podium_<1-5>`), avec le skin, le nom
 et le score du joueur, mis à jour à chaque calcul ; une place vide montre « ??? ». `/eterreward podium <1-5>` pose une
@@ -169,6 +175,6 @@ par EterEconomy, XP du pass, clés par EterResource) ; il n'y a donc pas d'objet
 - `eterreward_challenge_periods` : `period`, `challenges` (identifiants tirés, séparés par des virgules).
 - `eterreward_challenge_progress` : `uuid`, `period`, `challenge`, `progress`, `done`.
 - `eterreward_challenge_monthly` : `uuid`, `season`, `completed` (défis réussis du mois, pour le classement).
-- `eterreward_ranking_monthly` : `uuid`, `season`, `board`, `amount` (autres valeurs du mois : quêtes de métier, votes).
+- `eterreward_ranking_monthly` : `uuid`, `season`, `board`, `amount` (autres valeurs du mois : quêtes de métier, votes, minutes de jeu ; saison `all` : temps de jeu total).
 - `eterreward_ranking_rewards` : `season`, `board`, `given_at` (récompenses de fin de mois déjà données).
 - `eterreward_votes` : `uuid`, `streak` (jours de vote d'affilée), `last_day` (jour julien du dernier vote).

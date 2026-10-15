@@ -272,6 +272,11 @@ public class RankingService {
     }
 
     /** Un vote validé (tâche de fond de VoteService) : compté pour le classement du mois. */
+    /** Une minute de jeu actif (tâche de fond de PassActivity). Bloquant. */
+    public void playedMinute(UUID player) {
+        store.addMinute(player, season(), Boards.PLAYTIME.id());
+    }
+
     public void voted(UUID player) {
         store.addMonthly(player, season(), Boards.VOTES.id());
     }

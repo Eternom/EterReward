@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Le classement général du mois : seulement ce qui est fait dans le mois (un nouveau joueur part à égalité), sur quatre
- * classements : paliers du pass (premium ou non), défis réussis, quêtes de métier réussies, votes. Dans chacun, une note
+ * Le classement général du mois : seulement ce qui est fait dans le mois (un nouveau joueur part à égalité), sur cinq
+ * classements : paliers du pass (premium ou non), défis réussis, quêtes de métier réussies, votes, temps de jeu actif. Dans chacun, une note
  * sur 100 selon la PLACE (pas la valeur : aucun classement n'écrase les autres) : 1er sur N = 100, dernier = 100/N,
- * absent = 0. Le général est la moyenne des quatre notes, gardée en dixièmes (875 = 87,5 points).
+ * absent = 0. Le général est la moyenne des cinq notes, gardée en dixièmes (875 = 87,5 points).
  */
 final class GeneralRanking {
 
@@ -27,7 +27,7 @@ final class GeneralRanking {
         List<Entry> tiers = store.allPass(season).stream().map(entry -> new Entry(entry.player(), context.tierOf().applyAsLong(entry.value())))
                 .filter(entry -> entry.value() > 0).toList();
         List<List<Entry>> boards = List.of(tiers, store.allChallenges(season), store.allMonthly(Boards.QUESTS.id(), season),
-                store.allMonthly(Boards.VOTES.id(), season));
+                store.allMonthly(Boards.VOTES.id(), season), store.allMonthly(Boards.PLAYTIME.id(), season));
         Map<UUID, Double> total = new HashMap<>();
         for (List<Entry> board : boards) {
             notes(board).forEach((player, note) -> total.merge(player, note, Double::sum));

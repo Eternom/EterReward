@@ -12,7 +12,7 @@ public class Events {
     public Events(Main main) {
         main.getServer().getPluginManager().registerEvents(new DailyListener(main, main.getDaily()), main);
 
-        PassActivity activity = new PassActivity(main.getPass());
+        PassActivity activity = new PassActivity(main.getPass(), main.getRanking()::playedMinute);
         main.getServer().getPluginManager().registerEvents(activity, main);
         activity.start();
 
