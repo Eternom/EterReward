@@ -67,6 +67,12 @@ public class PassStore {
         database.set(SEASONS, Map.of("season", season, "pass", pass), "season");
     }
 
+    /** XP de temps de jeu gagnée aujourd'hui (day : jour julien), 0 si rien aujourd'hui. */
+    public int playedToday(UUID player, String season, long day) {
+        return database.getFirst(PROGRESS, Map.of("uuid", player, "season", season))
+                .filter(row -> row.getLong("play_day") == day).map(row -> row.getInt("play_xp")).orElse(0);
+    }
+
     public int xp(UUID player, String season) {
         return database.getFirst(PROGRESS, Map.of("uuid", player, "season", season)).map(row -> row.getInt("xp")).orElse(0);
     }

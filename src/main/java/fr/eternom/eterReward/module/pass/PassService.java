@@ -182,6 +182,14 @@ public class PassService {
         notifyTier(player, season, before, store.xp(player, season.key()));
     }
 
+    /** Minutes de jeu actif aujourd'hui (temps de jeu du pass) ; sans pass, pas de limite (Integer.MAX_VALUE). Bloquant. */
+    public int activeMinutesToday(UUID player) {
+        if (!enabled()) {
+            return Integer.MAX_VALUE;
+        }
+        return store.playedToday(player, season().key(), LocalDate.now(zone).toEpochDay()) / Math.max(1, settings.playtimeXpPerMinute());
+    }
+
     /** /daily réclamé (tâche de fond de DailyService). Bloquant. */
     public void dailyClaimed(UUID player) {
         if (!enabled()) {

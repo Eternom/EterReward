@@ -74,7 +74,8 @@ public final class Main extends JavaPlugin {
                 messages, zone, lib.backButton(getConfig().getString("menus.pass.back-command", "")));
         daily = new DailyService(this, new DailyStore(database),
                 DailyRewards.load(getConfig().getConfigurationSection("daily.days"), getLogger()), messages, zone,
-                lib.backButton(getConfig().getString("menus.daily.back-command", "")), pass);
+                lib.backButton(getConfig().getString("menus.daily.back-command", "")), pass,
+                getConfig().getInt("daily.min-active-minutes", 15));
         ChallengeCatalog.Catalog catalog = ChallengeCatalog.load(this);
         challenges = new ChallengeService(this, new ChallengeStore(database), catalog.pools(), catalog.counts(), pass, messages,
                 zone, lib.backButton(getConfig().getString("menus.challenges.back-command", "menu progression")));

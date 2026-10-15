@@ -4,6 +4,7 @@ import fr.eternom.eterEconomy.api.EconomyApi;
 import fr.eternom.eterLib.EterLib;
 import fr.eternom.eterLib.helper.economy.Money;
 import fr.eternom.eterLib.helper.gui.BackButton;
+import fr.eternom.eterLib.helper.gui.Sounds;
 import fr.eternom.eterLib.helper.message.Messages;
 import fr.eternom.eterLib.helper.task.Tasks;
 import fr.eternom.eterReward.api.DailyClaimEvent;
@@ -51,9 +52,12 @@ public class DailyService {
     private final ZoneId zone;
     private final BackButton backButton;
     private final PassService pass;
+    /** Minutes de jeu actif dans la journée avant de pouvoir réclamer (un second compte connecté pour la récompense ne l'a pas). */
+    private final int minActiveMinutes;
 
     public DailyService(JavaPlugin plugin, DailyStore store, DailyRewards rewards, Messages messages, ZoneId zone,
-                        BackButton backButton, PassService pass) {
+                        BackButton backButton, PassService pass, int minActiveMinutes) {
+        this.minActiveMinutes = Math.max(0, minActiveMinutes);
         this.pass = pass;
         this.plugin = plugin;
         this.store = store;
@@ -110,11 +114,23 @@ public class DailyService {
         long today = today();
         Tasks.async(plugin, player, () -> {
             DailyState state = DailyState.of(store.get(uuid), today);
+            if (state.canClaim() && minActiveMinutes > 0) {
+                int played = pass.activeMinutesToday(uuid);
+                if (played < minActiveMinutes) {
+                    return new Claimed(0, DailyStore.Progress.NONE, minActiveMinutes - played);
+                }
+            }
             if (!state.canClaim() || !store.claim(uuid, state.progress(), state.claimable(), today)) {
                 return Claimed.NONE;
             }
-            return new Claimed(state.claimable(), state.progress());
+            return new Claimed(state.claimable(), state.progress(), 0);
         }, result -> {
+            if (result.missing() > 0) {
+                messages.send(player, "daily.play-first", "minutes", String.valueOf(minActiveMinutes),
+                        "time", EterLib.get().formatDuration(player, result.missing() * 60L));
+                Sounds.refuse(player);
+                return;
+            }
             int claimed = result.day();
             if (claimed == 0) {
                 messages.send(player, "daily.already", "time", timeUntilTomorrow(player));
@@ -135,10 +151,10 @@ public class DailyService {
         });
     }
 
-    /** Le jour réclamé (0 : rien) et la progression lue avant, pour annuler si le joueur part. */
-    private record Claimed(int day, DailyStore.Progress read) {
+    /** Le jour réclamé (0 : rien), la progression lue avant (pour annuler si le joueur part), les minutes de jeu manquantes. */
+    private record Claimed(int day, DailyStore.Progress read, int missing) {
 
-        static final Claimed NONE = new Claimed(0, DailyStore.Progress.NONE);
+        static final Claimed NONE = new Claimed(0, DailyStore.Progress.NONE, 0);
     }
 
     /** Thread principal. */

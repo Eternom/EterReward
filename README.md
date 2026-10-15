@@ -19,6 +19,8 @@ Les récompenses du réseau : la **récompense quotidienne** (`/daily`), le **pa
 **Règles** : une récompense par jour et par joueur, **sur tout le réseau**. Une série de 7 jours : réclamer chaque jour
 fait avancer d'un jour, **un jour manqué fait repartir au jour 1**, et après le jour 7 la série recommence. Le jour
 change à **minuit dans `daily.time-zone`** (Europe/Paris), le même pour tout le monde.
+Réclamable seulement après `daily.min-active-minutes` (15) minutes de jeu actif dans la journée (temps de jeu du pass,
+`PassService#activeMinutesToday`) : un second compte connecté juste pour la récompense ne l'a pas.
 
 **Données** (`DailyStore`, table `eterreward_daily`) : `uuid`, `day` (dernier jour réclamé, 1 à 7), `last_claim`
 (date de cette réclamation en jour julien, `LocalDate#toEpochDay`). `DailyState` en déduit l'état du jour : déjà

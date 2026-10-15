@@ -13,6 +13,7 @@ daily:
   button-hover: "<info>Ouvrir <accent>/daily"
   claimed: "<info>Jour <accent><day></accent> réclamé : <accent><content></accent> !"
   already: "<error>Tu as déjà réclamé ta récompense aujourd'hui. Prochaine dans <accent><time></accent>."
+  play-first: "<error>Joue au moins <accent><minutes> min</accent> aujourd'hui avant de réclamer ta récompense : encore <accent><time></accent>."
   dropped: "<info>Inventaire plein : le reste est posé au sol devant toi."
   economy-missing: "<error>L'économie n'est pas disponible : réessaie plus tard."
   loot:

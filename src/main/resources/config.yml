@@ -14,6 +14,10 @@ daily:
   # Le jour change à minuit dans ce fuseau, le même pour tout le monde.
   time-zone: Europe/Paris
 
+  # Minutes de jeu actif dans la journée (temps de jeu du pass, AFK exclu) avant de pouvoir réclamer : un second compte
+  # connecté juste pour la récompense ne l'a pas. 0 : réclamable dès l'arrivée.
+  min-active-minutes: 15
+
   # Pour chaque jour : une icône, et un ou plusieurs tirages possibles (loots).
   # Un seul tirage est donné, au hasard : plus son poids (weight) est grand,
   # plus il a de chances de sortir (le menu affiche le pourcentage).
