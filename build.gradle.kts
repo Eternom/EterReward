@@ -27,6 +27,8 @@ dependencies {
 
     // Socle commun : base, langues, menus (plugin EterLib installé sur le serveur)
     compileOnly("com.github.Eternom:EterLib:1.15.0")
+    // Inventaire en cours de chargement (SyncApi) : aucun objet donné avant (softdepend)
+    compileOnly("com.github.Eternom:EterSync:1.2.2")
     // Podium du classement général (PNJ) et placeholders, facultatifs
     compileOnly("com.github.Eternom:EterNpc:1.0.0")
     compileOnly("me.clip:placeholderapi:2.11.6")

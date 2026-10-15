@@ -37,6 +37,16 @@ public class DailyStore {
                 .orElse(Progress.NONE);
     }
 
+    /** Annule une réclamation enregistrée mais pas donnée (joueur parti entre-temps) : retour à la progression lue. */
+    public void undo(UUID player, Progress read, int day, long today) {
+        if (read.equals(Progress.NONE)) {
+            database.execute("DELETE FROM " + database.table(TABLE) + " WHERE uuid = ? AND day = ? AND last_claim = ?", player, day, today);
+        } else {
+            database.execute("UPDATE " + database.table(TABLE) + " SET day = ?, last_claim = ? WHERE uuid = ? AND day = ? AND last_claim = ?",
+                    read.lastDay(), read.lastClaim(), player, day, today);
+        }
+    }
+
     /**
      * Enregistre la réclamation, seulement si la progression n'a pas changé depuis sa lecture : deux clics (ou deux
      * serveurs) au même moment ne donnent qu'une récompense.

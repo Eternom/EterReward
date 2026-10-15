@@ -5,6 +5,7 @@ import fr.eternom.eterLib.helper.gui.BackButton;
 import fr.eternom.eterLib.helper.message.Messages;
 import fr.eternom.eterLib.helper.gui.Sounds;
 import fr.eternom.eterLib.helper.task.Tasks;
+import fr.eternom.eterReward.module.SyncWait;
 import fr.eternom.eterReward.module.pass.PassDefinition.Reward;
 import fr.eternom.eterReward.module.pass.PassDefinition.Tier;
 import net.kyori.adventure.text.Component;
@@ -338,7 +339,36 @@ public class PassService {
                 rewards.giveLocal(player, reward, tierNumber);
             }
             open(player, page);
-        }, () -> messages.send(player, "error.generic"));
+        }, () -> messages.send(player, "error.generic"), error -> {
+            if (error == null) {
+                // Réclamée, mais parti avant de recevoir les objets : ils l'attendent à sa prochaine arrivée
+                Tasks.async(plugin, () -> store.addPending(uuid, new PassStore.Pending(shown.pass().id(), tierNumber, premium)),
+                        "Récompense du pass non mise de côté pour " + name);
+            }
+        });
+    }
+
+    /**
+     * À l'arrivée : les objets et commandes des récompenses réclamées juste avant un départ, une fois l'inventaire chargé
+     * par EterSync (sinon ils seraient écrasés). Même si le mois a changé : le pass est retrouvé par son identifiant.
+     */
+    public void deliverPending(Player player) {
+        UUID uuid = player.getUniqueId();
+        SyncWait.whenLoaded(plugin, player, () -> Tasks.async(plugin, player, () -> store.takePending(uuid), taken -> {
+            for (PassStore.Pending pending : taken) {
+                PassDefinition pass = passes.get(pending.pass());
+                if (pass == null || pending.tier() < 1 || pending.tier() > pass.tiers().size()) {
+                    plugin.getLogger().warning("Récompense en attente introuvable pour " + player.getName() + " : " + pending);
+                    continue;
+                }
+                Tier tier = pass.tiers().get(pending.tier() - 1);
+                Reward reward = pending.premium() ? tier.premium() : tier.free();
+                if (reward != null) {
+                    rewards.giveLocal(player, reward, pending.tier());
+                }
+            }
+        }, () -> { }, taken -> taken.forEach(pending -> Tasks.async(plugin, () -> store.addPending(uuid, pending),
+                "Récompense du pass non remise de côté pour " + uuid))));
     }
 
     // ---------- Premium (staff, boutique) ----------

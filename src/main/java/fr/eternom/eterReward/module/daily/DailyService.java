@@ -111,24 +111,34 @@ public class DailyService {
         Tasks.async(plugin, player, () -> {
             DailyState state = DailyState.of(store.get(uuid), today);
             if (!state.canClaim() || !store.claim(uuid, state.progress(), state.claimable(), today)) {
-                return 0;
+                return Claimed.NONE;
             }
-            try {
-                pass.dailyClaimed(uuid); // XP du pass de saison
-            } catch (RuntimeException e) {
-                plugin.getLogger().warning("XP du pass non donnée pour /daily : " + e.getMessage());
-            }
-            return state.claimable();
-        }, claimed -> {
+            return new Claimed(state.claimable(), state.progress());
+        }, result -> {
+            int claimed = result.day();
             if (claimed == 0) {
                 messages.send(player, "daily.already", "time", timeUntilTomorrow(player));
                 open(player);
                 return;
             }
             give(player, rewards.day(claimed), rewards.day(claimed).pick());
+            // XP du pass seulement une fois la récompense donnée : une réclamation annulée (départ) ne la donne pas deux fois
+            Tasks.async(plugin, () -> pass.dailyClaimed(uuid), "XP du pass non donnée pour /daily à " + player.getName());
             Bukkit.getPluginManager().callEvent(new DailyClaimEvent(player, claimed));
             open(player);
-        }, () -> messages.send(player, "error.generic"));
+        }, () -> messages.send(player, "error.generic"), result -> {
+            if (result.day() > 0) {
+                // Parti avant de recevoir quoi que ce soit : la réclamation est annulée, il la refera
+                Tasks.async(plugin, () -> store.undo(uuid, result.read(), result.day(), today),
+                        "Récompense du jour non annulée pour " + uuid);
+            }
+        });
+    }
+
+    /** Le jour réclamé (0 : rien) et la progression lue avant, pour annuler si le joueur part. */
+    private record Claimed(int day, DailyStore.Progress read) {
+
+        static final Claimed NONE = new Claimed(0, DailyStore.Progress.NONE);
     }
 
     /** Thread principal. */

@@ -26,7 +26,8 @@ réclamé, série qui continue (réclamé hier), ou retour au jour 1.
 
 **Réclamer** (`DailyService#claim`) : la base enregistre **d'abord**, par une requête conditionnelle
 (`UPDATE ... WHERE last_claim = <valeur lue>`, ou `INSERT IGNORE` la première fois) : deux clics ou deux serveurs au même
-moment ne donnent qu'une récompense. Ensuite seulement, un tirage est choisi au hasard selon les poids et donné :
+moment ne donnent qu'une récompense. Joueur parti avant de la recevoir : la réclamation est annulée (`DailyStore#undo`),
+il la refera ; l'XP du pass n'est donnée qu'une fois la récompense remise (jamais deux fois). Ensuite seulement, un tirage est choisi au hasard selon les poids et donné :
 objets (ce qui ne rentre pas est **posé au sol** devant le joueur), commandes lancées par la console (`{player}`),
 argent par EterEconomy en tâche de fond (source « EterReward · récompense du jour »). Son et particules, plus marqués le jour 7.
 
@@ -62,7 +63,9 @@ lang `pass.sidebar`), à l'arrivée et à chaque palier.
 **Réclamer** (`PassMenu` : 6 lignes, 7 paliers par page ; gratuit en haut, paliers au milieu, premium en bas) : la base
 enregistre d'abord (`INSERT IGNORE` dans `eterreward_pass_claims`, une seule fois même sur deux serveurs), puis on donne.
 Argent, clés et permissions partent en tâche de fond juste après l'enregistrement (même si le joueur part entre les
-deux) ; objets (au sol s'ils ne rentrent pas) et commandes sur le thread principal. Une récompense de clés ou de
+deux) ; objets (au sol s'ils ne rentrent pas) et commandes sur le thread principal. Joueur parti juste avant de les
+recevoir : ils sont mis de côté (`eterreward_pass_pending`) et donnés à sa prochaine arrivée, une fois l'inventaire
+chargé par EterSync (`SyncWait`), même si le mois a changé. Une récompense de clés ou de
 permissions est refusée (« réclame-la ailleurs ») sur un serveur sans EterResource ou LuckPerms. Les récompenses
 non réclamées à la fin du mois sont **perdues**.
 

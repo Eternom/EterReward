@@ -3,7 +3,9 @@ package fr.eternom.eterReward.module.pass;
 import fr.eternom.eterLib.helper.sql.Column;
 import fr.eternom.eterLib.helper.sql.Database;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -22,6 +24,8 @@ public class PassStore {
     private static final String SEASONS = "pass_seasons";
     private static final String PROGRESS = "pass_progress";
     private static final String CLAIMS = "pass_claims";
+    /** Récompenses réclamées dont les objets et commandes n'ont pas pu être donnés (joueur parti) : à sa prochaine arrivée. */
+    private static final String PENDING = "pass_pending";
 
     private final Database database;
 
@@ -39,6 +43,11 @@ public class PassStore {
         database.createTable(CLAIMS,
                 Column.of("uuid", Column.Type.UUID).primaryKey(),
                 Column.of("season", Column.Type.STRING).length(7).primaryKey(),
+                Column.of("tier", Column.Type.INT).primaryKey(),
+                Column.of("premium", Column.Type.BOOLEAN).primaryKey());
+        database.createTable(PENDING,
+                Column.of("uuid", Column.Type.UUID).primaryKey(),
+                Column.of("pass", Column.Type.STRING).length(64).primaryKey(),
                 Column.of("tier", Column.Type.INT).primaryKey(),
                 Column.of("premium", Column.Type.BOOLEAN).primaryKey());
     }
@@ -97,5 +106,27 @@ public class PassStore {
     public boolean claim(UUID player, String season, int tier, boolean premium) {
         return database.execute("INSERT IGNORE INTO " + database.table(CLAIMS) + " (uuid, season, tier, premium) VALUES (?, ?, ?, ?)",
                 player, season, tier, premium) > 0;
+    }
+
+    /** Une récompense dont les objets et commandes attendent le joueur. */
+    public record Pending(String pass, int tier, boolean premium) {
+    }
+
+    public void addPending(UUID player, Pending pending) {
+        database.execute("INSERT IGNORE INTO " + database.table(PENDING) + " (uuid, pass, tier, premium) VALUES (?, ?, ?, ?)",
+                player, pending.pass(), pending.tier(), pending.premium());
+    }
+
+    /** Les récompenses en attente, retirées de la base une à une : un même colis n'est donné qu'une fois (deux serveurs). */
+    public List<Pending> takePending(UUID player) {
+        List<Pending> taken = new ArrayList<>();
+        for (var row : database.get(PENDING, Map.of("uuid", player))) {
+            Pending pending = new Pending(row.getString("pass"), row.getInt("tier"), row.getBoolean("premium"));
+            if (database.delete(PENDING, Map.of("uuid", player, "pass", pending.pass(), "tier", pending.tier(),
+                    "premium", pending.premium())) > 0) {
+                taken.add(pending);
+            }
+        }
+        return taken;
     }
 }

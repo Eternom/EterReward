@@ -8,7 +8,7 @@ authors: [ NadTum ]
 description: Récompenses du réseau (récompense quotidienne sur 7 jours, pass de saison, défis, classements).
 depend: [EterLib, EterEconomy]
 # EterMarket : XP du pass pour les quêtes ; EterResource : clés de ressource ; LuckPerms : permissions temporaires
-softdepend: [EterMarket, EterResource, LuckPerms, EterNpc, PlaceholderAPI]
+softdepend: [EterMarket, EterResource, LuckPerms, EterNpc, PlaceholderAPI, EterSync]
 
 commands:
   daily:
