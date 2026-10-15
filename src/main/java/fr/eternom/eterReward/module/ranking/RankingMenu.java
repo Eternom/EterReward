@@ -22,7 +22,10 @@ class RankingMenu implements Menu {
 
     private static final int INFO = 4;
     /** Le général en haut, au centre ; ceux du mois en dessous, puis ceux de toujours (ordre de Boards). */
-    private static final int[] SLOTS = {13, 20, 21, 22, 23, 24, 29, 30, 32, 33};
+    private static final int[] SLOTS = {13, 20, 21, 22, 23, 24, 30, 31, 32};
+    /** Les statistiques de toujours de tous les joueurs (/stats d'EterSuccess), s'il est là. */
+    private static final int STATS = 40;
+    private static final String STATS_COMMAND = "stats";
     private static final int BACK = 49;
 
     private final RankingService service;
@@ -58,6 +61,9 @@ class RankingMenu implements Menu {
             shown.put(SLOTS[i], board);
             i++;
         }
+        if (Bukkit.getCommandMap().getCommand(STATS_COMMAND) != null) {
+            inventory.setItem(STATS, Items.item(Material.SPYGLASS, text("ranking.menu.stats"), List.of(text("ranking.menu.stats-lore"))));
+        }
         inventory.setItem(BACK, service.backButton().item(viewer));
     }
 
@@ -65,6 +71,11 @@ class RankingMenu implements Menu {
     public void onClick(Player player, int slot, ClickType click) {
         if (slot == BACK) {
             service.backButton().click(player);
+            return;
+        }
+        if (slot == STATS && Bukkit.getCommandMap().getCommand(STATS_COMMAND) != null) {
+            Sounds.click(player);
+            player.performCommand(STATS_COMMAND);
             return;
         }
         Boards board = shown.get(slot);

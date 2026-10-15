@@ -158,6 +158,8 @@ ranking:
     line: "<accent><place>.</accent> <info><player> <dark_gray>· <accent><value>"
     empty-line: "<dark_gray><place>. nobody"
     open: "<accent>Click <dark_gray>· <info>see the top 10"
+    stats: "<primary>Statistics"
+    stats-lore: "<info>Deaths, kills, harvest and playtime of every player, all time."
   board:
     general: "<primary>Overall ranking"
     pass: "<primary>Pass XP"
@@ -167,7 +169,6 @@ ranking:
     quests: "<primary>Monthly quests"
     votes: "<primary>Monthly votes"
     playtime: "<primary>Playtime this month"
-    playtime_total: "<primary>Total playtime"
     clans: "<primary>Clans"
   board-title: "<primary>Leaderboard <dark_gray>·</dark_gray> <board>"
   unit:
@@ -179,7 +180,6 @@ ranking:
     quests: "<info><accent><value></accent> quests completed this month"
     votes: "<info><accent><value></accent> votes this month"
     playtime: "<info><accent><value></accent> of active play this month"
-    playtime_total: "<info><accent><value></accent> of active play, all time"
     clans: "<info><accent><value></accent> chunks of land"
   entry:
     name: "<accent><place>. <player>"

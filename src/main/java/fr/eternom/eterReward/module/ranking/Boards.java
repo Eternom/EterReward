@@ -12,8 +12,7 @@ import java.util.UUID;
 import java.util.function.LongUnaryOperator;
 
 /**
- * Les classements. Les mensuels (général, pass, défis, quêtes, votes, temps de jeu) et le temps de jeu total sont à
- * EterReward ; les autres demandent leur classement
+ * Les classements. Les mensuels (général, pass, défis, quêtes, votes, temps de jeu) sont à EterReward ; les autres demandent leur classement
  * au plugin qui possède les données, par son API ou une source d'EterLib (RankingSource).
  */
 public enum Boards {
@@ -25,10 +24,9 @@ public enum Boards {
     QUESTS(Material.WRITABLE_BOOK, true),
     /** Votes validés sur les sites de vote (plugin Vote du site, commande eterreward vote). */
     VOTES(Material.PAPER, true),
-    /** Minutes de jeu actif (AFK exclu, PassActivity) du mois ; PLAYTIME_TOTAL : depuis toujours. */
+    /** Minutes de jeu actif du mois (AFK exclu, PassActivity). Le temps total est dans /stats (EterSuccess). */
     PLAYTIME(Material.CLOCK, true),
     SUCCESS(Material.GOLDEN_APPLE, false),
-    PLAYTIME_TOTAL(Material.RECOVERY_COMPASS, false),
     WEALTH(Material.GOLD_BLOCK, false),
     CLANS(Material.WHITE_BANNER, false);
 
@@ -77,7 +75,6 @@ public enum Boards {
             case WEALTH -> EconomyApi.get().map(api -> api.richest(limit).stream()
                     .map(ranked -> new Entry(ranked.player(), (long) Math.floor(ranked.value()))).toList()).orElse(List.of());
             case QUESTS, VOTES, PLAYTIME -> store.topMonthly(id(), season, limit);
-            case PLAYTIME_TOTAL -> store.topMonthly(PLAYTIME.id(), RankingStore.ALL_TIME, limit);
             case GENERAL -> GeneralRanking.compute(context).stream().limit(limit).toList();
             case CLANS -> Source.top("clans", limit);
         };
@@ -94,7 +91,6 @@ public enum Boards {
             case WEALTH -> EconomyApi.get().map(api -> new long[]{api.wealthRank(player), (long) Math.floor(api.balance(player))})
                     .orElse(new long[]{0, 0});
             case QUESTS, VOTES, PLAYTIME -> store.monthlyOf(player, id(), season);
-            case PLAYTIME_TOTAL -> store.monthlyOf(player, PLAYTIME.id(), RankingStore.ALL_TIME);
             case GENERAL -> GeneralRanking.standings(GeneralRanking.compute(context)).getOrDefault(player, new long[]{0, 0});
             case CLANS -> Source.of("clans", player);
         };
@@ -104,7 +100,7 @@ public enum Boards {
     String display(long value) {
         return switch (this) {
             case GENERAL -> String.format(Locale.FRANCE, "%.1f", value / 10.0);
-            case PLAYTIME, PLAYTIME_TOTAL -> String.format(Locale.FRANCE, "%s h %02d", Numbers.format(value / 60), value % 60);
+            case PLAYTIME -> String.format(Locale.FRANCE, "%s h %02d", Numbers.format(value / 60), value % 60);
             default -> Numbers.format(value);
         };
     }

@@ -158,6 +158,8 @@ ranking:
     line: "<accent><place>.</accent> <info><player> <dark_gray>· <accent><value>"
     empty-line: "<dark_gray><place>. personne"
     open: "<accent>Clic <dark_gray>· <info>voir le top 10"
+    stats: "<primary>Statistiques"
+    stats-lore: "<info>Morts, kills, récolte et temps de jeu de tous les joueurs, depuis toujours."
   board:
     general: "<primary>Classement général"
     pass: "<primary>XP du pass"
@@ -167,7 +169,6 @@ ranking:
     quests: "<primary>Quêtes du mois"
     votes: "<primary>Votes du mois"
     playtime: "<primary>Temps de jeu du mois"
-    playtime_total: "<primary>Temps de jeu total"
     clans: "<primary>Clans"
   board-title: "<primary>Classement <dark_gray>·</dark_gray> <board>"
   # La valeur de chaque classement (<value>)
@@ -180,7 +181,6 @@ ranking:
     quests: "<info><accent><value></accent> quêtes validées ce mois-ci"
     votes: "<info><accent><value></accent> votes ce mois-ci"
     playtime: "<info><accent><value></accent> de jeu actif ce mois-ci"
-    playtime_total: "<info><accent><value></accent> de jeu actif depuis toujours"
     clans: "<info><accent><value></accent> chunks de territoire"
   entry:
     name: "<accent><place>. <player>"

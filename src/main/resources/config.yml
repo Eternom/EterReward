@@ -111,8 +111,9 @@ pass:
 
 # Classements (/classement), recalculés toutes les 5 minutes. Du mois (remis à zéro chaque mois) : XP du pass, défis
 # et quêtes de métier réussis, votes, temps de jeu actif, et le GÉNÉRAL (moyenne des cinq : une note sur 100 selon la
-# place dans chacun ; les paliers du pass comptent, premium ou non). Depuis toujours : points de succès, temps de jeu
-# total, fortune, clans. Temps de jeu : seules les minutes où le joueur a regardé autour de lui ou parlé (AFK exclu).
+# place dans chacun ; les paliers du pass comptent, premium ou non). Depuis toujours : points de succès, fortune, clans
+# (le temps de jeu total est dans /stats d'EterSuccess). Temps de jeu du mois : seules les minutes où le joueur a
+# regardé autour de lui ou parlé (AFK exclu).
 # Le général a son podium (5 PNJ, EterNpc : /eterreward podium <1-5>) et ses placeholders (PlaceholderAPI).
 # rewarded : classements du mois dont le top 3 gagne à la fin du mois (une seule fois, sur un serveur avec EterResource) :
 #   money : argent ; keys : clés de monde ressource ; pass-xp : XP du pass du nouveau mois

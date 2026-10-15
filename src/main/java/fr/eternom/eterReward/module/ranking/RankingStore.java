@@ -20,8 +20,6 @@ public class RankingStore {
     private static final String CHALLENGES = "challenge_monthly";
     private static final String REWARDS = "ranking_rewards";
     private static final String MONTHLY = "ranking_monthly";
-    /** Saison des compteurs de toujours dans ranking_monthly (temps de jeu total). */
-    public static final String ALL_TIME = "all";
 
     /** Un joueur et sa valeur. */
     public record Entry(UUID player, long value) {
@@ -50,12 +48,6 @@ public class RankingStore {
     public void addChallenge(UUID player, String season) {
         database.execute("INSERT INTO " + database.table(CHALLENGES) + " (uuid, season, completed) VALUES (?, ?, 1)"
                 + " ON DUPLICATE KEY UPDATE completed = completed + 1", player, season);
-    }
-
-    /** Une minute de jeu actif : au temps du mois et au temps total (saison ALL_TIME). */
-    public void addMinute(UUID player, String season, String board) {
-        database.execute("INSERT INTO " + database.table(MONTHLY) + " (uuid, season, board, amount) VALUES (?, ?, ?, 1), (?, ?, ?, 1)"
-                + " ON DUPLICATE KEY UPDATE amount = amount + 1", player, season, board, player, ALL_TIME, board);
     }
 
     /** Une action de plus ce mois-ci dans un classement (ex : "quests"). */
