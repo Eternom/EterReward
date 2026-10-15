@@ -155,6 +155,11 @@ public class RankingService {
         Bukkit.getScheduler().runTask(plugin, () -> onGeneral.accept(top));
     }
 
+    /** Le contexte du mois en cours (sources offertes aux autres plugins). Bloquant pour la lecture qui suit. */
+    Boards.Context currentContext() {
+        return context(season());
+    }
+
     private Boards.Context context(String season) {
         return new Boards.Context(store, season, pass::tierFromXp);
     }

@@ -170,7 +170,7 @@ ranking:
     quests: "<primary>Quêtes du mois"
     votes: "<primary>Votes du mois"
     playtime: "<primary>Temps de jeu du mois"
-    clans: "<primary>Clans"
+    clans: "<primary>Clans du mois"
   board-title: "<primary>Classement <dark_gray>·</dark_gray> <board>"
   # La valeur de chaque classement (<value>)
   unit:
@@ -182,7 +182,7 @@ ranking:
     quests: "<info><accent><value></accent> quêtes validées ce mois-ci"
     votes: "<info><accent><value></accent> votes ce mois-ci"
     playtime: "<info><accent><value></accent> de jeu actif ce mois-ci"
-    clans: "<info><accent><value></accent> chunks de territoire"
+    clans: "<info><accent><value></accent> points ce mois-ci <dark_gray>(activité, travail, trésor, expansion)"
   entry:
     name: "<accent><place>. <player>"
     none: "<error>Personne pour l'instant"

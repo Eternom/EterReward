@@ -105,7 +105,9 @@ réussies (`eterreward_ranking_monthly`, comptées à chaque `JobQuestCompleteEv
 **général** (`GeneralRanking`) : dans chacun des cinq classements (paliers du pass au lieu de l'XP, premium ou non),
 une note sur 100 selon la PLACE (1er sur N = 100, dernier = 100/N, absent = 0, ex aequo à la même place), puis la
 moyenne des cinq notes, gardée en
-dixièmes (875 = 87,5 points). La place plutôt que la valeur : aucun classement n'écrase les autres. **Depuis
+dixièmes (875 = 87,5 points). La place plutôt que la valeur : aucun classement n'écrase les autres. **Clans du mois** : la source `clans` d'EterClan (score de son classement du mois, en dixièmes). Les classements du mois
+de temps de jeu, quêtes et défis sont offerts aux autres plugins par EterLib (`MonthlySource`, `monthly_<id>`) : EterClan
+s'en sert pour l'activité de ses membres. **Depuis
 toujours** : points de succès (source `success` d'EterSuccess, lue par EterLib `RankingSource` : EterReward ne dépend pas
 d'EterSuccess, qui dépend déjà de lui), fortune (`EconomyApi#richest`), clans par territoire (source `clans` d'EterClan :
 la ligne affiche le nom du clan et une bannière ; un vrai classement de clans viendra plus tard, hors de la moyenne).

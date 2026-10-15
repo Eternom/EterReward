@@ -170,7 +170,7 @@ ranking:
     quests: "<primary>Monthly quests"
     votes: "<primary>Monthly votes"
     playtime: "<primary>Playtime this month"
-    clans: "<primary>Clans"
+    clans: "<primary>Clans of the month"
   board-title: "<primary>Leaderboard <dark_gray>·</dark_gray> <board>"
   unit:
     general: "<info><accent><value></accent> points this month <dark_gray>(pass, challenges, quests, votes, playtime)"
@@ -181,7 +181,7 @@ ranking:
     quests: "<info><accent><value></accent> quests completed this month"
     votes: "<info><accent><value></accent> votes this month"
     playtime: "<info><accent><value></accent> of active play this month"
-    clans: "<info><accent><value></accent> chunks of land"
+    clans: "<info><accent><value></accent> points this month <dark_gray>(activity, work, treasury, expansion)"
   entry:
     name: "<accent><place>. <player>"
     none: "<error>Nobody yet"

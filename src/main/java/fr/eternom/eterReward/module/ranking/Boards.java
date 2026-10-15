@@ -28,7 +28,8 @@ public enum Boards {
     PLAYTIME(Material.CLOCK, true),
     SUCCESS(Material.GOLDEN_APPLE, false),
     WEALTH(Material.GOLD_BLOCK, false),
-    CLANS(Material.WHITE_BANNER, false);
+    /** Classement des clans du mois (source « clans » d'EterClan : moyenne de 4 notes, en dixièmes comme le général). */
+    CLANS(Material.WHITE_BANNER, true);
 
     private final Material icon;
     private final boolean monthly;
@@ -96,10 +97,10 @@ public enum Boards {
         };
     }
 
-    /** Valeur affichée : le général est gardé en dixièmes (875 -> 87,5), le temps de jeu en minutes (754 -> 12 h 34). */
+    /** Valeur affichée : le général et les clans sont gardés en dixièmes (875 -> 87,5), le temps de jeu en minutes (754 -> 12 h 34). */
     String display(long value) {
         return switch (this) {
-            case GENERAL -> String.format(Locale.FRANCE, "%.1f", value / 10.0);
+            case GENERAL, CLANS -> String.format(Locale.FRANCE, "%.1f", value / 10.0);
             case PLAYTIME -> String.format(Locale.FRANCE, "%s h %02d", Numbers.format(value / 60), value % 60);
             default -> Numbers.format(value);
         };

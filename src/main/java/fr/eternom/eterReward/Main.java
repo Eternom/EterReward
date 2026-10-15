@@ -2,6 +2,7 @@ package fr.eternom.eterReward;
 
 import fr.eternom.eterLib.EterLib;
 import fr.eternom.eterLib.helper.message.Messages;
+import fr.eternom.eterLib.helper.ranking.RankingSource;
 import fr.eternom.eterLib.helper.sql.Database;
 import fr.eternom.eterReward.api.RewardApi;
 import fr.eternom.eterReward.listeners.Commands;
@@ -18,6 +19,8 @@ import fr.eternom.eterReward.module.pass.PassService;
 import fr.eternom.eterReward.module.pass.PassStore;
 import fr.eternom.eterReward.module.ranking.Podium;
 import fr.eternom.eterReward.module.ranking.PodiumCommand;
+import fr.eternom.eterReward.module.ranking.Boards;
+import fr.eternom.eterReward.module.ranking.MonthlySource;
 import fr.eternom.eterReward.module.ranking.RankingPlaceholders;
 import fr.eternom.eterReward.module.ranking.RankingService;
 import fr.eternom.eterReward.module.ranking.RankingStore;
@@ -30,6 +33,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.time.DateTimeException;
 import java.time.ZoneId;
+import java.util.List;
 
 /** Récompenses du réseau : la récompense quotidienne (/daily), le pass de saison (/pass), les défis, les classements et les votes. */
 public final class Main extends JavaPlugin {
@@ -100,6 +104,10 @@ public final class Main extends JavaPlugin {
 
         // API pour les autres plugins (RewardApi.get())
         getServer().getServicesManager().register(RewardApi.class, new RewardApiService(daily, pass, challenges), this, ServicePriority.Normal);
+        // Classements du mois offerts aux autres plugins (EterClan : activité de ses membres), sans dépendance
+        for (Boards board : List.of(Boards.PLAYTIME, Boards.QUESTS, Boards.CHALLENGES)) {
+            getServer().getServicesManager().register(RankingSource.class, new MonthlySource(ranking, board), this, ServicePriority.Normal);
+        }
 
         new Commands(this);
         new Events(this);
