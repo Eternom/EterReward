@@ -1,20 +1,15 @@
 package fr.eternom.eterReward.module.pass;
 
-import io.papermc.paper.event.player.AsyncChatEvent;
+import fr.eternom.eterLib.EterLib;
+import fr.eternom.eterLib.module.activity.Activity;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 /**
@@ -22,6 +17,7 @@ import java.util.function.Consumer;
  * pendant la minute gagnent de l'XP. Un AFK immobile ne gagne rien ; un AFK « malin » (bassin d'eau...) est arrêté par
  * le plafond par jour, qui oblige à faire les quêtes pour finir le pass.
  * Les mêmes minutes, si le joueur a aussi regardé autour de lui ou parlé, comptent au classement du temps de jeu.
+ * L'activité elle-même est mesurée par EterLib (Activity), la même pour tous les plugins.
  */
 public class PassActivity implements Listener {
 
@@ -30,12 +26,6 @@ public class PassActivity implements Listener {
     private final PassService pass;
     /** Chaque minute active, aussi pour le classement du temps de jeu (tâche de fond, bloquant). */
     private final Consumer<UUID> onActiveMinute;
-    private final Map<UUID, Long> lastActive = new ConcurrentHashMap<>();
-    /**
-     * Dernier regard ou message : le classement du temps de jeu n'a pas de plafond, il ne compte donc que les minutes où
-     * le joueur a tourné la tête ou parlé (un courant d'eau ou un wagonnet en boucle déplace, mais ne fait pas regarder).
-     */
-    private final Map<UUID, Long> lastLook = new ConcurrentHashMap<>();
 
     public PassActivity(PassService pass, Consumer<UUID> onActiveMinute) {
         this.pass = pass;
@@ -49,16 +39,18 @@ public class PassActivity implements Listener {
 
     private void minute() {
         long since = System.currentTimeMillis() - MINUTE_MILLIS;
+        Activity activity = EterLib.get().getActivity();
         List<UUID> active = Bukkit.getOnlinePlayers().stream()
                 .filter(player -> player.hasPermission(PassService.PERMISSION))
                 .map(Player::getUniqueId)
-                .filter(uuid -> lastActive.getOrDefault(uuid, 0L) >= since)
+                .filter(uuid -> activity.activeSince(uuid, since))
                 .toList();
         if (active.isEmpty()) {
             return;
         }
         boolean passEnabled = pass.enabled();
-        List<UUID> looking = active.stream().filter(uuid -> lastLook.getOrDefault(uuid, 0L) >= since).toList();
+        // Le classement du temps de jeu n'a pas de plafond : seulement les minutes où le joueur a regardé ou parlé
+        List<UUID> looking = active.stream().filter(uuid -> activity.lookedSince(uuid, since)).toList();
         Bukkit.getScheduler().runTaskAsynchronously(pass.plugin(), () -> {
             for (UUID uuid : active) {
                 try {
@@ -75,28 +67,6 @@ public class PassActivity implements Listener {
         });
     }
 
-    /** Seulement un vrai mouvement ou un regard : pas les petits recalages du serveur. */
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onMove(PlayerMoveEvent event) {
-        if (event.hasChangedBlock() || event.hasChangedOrientation()) {
-            lastActive.put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
-        }
-        if (event.hasChangedOrientation()) {
-            lastLook.put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onInteract(PlayerInteractEvent event) {
-        lastActive.put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onChat(AsyncChatEvent event) {
-        lastActive.put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
-        lastLook.put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
-    }
-
     /** Le palier du pass dans la sidebar, peu après l'arrivée ; et les récompenses réclamées juste avant un départ. */
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
@@ -107,11 +77,5 @@ public class PassActivity implements Listener {
                 pass.publishTag(player);
             }
         }, 40);
-    }
-
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        lastActive.remove(event.getPlayer().getUniqueId());
-        lastLook.remove(event.getPlayer().getUniqueId());
     }
 }

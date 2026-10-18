@@ -39,7 +39,7 @@ import java.util.List;
 public final class Main extends JavaPlugin {
 
     /** Version minimale d'EterLib : textes communs et outils partagés (Frame, Money, NetworkBus) depuis 1.6.0. */
-    private static final String REQUIRED_ETERLIB = "1.15.0";
+    private static final String REQUIRED_ETERLIB = "1.18.0";
 
     /** Préfixe des tables d'EterReward dans la base commune : eterreward_daily, eterreward_pass_... */
     private static final String TABLE_PREFIX = "eterreward_";

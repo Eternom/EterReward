@@ -5,7 +5,7 @@ Les récompenses du réseau : la **récompense quotidienne** (`/daily`), le **pa
 
 ## Prérequis
 
-- **EterLib 1.15.0+** (`depend`, textes communs, cadre des menus, bus réseau, `Money`, `Numbers`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
+- **EterLib 1.18.0+** (`depend`, activité des joueurs `Activity`, textes communs, cadre des menus, bus réseau, `Money`, `Numbers`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
 - **EterEconomy 2.2.2+** (`depend`, son API `EconomyApi`) pour les récompenses en argent.
 - Facultatifs (`softdepend`), chacun dans une classe à part chargée seulement s'il est là :
   - **EterMarket 1.5.0+** : son événement `JobQuestCompleteEvent` donne l'XP du pass des quêtes de métier et compte les quêtes du mois ;
@@ -53,7 +53,7 @@ les autres le lisent : le même pour tout le réseau. `/eterreward pass set <pas
 sont copiés s'ils manquent (au démarrage) : pour en retirer un de la rotation, `enabled: false` dans son fichier.
 
 **XP** (`pass.*` de la config) : `xp-per-tier` par palier. Sources :
-- **temps de jeu actif** (`PassActivity`) : chaque minute, les joueurs qui ont bougé, tourné la tête, agi ou parlé gagnent
+- **temps de jeu actif** (`PassActivity`, activité mesurée par EterLib `Activity`) : chaque minute, les joueurs qui ont bougé, tourné la tête, agi ou parlé gagnent
   `playtime-xp-per-minute`, plafonné à `playtime-daily-cap` par jour (une seule requête qui ajoute et plafonne,
   `PassStore#addPlaytime`) : l'AFK ne mène pas au bout, il faut faire les quêtes ;
 - **`/daily`** réclamé : `daily-xp` (dans la même tâche que la réclamation) ;
