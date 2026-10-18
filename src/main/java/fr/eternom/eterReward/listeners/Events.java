@@ -5,6 +5,7 @@ import fr.eternom.eterReward.Main;
 import fr.eternom.eterReward.module.challenge.ChallengeListener;
 import fr.eternom.eterReward.module.daily.DailyListener;
 import fr.eternom.eterReward.module.pass.MarketQuestListener;
+import fr.eternom.eterReward.module.vote.VoteListener;
 import fr.eternom.eterReward.module.pass.PassActivity;
 
 public class Events {
@@ -15,6 +16,8 @@ public class Events {
         PassActivity activity = new PassActivity(main.getPass(), main.getRanking()::playedMinute);
         main.getServer().getPluginManager().registerEvents(activity, main);
         activity.start();
+
+        main.getServer().getPluginManager().registerEvents(new VoteListener(main.getVotes()), main);
 
         ChallengeListener challenges = new ChallengeListener(main.getChallenges());
         main.getServer().getPluginManager().registerEvents(challenges, main);

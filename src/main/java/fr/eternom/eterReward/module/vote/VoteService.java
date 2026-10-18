@@ -31,7 +31,8 @@ import java.util.UUID;
 /**
  * Votes sur les sites de vote. Le plugin Vote du site lance « eterreward vote <joueur> » dans la console (par AzLink)
  * à chaque vote validé. Le joueur peut être hors ligne ou sur un autre serveur : tout passe par la base (argent par
- * EterEconomy, XP du pass, clés par EterResource), rien n'attend sa connexion.
+ * EterEconomy, XP du pass, clés par EterResource). Seules attendent sa prochaine arrivée (eterreward_vote_away) : les
+ * clés reçues sur un serveur sans EterResource, et, s'il n'était connecté nulle part, le résumé de ses votes.
  *
  * Un vote : la série avance (premier vote du jour), le vote compte au classement du mois, un tirage est donné, plus le
  * bonus de série s'il y en a un pour ce nombre de jours. Le joueur est prévenu là où il est (dans sa langue), et un
@@ -42,8 +43,11 @@ public class VoteService {
     private static final String RECEIVED = "received";
     private static final String THANKS = "thanks";
 
-    /** Ce que le joueur a reçu, envoyé tel quel au serveur où il se trouve pour lui écrire dans sa langue. */
-    private record Gift(double money, int passXp, int keys, String label) {
+    /**
+     * Ce que le joueur a reçu, envoyé tel quel au serveur où il se trouve pour lui écrire dans sa langue. owedKeys : clés
+     * pas encore données (serveur sans EterResource), mises de côté pour sa prochaine arrivée.
+     */
+    private record Gift(double money, int passXp, int keys, int owedKeys, String label) {
     }
 
     private final JavaPlugin plugin;
@@ -90,6 +94,7 @@ public class VoteService {
             Loot bonus = day.first() ? rewards.streakBonus(day.streak()) : null;
             Gift voteGift = give(player, vote);
             Gift bonusGift = give(player, bonus);
+            keepForArrival(player, voteGift, bonusGift);
             Bukkit.getScheduler().runTask(plugin, () -> {
                 messages.send(sender, "vote.done", "player", player.name(), "streak", String.valueOf(day.streak()));
                 received(player.uuid(), day.streak(), voteGift, bonusGift);
@@ -116,15 +121,91 @@ public class VoteService {
         if (passXp > 0) {
             pass.addXp(player.uuid(), passXp);
         }
-        if (loot.keys() > 0 && (!Bukkit.getPluginManager().isPluginEnabled("EterResource")
-                || !ResourceRewards.give(player.uuid(), loot.keys(), 0))) {
-            plugin.getLogger().warning("Vote : clés non données à " + player.name() + " (EterResource absent sur ce serveur)");
+        int keys = 0;
+        int owedKeys = 0;
+        if (loot.keys() > 0) {
+            if (Bukkit.getPluginManager().isPluginEnabled("EterResource") && ResourceRewards.give(player.uuid(), loot.keys(), 0)) {
+                keys = loot.keys();
+            } else {
+                owedKeys = loot.keys(); // données à sa prochaine arrivée sur un serveur avec EterResource
+            }
         }
         for (String command : loot.commands()) {
             Bukkit.getScheduler().runTask(plugin, () ->
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.name())));
         }
-        return new Gift(loot.money(), passXp, loot.keys(), loot.label());
+        return new Gift(loot.money(), passXp, keys, owedKeys, loot.label());
+    }
+
+    /**
+     * Bloquant. Met de côté pour la prochaine arrivée du joueur : les clés pas encore données, et, s'il n'est connecté
+     * nulle part, le résumé du vote (sinon il ne l'apprendrait jamais : le message ne part qu'au moment du vote).
+     */
+    private void keepForArrival(NetworkPlayer player, Gift vote, Gift bonus) {
+        int owedKeys = owedKeys(vote) + owedKeys(bonus);
+        boolean offline = !player.isOnline();
+        if (!offline && owedKeys == 0) {
+            return;
+        }
+        store.addAway(player.uuid(), offline
+                ? new VoteStore.Away(1, money(vote) + money(bonus), passXp(vote) + passXp(bonus), keys(vote) + keys(bonus), owedKeys)
+                : new VoteStore.Away(0, 0, 0, 0, owedKeys));
+    }
+
+    /**
+     * À l'arrivée sur un serveur (thread principal), quelques secondes après les messages d'accueil : le résumé des votes
+     * reçus hors ligne, et les clés dues si EterResource tourne ici (sinon elles attendent un serveur qui l'a).
+     */
+    public void welcome(Player player) {
+        UUID uuid = player.getUniqueId();
+        boolean withKeys = Bukkit.getPluginManager().isPluginEnabled("EterResource");
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (!player.isOnline()) {
+                return;
+            }
+            Tasks.async(plugin, player, () -> {
+                VoteStore.Away away = store.takeAway(uuid, withKeys);
+                if (away.keysOwed() > 0 && !ResourceRewards.give(uuid, away.keysOwed(), 0)) {
+                    store.addAway(uuid, new VoteStore.Away(0, 0, 0, 0, away.keysOwed()));
+                    return new VoteStore.Away(away.votes(), away.money(), away.passXp(), away.keysGiven(), 0);
+                }
+                return away;
+            }, away -> {
+                if (away.votes() > 0) {
+                    Gift total = new Gift(away.money(), away.passXp(), away.keysGiven(), 0, null);
+                    player.sendMessage(messages.prefix().append(messages.get(player, "vote.away",
+                            Placeholder.component("content", describe(player, total)), "votes", String.valueOf(away.votes()))));
+                }
+                if (away.keysOwed() > 0) {
+                    messages.send(player, "vote.keys-delivered", "amount", String.valueOf(away.keysOwed()));
+                }
+                if (!away.isEmpty()) {
+                    player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.3f);
+                }
+            }, () -> { }, away -> {
+                // Reparti pendant la lecture : le résumé attend la prochaine fois (les clés, elles, sont déjà données)
+                if (away.votes() > 0) {
+                    Tasks.async(plugin, () -> store.addAway(uuid, new VoteStore.Away(away.votes(), away.money(), away.passXp(),
+                            away.keysGiven() + away.keysOwed(), 0)), "Résumé des votes perdu pour " + uuid);
+                }
+            });
+        }, 20 * 4);
+    }
+
+    private static int owedKeys(Gift gift) {
+        return gift == null ? 0 : gift.owedKeys();
+    }
+
+    private static int keys(Gift gift) {
+        return gift == null ? 0 : gift.keys();
+    }
+
+    private static int passXp(Gift gift) {
+        return gift == null ? 0 : gift.passXp();
+    }
+
+    private static double money(Gift gift) {
+        return gift == null ? 0 : gift.money();
     }
 
     /** Thread principal : prévient le joueur ici, ou sur le serveur où il se trouve. */
@@ -174,6 +255,9 @@ public class VoteService {
         if (gift.keys() > 0) {
             parts.add(messages.get(viewer, "vote.part.keys", "amount", String.valueOf(gift.keys())));
         }
+        if (gift.owedKeys() > 0) {
+            parts.add(messages.get(viewer, "vote.part.keys-later", "amount", String.valueOf(gift.owedKeys())));
+        }
         return parts.isEmpty() ? messages.get(viewer, "vote.nothing") : Component.join(JoinConfiguration.commas(true), parts);
     }
 
@@ -185,6 +269,7 @@ public class VoteService {
         json.addProperty("money", gift.money());
         json.addProperty("pass-xp", gift.passXp());
         json.addProperty("keys", gift.keys());
+        json.addProperty("owed-keys", gift.owedKeys());
         if (gift.label() != null) {
             json.addProperty("label", gift.label());
         }
@@ -196,7 +281,9 @@ public class VoteService {
             return null;
         }
         JsonObject json = data.getAsJsonObject(key);
+        // owed-keys absent : message d'un serveur pas encore à jour
         return new Gift(json.get("money").getAsDouble(), json.get("pass-xp").getAsInt(), json.get("keys").getAsInt(),
+                json.has("owed-keys") ? json.get("owed-keys").getAsInt() : 0,
                 json.has("label") ? json.get("label").getAsString() : null);
     }
 }

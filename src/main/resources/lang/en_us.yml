@@ -215,12 +215,15 @@ ranking:
 # Votes on voting sites (eterreward vote command, run by the website)
 vote:
   received: "<success>Thanks for voting!</success> <info>You get <accent><content></accent>. <dark_gray>(streak: <streak> day(s))"
+  away: "<success>While you were away, your votes (<votes>) earned you <accent><content></accent>. Thanks!"
+  keys-delivered: "<info>Your <accent><amount> resource world key(s)</accent> earned by voting have arrived."
   streak-bonus: "<success><streak>-day streak!</success> <info>Bonus: <accent><content></accent>"
   thanks: "<info>Thanks to <accent><player></accent> for voting! <dark_gray>(/vote on the website)"
   nothing: "nothing this time"
   part:
     pass-xp: "<amount> pass XP"
     keys: "<amount> resource world key(s)"
+    keys-later: "<amount> resource world key(s) (on your next resource world visit)"
   done: "<info>Vote from <accent><player></accent> recorded <dark_gray>(streak: <streak> day(s))"
   unknown: "<error>Unknown player: <accent><player></accent> <dark_gray>(never joined the server)"
   usage: '<error>Usage: <accent>/eterreward vote \<player>'

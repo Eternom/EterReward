@@ -149,6 +149,10 @@ par EterEconomy, XP du pass, clés par EterResource) ; il n'y a donc pas d'objet
   au général (4e critère). `ranking.rewarded` récompense par défaut le général et les votes.
 - **Messages** : le joueur est prévenu dans sa langue là où il est (bus `eterreward-votes`, message `received` avec le
   détail, rédigé par son serveur), et un merci est annoncé sur tout le réseau (`votes.announce`, message `thanks`).
+- **Joueur absent** (`VoteStore`, table `eterreward_vote_away`) : connecté nulle part au moment du vote (annuaire
+  d'EterLib), il reçoit quand même tout en base, et le résumé de ses votes est gardé : à sa prochaine arrivée sur un
+  serveur, « pendant ton absence, tes votes (n) t'ont rapporté… » (`VoteListener`, 4 s après l'arrivée). Une **clé** tirée
+  sur un serveur sans EterResource n'est plus perdue : elle attend la prochaine arrivée du joueur sur un serveur qui l'a.
 
 ## Commandes et permissions
 

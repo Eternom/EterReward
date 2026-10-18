@@ -216,12 +216,15 @@ ranking:
 # Votes sur les sites de vote (commande eterreward vote, lancée par le site)
 vote:
   received: "<success>Merci pour ton vote !</success> <info>Tu reçois <accent><content></accent>. <dark_gray>(série : <streak> jour(s))"
+  away: "<success>Pendant ton absence, tes votes (<votes>) t'ont rapporté <accent><content></accent>. Merci !"
+  keys-delivered: "<info>Tes <accent><amount> clé(s) de monde ressource</accent> gagnées en votant sont arrivées."
   streak-bonus: "<success>Série de <streak> jours !</success> <info>Bonus : <accent><content></accent>"
   thanks: "<info>Merci à <accent><player></accent> pour son vote ! <dark_gray>(/vote sur le site)"
   nothing: "rien cette fois"
   part:
     pass-xp: "<amount> XP de pass"
     keys: "<amount> clé(s) de monde ressource"
+    keys-later: "<amount> clé(s) de monde ressource (à ta prochaine arrivée en ressource)"
   done: "<info>Vote de <accent><player></accent> enregistré <dark_gray>(série : <streak> jour(s))"
   unknown: "<error>Joueur inconnu : <accent><player></accent> <dark_gray>(jamais venu sur le serveur)"
   usage: '<error>Utilisation : <accent>/eterreward vote \<joueur>'
