@@ -48,6 +48,15 @@ public class VoteService {
      * pas encore données (serveur sans EterResource), mises de côté pour sa prochaine arrivée.
      */
     private record Gift(double money, int passXp, int keys, int owedKeys, String label) {
+
+        private static final Gift NONE = new Gift(0, 0, 0, 0, null);
+
+        /** Somme de deux récompenses (null : rien), sans label. */
+        static Gift sum(Gift a, Gift b) {
+            Gift x = a == null ? NONE : a;
+            Gift y = b == null ? NONE : b;
+            return new Gift(x.money + y.money, x.passXp + y.passXp, x.keys + y.keys, x.owedKeys + y.owedKeys, null);
+        }
     }
 
     private final JavaPlugin plugin;
@@ -142,14 +151,14 @@ public class VoteService {
      * nulle part, le résumé du vote (sinon il ne l'apprendrait jamais : le message ne part qu'au moment du vote).
      */
     private void keepForArrival(NetworkPlayer player, Gift vote, Gift bonus) {
-        int owedKeys = owedKeys(vote) + owedKeys(bonus);
+        Gift total = Gift.sum(vote, bonus);
         boolean offline = !player.isOnline();
-        if (!offline && owedKeys == 0) {
+        if (!offline && total.owedKeys() == 0) {
             return;
         }
         store.addAway(player.uuid(), offline
-                ? new VoteStore.Away(1, money(vote) + money(bonus), passXp(vote) + passXp(bonus), keys(vote) + keys(bonus), owedKeys)
-                : new VoteStore.Away(0, 0, 0, 0, owedKeys));
+                ? new VoteStore.Away(1, total.money(), total.passXp(), total.keys(), total.owedKeys())
+                : new VoteStore.Away(0, 0, 0, 0, total.owedKeys()));
     }
 
     /**
@@ -190,22 +199,6 @@ public class VoteService {
                 }
             });
         }, 20 * 4);
-    }
-
-    private static int owedKeys(Gift gift) {
-        return gift == null ? 0 : gift.owedKeys();
-    }
-
-    private static int keys(Gift gift) {
-        return gift == null ? 0 : gift.keys();
-    }
-
-    private static int passXp(Gift gift) {
-        return gift == null ? 0 : gift.passXp();
-    }
-
-    private static double money(Gift gift) {
-        return gift == null ? 0 : gift.money();
     }
 
     /** Thread principal : prévient le joueur ici, ou sur le serveur où il se trouve. */
