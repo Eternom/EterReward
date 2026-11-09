@@ -65,7 +65,7 @@ public class ChallengeListener implements Listener {
         }
     }
 
-    /** Appelé par l'écouteur des quêtes d'EterMarket (classe à part). */
+    /** Appelé par l'écouteur des quêtes d'EterJob (classe à part). */
     public void onQuest(Player player) {
         challenges.count(player, Kind.QUEST, challenge -> true);
     }

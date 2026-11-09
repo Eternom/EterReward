@@ -30,7 +30,7 @@ public record ChallengeDefinition(String id, Kind kind, Set<Material> blocks, Se
         KILL,
         /** Pêcher (une prise). */
         FISH,
-        /** Valider des quêtes de métier (EterMarket). */
+        /** Valider des quêtes de métier (EterJob). */
         QUEST
     }
 

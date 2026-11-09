@@ -4,7 +4,7 @@ import fr.eternom.eterLib.helper.task.Tasks;
 import fr.eternom.eterReward.Main;
 import fr.eternom.eterReward.module.challenge.ChallengeListener;
 import fr.eternom.eterReward.module.daily.DailyListener;
-import fr.eternom.eterReward.module.pass.MarketQuestListener;
+import fr.eternom.eterReward.module.pass.JobQuestListener;
 import fr.eternom.eterReward.module.vote.VoteListener;
 import fr.eternom.eterReward.module.pass.PassActivity;
 import fr.eternom.eterReward.module.pass.SuccessListener;
@@ -28,9 +28,9 @@ public class Events {
         ChallengeListener challenges = new ChallengeListener(main.getChallenges());
         main.getServer().getPluginManager().registerEvents(challenges, main);
 
-        // Quêtes de métier : seulement si EterMarket est là (sa classe d'événement n'existe pas sinon)
-        if (main.getServer().getPluginManager().isPluginEnabled("EterMarket")) {
-            main.getServer().getPluginManager().registerEvents(new MarketQuestListener(main.getPass(), challenges,
+        // Quêtes de métier : seulement si EterJob est là (sa classe d'événement n'existe pas sinon)
+        if (main.getServer().getPluginManager().isPluginEnabled("EterJob")) {
+            main.getServer().getPluginManager().registerEvents(new JobQuestListener(main.getPass(), challenges,
                     uuid -> Tasks.async(main, () -> main.getRanking().questCompleted(uuid),
                             "Quête non comptée au classement")), main);
         }

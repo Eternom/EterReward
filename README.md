@@ -8,7 +8,7 @@ Les récompenses du réseau : la **récompense quotidienne** (`/daily`), le **pa
 - **EterLib 1.18.0+** (`depend`, activité des joueurs `Activity`, textes communs, cadre des menus, bus réseau, `Money`, `Numbers`) : base, langues, menus (bouton Retour/Fermer), durées lisibles.
 - **EterEconomy 2.2.2+** (`depend`, son API `EconomyApi`) pour les récompenses en argent.
 - Facultatifs (`softdepend`), chacun dans une classe à part chargée seulement s'il est là :
-  - **EterMarket 1.5.0+** : son événement `JobQuestCompleteEvent` donne l'XP du pass des quêtes de métier et compte les quêtes du mois ;
+  - **EterJob 2.0.0+** : son événement `JobQuestCompleteEvent` donne l'XP du pass des quêtes de métier et compte les quêtes du mois ;
   - **EterResource** : son API `ResourceApi` pour les clés et le temps de monde ressource ;
   - **LuckPerms** : les permissions temporaires des récompenses (sans lui, elles attendent en colis) ;
   - **EterClan 1.7.0+** : objectifs de clan et premium offert à tout le clan ;
@@ -69,7 +69,7 @@ rapport par pass (récompenses gratuites et premium) et des avertissements (pali
   par jour (`playtime-daily-cap` ou le `playtime-cap` du pass, × `playtime-cap-days` selon le jour), avec **report** de
   `playtime-carry-over` du plafond non utilisé la veille (un jour au plus). Toutes les minutes du serveur en **une lecture
   et une écriture** (`PassStore#progress(List)`, `#addPlaytime(List)`) ;
-- **`/daily`**, **quêtes** (EterMarket, `quest-xp`), **défis et missions**, **votes**, **classements**, **succès**
+- **`/daily`**, **quêtes** (EterJob, `quest-xp`), **défis et missions**, **votes**, **classements**, **succès**
   (EterSuccess, `success-xp-per-point`), **objectifs de clan** (`ClanGoals` : palier moyen des membres, une fois par mois et
   par objectif), `RewardApi#addPassXp`, `/eterreward pass xp <joueur> <montant> [source]` (boss, évènements...).
 - **Rattrapage** (`catch-up`) : en retard de plus de `margin` paliers sur le rythme attendu, XP × `multiplier` (hors temps
@@ -116,7 +116,7 @@ premier serveur qui en a besoin les écrit (`INSERT IGNORE` dans `eterreward_cha
 
 **Comptage** (`ChallengeListener`, en survie) : `break` (blocs **naturels** seulement : un bloc posé par un joueur ne compte
 pas, EterLib `PlacedBlocks`), `harvest` (cultures mûres), `kill` (tuées par le joueur ; `#monsters` = les `Enemy`), `fish`,
-`quest` (EterMarket). Chaque action s'ajoute en mémoire (`compute` atomique avec la vidange), puis part en base toutes les
+`quest` (EterJob). Chaque action s'ajoute en mémoire (`compute` atomique avec la vidange), puis part en base toutes les
 15 s et au départ (une requête relative par défi). Un défi atteint est validé par une requête conditionnelle
 (`done = FALSE AND progress >= target`) : récompense (XP du pass, argent « EterReward · défis ») une seule fois, même avec
 plusieurs serveurs ; puis l'événement `ChallengeCompleteEvent`.

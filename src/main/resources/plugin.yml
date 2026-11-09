@@ -7,9 +7,9 @@ load: POSTWORLD
 authors: [ NadTum ]
 description: Récompenses du réseau (récompense quotidienne sur 7 jours, pass de saison, défis, classements).
 depend: [EterLib, EterEconomy]
-# EterMarket : XP du pass pour les quêtes ; EterResource : clés de ressource ; LuckPerms : permissions temporaires ;
+# EterJob : XP du pass pour les quêtes ; EterResource : clés de ressource ; LuckPerms : permissions temporaires ;
 # EterClan : objectifs de clan et premium du clan ; EterSuccess : XP des succès
-softdepend: [EterMarket, EterResource, LuckPerms, EterNpc, PlaceholderAPI, EterSync, EterClan, EterSuccess]
+softdepend: [EterJob, EterResource, LuckPerms, EterNpc, PlaceholderAPI, EterSync, EterClan, EterSuccess]
 
 commands:
   daily:

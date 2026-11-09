@@ -127,7 +127,7 @@ pass:
 
   # Récompense du jour (/daily) réclamée.
   daily-xp: 300
-  # Quête de métier validée (EterMarket), selon sa difficulté ; bonus = la quête bonus du jour.
+  # Quête de métier validée (EterJob), selon sa difficulté ; bonus = la quête bonus du jour.
   quest-xp:
     easy: 100
     normal: 200
