@@ -40,8 +40,8 @@ import java.util.function.Predicate;
  */
 public class ChallengeService {
 
-    /** Période d'un défi : jour ou semaine. */
-    public enum Period { DAILY, WEEKLY }
+    /** Période d'un défi : jour, semaine, ou mission de la semaine du pass (choisie selon le pass du mois). */
+    public enum Period { DAILY, WEEKLY, MISSION }
 
     /** Défis en cours d'une période, avec leur clé en base. */
     record Active(Period period, String key, List<ChallengeDefinition> challenges, ZonedDateTime end) {
@@ -92,7 +92,7 @@ public class ChallengeService {
         if (active != null && active.key().equals(key)) {
             return active;
         }
-        List<ChallengeDefinition> pool = pools.getOrDefault(period, List.of());
+        List<ChallengeDefinition> pool = themed(period, pools.getOrDefault(period, List.of()));
         List<String> ids = store.period(key).orElseGet(() -> store.createPeriod(key, pick(pool, counts.getOrDefault(period, 3))));
         List<ChallengeDefinition> challenges = new ArrayList<>();
         for (String id : ids) {
@@ -108,6 +108,16 @@ public class ChallengeService {
         return active;
     }
 
+    /** Missions : celles choisies par le pass du mois (s'il en choisit et qu'elles existent), sinon toutes. Bloquant. */
+    private List<ChallengeDefinition> themed(Period period, List<ChallengeDefinition> pool) {
+        if (period != Period.MISSION) {
+            return pool;
+        }
+        List<String> chosen = pass.missionIds();
+        List<ChallengeDefinition> themed = pool.stream().filter(challenge -> chosen.contains(challenge.id())).toList();
+        return themed.isEmpty() ? pool : themed;
+    }
+
     private static List<String> pick(List<ChallengeDefinition> pool, int count) {
         List<String> ids = new ArrayList<>(pool.stream().map(ChallengeDefinition::id).toList());
         Collections.shuffle(ids);
@@ -118,7 +128,7 @@ public class ChallengeService {
         LocalDate today = LocalDate.now(zone);
         return period == Period.DAILY
                 ? "d:" + today.toEpochDay()
-                : "w:" + today.get(IsoFields.WEEK_BASED_YEAR) + "-" + today.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+                : (period == Period.MISSION ? "m:" : "w:") + today.get(IsoFields.WEEK_BASED_YEAR) + "-" + today.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
     }
 
     private ZonedDateTime end(Period period) {
@@ -226,8 +236,8 @@ public class ChallengeService {
         }
         int xp = challenge.xp();
         try {
-            xp = pass.challengeXp(challenge.xp());
-            pass.addXp(uuid, xp);
+            xp = pass.addXp(uuid, pass.challengeXp(challenge.xp()),
+                    period == Period.MISSION ? PassService.Source.MISSION : PassService.Source.CHALLENGE);
         } catch (RuntimeException e) {
             plugin.getLogger().warning("XP du pass non donnée pour le défi " + challenge.id() + " : " + e.getMessage());
         }
@@ -237,18 +247,22 @@ public class ChallengeService {
             if (player == null) {
                 return;
             }
-            messages.send(player, period == Period.DAILY ? "challenges.done-daily" : "challenges.done-weekly",
+            messages.send(player, switch (period) {
+                        case DAILY -> "challenges.done-daily";
+                        case WEEKLY -> "challenges.done-weekly";
+                        case MISSION -> "challenges.done-mission";
+                    },
                     "challenge", messages.plain(player, "challenges.list." + challenge.id(), "target", String.valueOf(challenge.target())),
                     "xp", String.valueOf(shownXp), "money", Money.format(challenge.money()));
             player.playSound(player, Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.7f, 1.2f);
-            Bukkit.getPluginManager().callEvent(new ChallengeCompleteEvent(player, challenge.id(), period == Period.WEEKLY));
+            Bukkit.getPluginManager().callEvent(new ChallengeCompleteEvent(player, challenge.id(), period != Period.DAILY));
         });
     }
 
     // ---------- Menu ----------
 
     /** Ce que montre le menu : défis en cours et avancée du joueur (base + pas encore enregistré). */
-    record View(Active daily, Active weekly, Map<String, int[]> progress) {
+    record View(Active daily, Active weekly, Active missions, Map<String, int[]> progress) {
     }
 
     public void open(Player player) {
@@ -256,16 +270,18 @@ public class ChallengeService {
         Tasks.async(plugin, player, () -> {
             Active daily = active(Period.DAILY);
             Active weekly = active(Period.WEEKLY);
+            Active missions = active(Period.MISSION);
             Map<String, int[]> progress = new HashMap<>();
             store.progress(uuid, daily.key()).forEach((id, value) -> progress.put(daily.key() + "|" + id, value));
             store.progress(uuid, weekly.key()).forEach((id, value) -> progress.put(weekly.key() + "|" + id, value));
+            store.progress(uuid, missions.key()).forEach((id, value) -> progress.put(missions.key() + "|" + id, value));
             Map<String, Integer> unsaved = new HashMap<>();
             pending.computeIfPresent(uuid, (key, counts) -> {
                 unsaved.putAll(counts); // copie sous verrou : le thread principal continue d'ajouter
                 return counts;
             });
             unsaved.forEach((key, amount) -> progress.merge(key, new int[]{amount, 0}, (a, b) -> new int[]{a[0] + b[0], a[1]}));
-            return new View(daily, weekly, progress);
+            return new View(daily, weekly, missions, progress);
         }, view -> player.openInventory(new ChallengeMenu(this, player, view).getInventory()),
                 () -> messages.send(player, "error.generic"));
     }

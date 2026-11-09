@@ -87,23 +87,44 @@ daily:
         #   label: "<accent>Clé de caisse rare"
         #   commands: [ "crate give {player} rare 1" ]
 
-# Pass de saison (/pass) : chaque mois (dans le fuseau daily.time-zone), un des pass de passes/ est tiré au hasard,
-# jamais celui du mois d'avant, le même pour tout le réseau. 30 paliers, une ligne gratuite et une premium
-# (permission eterreward.pass.premium.<pass>, ex : /eterreward pass premium <joueur>, jusqu'à la fin du mois).
-# Les récompenses non réclamées à la fin du mois sont perdues. Un pass = un fichier de passes/ (le nom du fichier
-# est son identifiant) ; les 10 fournis sont copiés s'ils manquent. Pour retirer un pass : « enabled: false » dans son fichier.
+# Pass de saison (/pass) : chaque mois (dans le fuseau daily.time-zone), un des pass de passes/ est tiré au hasard
+# (quelques jours avant la fin du mois d'avant), jamais un des derniers mois, le même pour tout le réseau. 30 paliers,
+# une ligne gratuite et une premium, puis des paliers bonus répétables. Un pass = un fichier de passes/ (le nom du
+# fichier est son identifiant) ; les 10 fournis sont copiés s'ils manquent. Pour retirer un pass : « enabled: false ».
+# /eterreward pass reload relit cette section et passes/ sur tous les serveurs, sans redémarrage.
 pass:
-  # XP pour passer un palier (30 paliers). Repères avec les valeurs ci-dessous et les défis (challenges.yml) :
+  # XP pour passer un palier. Repères avec les valeurs ci-dessous et les défis (challenges.yml) :
   # - joueur occasionnel (1 h de jeu, /daily, 1 quête normale, 1 défi du jour : ~900 XP/jour) : palier 22 environ
   #   en fin de mois ;
   # - joueur assidu (temps plafonné, /daily, 3 quêtes + la bonus, tous les défis : ~2 150 XP/jour) : fini vers le
   #   17e jour, vers le 14e quand le bonus du mois est sur son métier.
   # Attention en montant l'XP des quêtes ou des défis : ce sont eux qui font finir le pass trop vite.
   xp-per-tier: 1200
+  # Coût de chaque palier, dans l'ordre (la dernière valeur vaut pour les paliers suivants) ; vide : xp-per-tier
+  # partout. Par défaut, les premiers paliers vont plus vite pour accrocher les nouveaux.
+  xp-curve: [ 600, 800, 1000, 1200 ]
+
+  # Paliers bonus, au-delà du dernier : un tous les « xp », « max » au plus par mois, chacun réclamable (ligne gratuite).
+  # max: 0 pour ne pas en avoir.
+  overflow:
+    xp: 2400
+    max: 20
+    money: 150
+    keys: 0
+
   # Temps de jeu ACTIF (le joueur a bougé, agi ou parlé dans la minute) : XP par minute, et plafond par jour
   # (100 minutes) : l'AFK ne suffit pas, il faut faire les quêtes pour finir le pass.
   playtime-xp-per-minute: 5
   playtime-daily-cap: 500
+  # Plafond multiplié certains jours (MONDAY ... SUNDAY).
+  playtime-cap-days:
+    SATURDAY: 1.5
+    SUNDAY: 1.5
+  # Part du plafond NON utilisée la veille reportée sur le jour (0,5 = la moitié ; un seul jour reporté ; 0 : rien).
+  playtime-carry-over: 0.5
+  # Temps de jeu multiplié dans certains mondes (début du nom du monde), ex : « ressource: 1.25 ».
+  world-xp: {}
+
   # Récompense du jour (/daily) réclamée.
   daily-xp: 300
   # Quête de métier validée (EterMarket), selon sa difficulté ; bonus = la quête bonus du jour.
@@ -112,6 +133,53 @@ pass:
     normal: 200
     hard: 300
     bonus: 300
+  # Succès débloqué (EterSuccess) : XP par point de succès (0 : rien).
+  success-xp-per-point: 10
+
+  # Rattrapage : un joueur en retard sur le rythme « attendu » (expected-end-tier paliers en fin de mois, réparti sur
+  # les jours) de plus de « margin » paliers gagne « multiplier » fois plus d'XP (sauf le temps de jeu).
+  # expected-end-tier: 0 pour désactiver.
+  catch-up:
+    expected-end-tier: 22
+    margin: 3
+    multiplier: 2
+
+  # Objectifs de clan (EterClan, à partir de premium.clan-min-members membres) : quand le palier MOYEN des membres
+  # atteint average-tier, chaque membre gagne « xp », une fois par mois et par objectif. Vide : pas d'objectifs.
+  clan-goals:
+    - average-tier: 10
+      xp: 600
+    - average-tier: 20
+      xp: 1200
+
+  # Jours pour réclamer les récompenses du mois d'avant (0 : perdues à la fin du mois).
+  grace-days: 7
+  # Le pass du mois suivant est tiré ce nombre de jours avant la fin du mois ; son aperçu est visible dans le menu
+  # les preview-days derniers jours.
+  draw-ahead-days: 6
+  preview-days: 3
+  # Un pass ne revient pas avant ce nombre de mois (s'il y a assez de pass).
+  no-repeat-months: 3
+
+  # Premium du mois. Donné par la boutique (/eterreward pass premium <joueur> [acheteur] [paliers]) ou acheté en jeu.
+  # Le grade qui l'a tous les mois : permission eterreward.pass.premium.always.
+  premium:
+    # Lien du bouton premium du menu (vide : pas de lien).
+    shop-url: "https://craft.eternom.fr/shop"
+    # Prix en jeu (Heloks) ; 0 : pas d'achat en jeu, seulement la boutique. Repère : ~10 jours de quêtes.
+    price: 0
+    # Acheté en jeu pour tout son clan (le chef paie pour les membres qui ne l'ont pas) : réduction, et taille minimale.
+    clan-discount: 0.25
+    clan-min-members: 3
+    # Acheté dans les derniers jours du mois : le mois suivant est compris.
+    late-buy-days: 5
+    # Chaque premium donne l'insigne du mois (objet de collection, dans la boîte /pass colis).
+    badge: true
+
+  # Annonce du nouveau pass le 1er du mois à tous les joueurs (et le bilan du mois d'avant au staff).
+  announce: true
+  # Annonces et bilans aussi sur un salon Discord (URL d'un webhook ; vide : non).
+  discord-webhook: ""
 
 # Classements (/classement), recalculés toutes les 5 minutes. Du mois (remis à zéro chaque mois) : XP du pass, défis
 # et quêtes de métier réussis, votes, temps de jeu actif, et le GÉNÉRAL (moyenne des cinq : une note sur 100 selon la

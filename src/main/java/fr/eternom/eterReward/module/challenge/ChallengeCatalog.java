@@ -11,7 +11,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-/** challenges.yml : les défis possibles du jour et de la semaine (copié au premier démarrage). */
+/** challenges.yml : les défis possibles du jour, de la semaine, et les missions du pass (copié au premier démarrage). */
 public final class ChallengeCatalog {
 
     public record Catalog(Map<Period, List<ChallengeDefinition>> pools, Map<Period, Integer> counts) {
@@ -26,13 +26,30 @@ public final class ChallengeCatalog {
             plugin.saveResource("challenges.yml", false);
         }
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
+        // Une section absente du fichier (ex : missions, ajoutées en 1.12.0) est lue dans celui du plugin
+        var bundled = plugin.getResource("challenges.yml");
+        if (bundled != null) {
+            yaml.setDefaults(YamlConfiguration.loadConfiguration(new java.io.InputStreamReader(bundled, java.nio.charset.StandardCharsets.UTF_8)));
+        }
         Map<Period, List<ChallengeDefinition>> pools = new EnumMap<>(Period.class);
         Map<Period, Integer> counts = new EnumMap<>(Period.class);
         for (Period period : Period.values()) {
-            String name = period == Period.DAILY ? "daily" : "weekly";
+            String name = switch (period) {
+                case DAILY -> "daily";
+                case WEEKLY -> "weekly";
+                case MISSION -> "missions";
+            };
             counts.put(period, Math.max(0, yaml.getInt(name + "-count", 3)));
-            int xp = yaml.getInt("defaults." + name + ".xp", period == Period.DAILY ? 100 : 300);
-            double money = yaml.getDouble("defaults." + name + ".money", period == Period.DAILY ? 30 : 150);
+            int xp = yaml.getInt("defaults." + name + ".xp", switch (period) {
+                case DAILY -> 100;
+                case WEEKLY -> 300;
+                case MISSION -> 500;
+            });
+            double money = yaml.getDouble("defaults." + name + ".money", switch (period) {
+                case DAILY -> 30;
+                case WEEKLY -> 150;
+                case MISSION -> 200;
+            });
             List<ChallengeDefinition> pool = new ArrayList<>();
             ConfigurationSection section = yaml.getConfigurationSection(name);
             if (section != null) {

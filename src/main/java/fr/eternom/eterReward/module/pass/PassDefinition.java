@@ -16,8 +16,11 @@ import java.util.regex.Pattern;
 /**
  * Un pass de saison (un fichier de plugins/EterReward/passes/) : son nom, son icône, son bonus du mois et ses paliers,
  * chacun avec une récompense gratuite et une récompense premium.
+ *
+ * @param missions missions de la semaine propres à ce pass (identifiants de challenges.yml > missions) ; vide : toutes
  */
-public record PassDefinition(String id, String name, Material icon, List<String> description, Bonus bonus, List<Tier> tiers) {
+public record PassDefinition(String id, String name, Material icon, List<String> description, Bonus bonus, List<Tier> tiers,
+                             List<String> missions) {
 
     /**
      * Le bonus du mois. questJob : les quêtes de ce métier rapportent questMultiplier fois plus d'XP (vide : toutes les
@@ -105,8 +108,28 @@ public record PassDefinition(String id, String name, Material icon, List<String>
             logger.warning(where + " : aucun palier valable, pass ignoré");
             return null;
         }
+        // Contrôle : paliers vides, commandes sans {player}, icône inconnue
+        List<Integer> empty = tiers.stream().filter(tier -> tier.free() == null && tier.premium() == null).map(Tier::number).toList();
+        if (!empty.isEmpty()) {
+            logger.warning(where + " : paliers sans aucune récompense : " + empty);
+        }
+        if (icon == null || !icon.isItem()) {
+            logger.warning(where + " : icône inconnue (" + yaml.getString("icon") + "), NETHER_STAR utilisée");
+        }
+        for (Tier tier : tiers) {
+            for (Reward reward : java.util.Arrays.asList(tier.free(), tier.premium())) {
+                if (reward != null) {
+                    reward.commands().stream().filter(command -> !command.contains("{player}")).forEach(command ->
+                            logger.warning(where + " palier " + tier.number() + " : commande sans {player} : " + command));
+                }
+            }
+        }
+        long free = tiers.stream().filter(tier -> tier.free() != null).count();
+        long premium = tiers.stream().filter(tier -> tier.premium() != null).count();
+        logger.info(where + " : " + free + " récompenses gratuites, " + premium + " premium" + (bonus == Bonus.NONE ? "" : ", bonus du mois"));
         return new PassDefinition(id, yaml.getString("name", id), icon == null || !icon.isItem() ? Material.NETHER_STAR : icon,
-                yaml.getStringList("description"), bonus, List.copyOf(tiers));
+                yaml.getStringList("description"), bonus, List.copyOf(tiers),
+                yaml.getStringList("missions").stream().map(mission -> mission.toLowerCase(Locale.ROOT)).toList());
     }
 
     private static Reward reward(ConfigurationSection section, String where, Logger logger) {

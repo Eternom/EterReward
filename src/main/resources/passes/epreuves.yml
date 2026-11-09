@@ -4,7 +4,7 @@
 #   money            : de l'argent (EterEconomy)
 #   keys             : des clés de monde ressource (EterResource)
 #   resource-minutes : du temps de monde ressource (EterResource)
-#   items            : des objets, "MATIÈRE quantité" ; ce qui ne rentre pas est posé au sol
+#   items            : des objets, "MATIÈRE quantité" ; ce qui ne rentre pas part dans la boîte (/pass colis)
 #   permissions      : "permission durée" (d, h, m), par LuckPerms, sur tout le réseau. La durée est la sienne,
 #                      même après la fin du pass. Seulement des commandes d'usage (/craft, /back...), jamais
 #                      ce que le joueur garde (homes, annonces) : il le perdrait à la fin.
@@ -22,6 +22,9 @@ description:
 # des votes).
 bonus:
   challenge-multiplier: 1.5
+
+# Missions de la semaine propres à ce pass (challenges.yml > missions) ; sans cette liste : toutes.
+missions: [ "m-traque", "m-maitre", "m-carriere" ]
 
 tiers:
   1:

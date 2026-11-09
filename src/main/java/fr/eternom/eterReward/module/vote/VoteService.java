@@ -128,7 +128,7 @@ public class VoteService {
         }
         int passXp = loot.passXp() > 0 ? pass.voteXp(loot.passXp()) : 0;
         if (passXp > 0) {
-            pass.addXp(player.uuid(), passXp);
+            pass.addXp(player.uuid(), passXp, PassService.Source.VOTE);
         }
         int keys = 0;
         int owedKeys = 0;

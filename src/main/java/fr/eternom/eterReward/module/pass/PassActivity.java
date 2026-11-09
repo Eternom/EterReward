@@ -7,15 +7,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
  * Temps de jeu ACTIF pour l'XP du pass : chaque minute, seuls les joueurs qui ont tourné la tête, marché, agi ou parlé
- * pendant la minute gagnent de l'XP. Un AFK immobile ne gagne rien ; un AFK « malin » (bassin d'eau...) est arrêté par
- * le plafond par jour, qui oblige à faire les quêtes pour finir le pass.
+ * pendant la minute gagnent de l'XP (multipliée dans certains mondes : pass.world-xp). Un AFK immobile ne gagne rien ;
+ * un AFK « malin » est arrêté par le plafond par jour. Toutes les minutes du serveur partent en une seule écriture.
  * Les mêmes minutes, si le joueur a aussi regardé autour de lui ou parlé, comptent au classement du temps de jeu.
  * L'activité elle-même est mesurée par EterLib (Activity), la même pour tous les plugins.
  */
@@ -40,42 +42,54 @@ public class PassActivity implements Listener {
     private void minute() {
         long since = System.currentTimeMillis() - MINUTE_MILLIS;
         Activity activity = EterLib.get().getActivity();
-        List<UUID> active = Bukkit.getOnlinePlayers().stream()
-                .filter(player -> player.hasPermission(PassService.PERMISSION))
-                .map(Player::getUniqueId)
-                .filter(uuid -> activity.activeSince(uuid, since))
-                .toList();
-        if (active.isEmpty()) {
+        boolean passEnabled = pass.enabled();
+        int perMinute = pass.settings().playtimeXpPerMinute();
+        List<PassService.Minute> minutes = new ArrayList<>();
+        List<UUID> looking = new ArrayList<>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            UUID uuid = player.getUniqueId();
+            if (!player.hasPermission(PassService.PERMISSION) || !activity.activeSince(uuid, since)) {
+                continue;
+            }
+            pass.refreshBoost(player);
+            int amount = (int) Math.round(perMinute * pass.settings().worldMultiplier(player.getWorld().getName()));
+            if (amount > 0) {
+                minutes.add(new PassService.Minute(uuid, amount));
+            }
+            // Le classement du temps de jeu n'a pas de plafond : seulement les minutes où le joueur a regardé ou parlé
+            if (activity.lookedSince(uuid, since)) {
+                looking.add(uuid);
+            }
+        }
+        if (minutes.isEmpty() && looking.isEmpty()) {
             return;
         }
-        boolean passEnabled = pass.enabled();
-        // Le classement du temps de jeu n'a pas de plafond : seulement les minutes où le joueur a regardé ou parlé
-        List<UUID> looking = active.stream().filter(uuid -> activity.lookedSince(uuid, since)).toList();
         Bukkit.getScheduler().runTaskAsynchronously(pass.plugin(), () -> {
-            for (UUID uuid : active) {
+            if (passEnabled) {
                 try {
-                    if (passEnabled) {
-                        pass.playtime(uuid);
-                    }
-                    if (looking.contains(uuid)) {
-                        onActiveMinute.accept(uuid);
-                    }
+                    pass.playtime(minutes);
                 } catch (RuntimeException e) {
-                    pass.plugin().getLogger().warning("Temps de jeu non compté pour " + uuid + " : " + e.getMessage());
+                    pass.plugin().getLogger().warning("Temps de jeu du pass non compté : " + e.getMessage());
+                }
+            }
+            for (UUID uuid : looking) {
+                try {
+                    onActiveMinute.accept(uuid);
+                } catch (RuntimeException e) {
+                    pass.plugin().getLogger().warning("Temps de jeu non compté au classement pour " + uuid + " : " + e.getMessage());
                 }
             }
         });
     }
 
-    /** Le palier du pass dans la sidebar, peu après l'arrivée ; et les récompenses réclamées juste avant un départ. */
+    /** Arrivée : booster, sidebar, rappels (paliers à réclamer, mois d'avant, colis). */
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        pass.deliverPending(player);
-        Bukkit.getScheduler().runTaskLater(pass.plugin(), () -> {
-            if (player.isOnline()) {
-                pass.publishTag(player);
-            }
-        }, 40);
+        pass.joined(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        pass.forget(event.getPlayer().getUniqueId());
     }
 }

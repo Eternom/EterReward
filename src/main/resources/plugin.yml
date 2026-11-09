@@ -7,8 +7,9 @@ load: POSTWORLD
 authors: [ NadTum ]
 description: Récompenses du réseau (récompense quotidienne sur 7 jours, pass de saison, défis, classements).
 depend: [EterLib, EterEconomy]
-# EterMarket : XP du pass pour les quêtes ; EterResource : clés de ressource ; LuckPerms : permissions temporaires
-softdepend: [EterMarket, EterResource, LuckPerms, EterNpc, PlaceholderAPI, EterSync]
+# EterMarket : XP du pass pour les quêtes ; EterResource : clés de ressource ; LuckPerms : permissions temporaires ;
+# EterClan : objectifs de clan et premium du clan ; EterSuccess : XP des succès
+softdepend: [EterMarket, EterResource, LuckPerms, EterNpc, PlaceholderAPI, EterSync, EterClan, EterSuccess]
 
 commands:
   daily:
@@ -18,7 +19,7 @@ commands:
     permission: eterreward.daily
   pass:
     description: Le pass de saison du mois.
-    usage: /pass
+    usage: /pass [colis|historique|premium]
     aliases: [battlepass, saison]
     permission: eterreward.pass
   defis:
@@ -33,7 +34,7 @@ commands:
     permission: eterreward.ranking
   eterreward:
     description: Gérer le pass, poser le podium du classement général, enregistrer un vote (staff, console).
-    usage: /eterreward <pass <premium|set|xp> ... | podium <1-5> | vote <joueur>>
+    usage: /eterreward <pass <premium|gift|skip|set|reload|xp|setxp|info|reset|unclaim|event> ... | podium <1-5> | vote <joueur>>
     permission: eterreward.admin
 
 permissions:
@@ -50,8 +51,11 @@ permissions:
     description: Voir les classements.
     default: true
   eterreward.pass.premium.*:
-    description: La ligne premium de tous les pass. D'habitude, on donne eterreward.pass.premium.<pass> pour le mois.
+    description: La ligne premium de tous les mois. D'habitude, le premium est donné en base pour le mois (boutique, achat en jeu).
     default: op
+  eterreward.pass.premium.always:
+    description: Le premium de chaque mois tant que la permission est là (ex : grade Légende).
+    default: false
   eterreward.admin:
     description: Toutes les permissions d'EterReward, et /eterreward pass.
     default: op

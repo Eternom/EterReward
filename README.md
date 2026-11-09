@@ -10,7 +10,9 @@ Les récompenses du réseau : la **récompense quotidienne** (`/daily`), le **pa
 - Facultatifs (`softdepend`), chacun dans une classe à part chargée seulement s'il est là :
   - **EterMarket 1.5.0+** : son événement `JobQuestCompleteEvent` donne l'XP du pass des quêtes de métier et compte les quêtes du mois ;
   - **EterResource** : son API `ResourceApi` pour les clés et le temps de monde ressource ;
-  - **LuckPerms** : les permissions temporaires (récompenses, premium) ;
+  - **LuckPerms** : les permissions temporaires des récompenses (sans lui, elles attendent en colis) ;
+  - **EterClan 1.7.0+** : objectifs de clan et premium offert à tout le clan ;
+  - **EterSuccess** : l'XP du pass des succès débloqués ;
   - **EterNpc 1.0.0+** : le podium du classement général ;
   - **PlaceholderAPI** : les placeholders du classement général (hologramme, scoreboard).
 
@@ -46,43 +48,69 @@ bouton Retour/Fermer (`menus.daily.back-command`).
 ## Pass de saison
 
 **Rotation** (`PassService#season`) : chaque mois (fuseau `daily.time-zone`), un des pass de `passes/` est tiré au hasard,
-jamais celui du mois d'avant. Le premier serveur qui en a besoin l'écrit (`INSERT IGNORE` dans `eterreward_pass_seasons`),
-les autres le lisent : le même pour tout le réseau. `/eterreward pass set <pass>` le force. Un pass = un fichier de
-`passes/` (`PassDefinition`) : nom, icône, description, **bonus du mois** (`quest-job`/`quest-multiplier`,
-`daily-multiplier`, `playtime-cap`, `challenge-multiplier`, `vote-multiplier`) et 30 paliers ; les 10 fournis (`PassCatalog`)
-sont copiés s'ils manquent (au démarrage) : pour en retirer un de la rotation, `enabled: false` dans son fichier.
+jamais un des `no-repeat-months` derniers (s'il en reste). Il est tiré `draw-ahead-days` avant la fin du mois d'avant
+(`nextSeason`, tâche de fond toutes les 10 min) : aperçu dans le menu les `preview-days` derniers jours. Le premier serveur
+qui en a besoin l'écrit (`INSERT IGNORE` dans `eterreward_pass_seasons`), les autres le lisent : le même pour tout le
+réseau. Au premier besoin du mois, un seul serveur le marque annoncé (`announced`) et l'annonce partout (`PassAnnouncer`,
+NetworkBus `eterreward`, et Discord si `discord-webhook`), avec le bilan du mois d'avant au staff (joueurs, palier moyen,
+pass finis, premium). `/eterreward pass set <pass>` le force **sur tout le réseau** (XP, paliers réclamés et premium
+gardés) ; `/eterreward pass reload` relit `config.yml` et `passes/` partout.
 
-**XP** (`pass.*` de la config) : `xp-per-tier` par palier. Sources :
-- **temps de jeu actif** (`PassActivity`, activité mesurée par EterLib `Activity`) : chaque minute, les joueurs qui ont bougé, tourné la tête, agi ou parlé gagnent
-  `playtime-xp-per-minute`, plafonné à `playtime-daily-cap` par jour (une seule requête qui ajoute et plafonne,
-  `PassStore#addPlaytime`) : l'AFK ne mène pas au bout, il faut faire les quêtes ;
-- **`/daily`** réclamé : `daily-xp` (dans la même tâche que la réclamation) ;
-- **quêtes de métier** (EterMarket) : `quest-xp` selon la difficulté (bonus = la quête bonus du jour) ;
-- `RewardApi#addPassXp` (autres plugins) et `/eterreward pass xp`.
-Un palier atteint prévient le joueur (bouton `/pass`). Le palier est aussi affiché dans la sidebar d'EterTab (étiquette `pass`,
-lang `pass.sidebar`), à l'arrivée et à chaque palier.
+Un pass = un fichier de `passes/` (`PassDefinition`) : nom, icône, description, **bonus du mois** (`quest-job` /
+`quest-multiplier`, `daily-multiplier`, `playtime-cap`, `challenge-multiplier`, `vote-multiplier`), `missions` (missions de
+la semaine propres au pass) et 30 paliers ; les 10 fournis (`PassCatalog`) sont copiés s'ils manquent. Au chargement, un
+rapport par pass (récompenses gratuites et premium) et des avertissements (paliers vides, icône inconnue, commande sans
+`{player}`). Pour retirer un pass : `enabled: false`.
 
-**Réclamer** (`PassMenu` : 6 lignes, 7 paliers par page ; gratuit en haut, paliers au milieu, premium en bas) : la base
-enregistre d'abord (`INSERT IGNORE` dans `eterreward_pass_claims`, une seule fois même sur deux serveurs), puis on donne.
-Argent, clés et permissions partent en tâche de fond juste après l'enregistrement (même si le joueur part entre les
-deux) ; objets (au sol s'ils ne rentrent pas) et commandes sur le thread principal. Joueur parti juste avant de les
-recevoir : ils sont mis de côté (`eterreward_pass_pending`) et donnés à sa prochaine arrivée, une fois l'inventaire
-chargé par EterSync (`SyncWait`), même si le mois a changé. Une récompense de clés ou de
-permissions est refusée (« réclame-la ailleurs ») sur un serveur sans EterResource ou LuckPerms. Les récompenses
-non réclamées à la fin du mois sont **perdues**.
+**XP** (`XpCurve`, logique pure testée) : `xp-curve` (coût de chaque palier, la dernière valeur vaut pour la suite), sinon
+`xp-per-tier`. Après le dernier palier, des **paliers bonus** répétables (`overflow` : un tous les `xp`, `max` au plus,
+`money`/`keys`). Sources (`PassService.Source`, journal `/pass historique`) :
+- **temps de jeu actif** (`PassActivity`, activité d'EterLib) : `playtime-xp-per-minute` (× `world-xp` selon le monde), plafonné
+  par jour (`playtime-daily-cap` ou le `playtime-cap` du pass, × `playtime-cap-days` selon le jour), avec **report** de
+  `playtime-carry-over` du plafond non utilisé la veille (un jour au plus). Toutes les minutes du serveur en **une lecture
+  et une écriture** (`PassStore#progress(List)`, `#addPlaytime(List)`) ;
+- **`/daily`**, **quêtes** (EterMarket, `quest-xp`), **défis et missions**, **votes**, **classements**, **succès**
+  (EterSuccess, `success-xp-per-point`), **objectifs de clan** (`ClanGoals` : palier moyen des membres, une fois par mois et
+  par objectif), `RewardApi#addPassXp`, `/eterreward pass xp <joueur> <montant> [source]` (boss, évènements...).
+- **Rattrapage** (`catch-up`) : en retard de plus de `margin` paliers sur le rythme attendu, XP × `multiplier` (hors temps
+  de jeu, staff, boutique, clan).
+- **Évènements** (`/eterreward pass event <durée> [multiplicateur] [uncapped]`, table `pass_boosts`, tout le réseau) et
+  **boosters** (permission `eterreward.pass.boost.<pourcentage>`, ex : une récompense temporaire).
 
-**Récompenses** : `money`, `keys`, `resource-minutes`, `items`, `permissions` (`"eteressential.craft 7d"`, `"eterkit.kit.heros 7d"` : par
-LuckPerms, une durée déjà en cours s'allonge ; **sa propre durée, même après la fin du pass** ; seulement des commandes
-d'usage, jamais ce que le joueur garde comme des homes), `commands`, `label`.
+**Annonces de palier** : `markNotified` (une requête conditionnelle) garantit **une seule annonce par niveau**, même avec
+deux gains au même moment ou sur deux serveurs ; en grand (titre) aux paliers 10, 20, 30. Le palier est dans la sidebar
+d'EterTab (étiquette `pass`).
 
-**Premium** : permission `eterreward.pass.premium.<pass>` (ou `.*`), vérifiée au clic. `/eterreward pass premium
-<joueur>` (staff ou console, ex : une boutique) la donne par LuckPerms **jusqu'à la fin du mois** exactement, même hors
-ligne.
+**Réclamer** (`PassMenu`) : palier par palier ou **tout réclamer** (gratuit, premium, bonus) ; filtre « à réclamer
+seulement » ; clic droit = détail dans le chat ; ouverture sur la page du premier palier à réclamer. La base enregistre
+d'abord (`INSERT IGNORE`, avec le serveur et l'heure), puis on donne : la partie à distance (permissions d'abord, puis clés
+et argent) en tâche de fond. Si LuckPerms refuse une permission, **la réclamation est annulée** (rien n'a été donné) ; ce qui
+ne peut pas être donné sur ce serveur (EterResource ou LuckPerms absent) part **en colis**. Objets et commandes ensuite sur
+le thread principal ; ce qui ne tient pas dans l'inventaire part en colis. Les récompenses du mois d'avant restent
+réclamables `grace-days` jours (bouton dans le menu, rappel à l'arrivée).
+
+**Boîte de colis** (`/pass colis`, `ParcelMenu`, table `pass_box`) : ce qui n'a pas pu être donné (inventaire plein,
+joueur parti, plugin absent), et l'insigne du premium. Un colis est retiré de la base avant d'être donné (une seule fois
+sur tout le réseau). L'ancienne file `pass_pending` est vidée dans la boîte au démarrage.
+
+**Récompenses** : `money`, `keys`, `resource-minutes`, `items` (donnés par piles complètes), `permissions`
+(`"eteressential.craft 7d"` : par LuckPerms, une durée déjà en cours s'allonge ; **sa propre durée, même après la fin du
+pass** ; seulement des commandes d'usage), `commands`, `label`.
+
+**Premium** (`PassPremium`) : **par mois**, en base (`pass_premium`) ; changer le pass du mois ne le retire à personne.
+- boutique, staff : `/eterreward pass premium <joueur> [acheteur] [paliers]` (cadeau si acheteur, paliers sautés en plus) ou
+  `gift <joueur> <acheteur>` ; acheté dans les `premium.late-buy-days` derniers jours, le mois suivant est compris ;
+- en jeu (`premium.price`, 0 : désactivé) : Maj+clic sur le bouton premium ; Maj+clic droit : le chef de clan l'offre
+  aux membres qui ne l'ont pas (`clan-discount`, à partir de `clan-min-members` membres) ;
+- permissions : `eterreward.pass.premium.always` (grade : tous les mois), `.<mois>` (`2026-11`), `.*`, et l'ancienne
+  `.<pass>` (toujours reconnue).
+Chaque premium en base donne l'**insigne du mois** (objet de collection, `premium.badge`) dans la boîte. Le joueur est
+prévenu où qu'il soit, avec le nombre de récompenses premium déjà réclamables.
 
 ## Défis
 
 **Tirage** (`ChallengeService#active`) : chaque jour (minuit) et chaque semaine (lundi minuit), fuseau `daily.time-zone`,
-`daily-count` et `weekly-count` défis sont tirés au hasard dans `challenges.yml`, **les mêmes pour tout le réseau** : le
+`daily-count` et `weekly-count` défis sont tirés au hasard dans `challenges.yml`, et `missions-count` **missions du pass** (section `missions`, filtrées par la liste `missions` du pass du mois ; période `m:<année>-<semaine>`, source d'XP « mission »), **les mêmes pour tout le réseau** : le
 premier serveur qui en a besoin les écrit (`INSERT IGNORE` dans `eterreward_challenge_periods`, période `d:<jour julien>` ou
 `w:<année>-<semaine>`).
 
@@ -159,10 +187,10 @@ par EterEconomy, XP du pass, clés par EterResource) ; il n'y a donc pas d'objet
 | Commande | Permission | Par défaut |
 |---|---|---|
 | `/daily` (`reward`, `recompense`) | `eterreward.daily` | tous |
-| `/pass` (`battlepass`, `saison`) | `eterreward.pass` ; premium : `eterreward.pass.premium.<pass>` | tous / personne |
+| `/pass` (`battlepass`, `saison`) [`colis` \| `historique` \| `premium`] | `eterreward.pass` ; premium : `eterreward.pass.premium.always` (ou `.<mois>`, `.*`) ; booster : `eterreward.pass.boost.<pourcentage>` | tous / personne |
 | `/defis` (`challenges`, `defi`) | `eterreward.challenges` | tous |
 | `/classement` (`ranking`, `top`) | `eterreward.ranking` | tous |
-| `/eterreward pass premium <joueur>` | `set <pass>` | `xp <joueur> <montant>` (aussi depuis la console) ; `/eterreward podium <1-5>` ; `/eterreward vote <joueur>` (console, lancée par le site) | `eterreward.admin` | op |
+| `/eterreward pass premium <joueur> [acheteur] [paliers]` · `gift` · `skip` · `set <pass>` · `reload` · `xp <joueur> <montant> [source]` · `setxp` · `info` · `reset` · `unclaim <joueur> <palier> [premium]` · `event <durée> [multiplicateur] [uncapped] | stop` (aussi depuis la console) ; `/eterreward podium <1-5>` ; `/eterreward vote <joueur>` (console, lancée par le site) | `eterreward.admin` | op |
 
 `eterreward.admin` regroupe tout.
 
@@ -180,9 +208,14 @@ par EterEconomy, XP du pass, clés par EterResource) ; il n'y a donc pas d'objet
 ## Données
 
 - `eterreward_daily` : `uuid`, `day` (dernier jour réclamé), `last_claim` (jour julien).
-- `eterreward_pass_seasons` : `season` (`2026-10`), `pass`.
-- `eterreward_pass_progress` : `uuid`, `season`, `xp`, `play_day` / `play_xp` (temps de jeu compté aujourd'hui, pour le plafond).
-- `eterreward_pass_claims` : `uuid`, `season`, `tier`, `premium` (clé : les quatre).
+- `eterreward_pass_seasons` : `season` (`2026-10`), `pass`, `announced`.
+- `eterreward_pass_progress` : `uuid`, `season`, `xp`, `play_day` / `play_xp` / `play_cap` (temps de jeu du dernier jour compté et son plafond, report compris), `notified` (dernier niveau annoncé).
+- `eterreward_pass_claims` : `uuid`, `season`, `tier` (31 et plus : paliers bonus), `premium` (clé : les quatre), `server`, `claimed_at`.
+- `eterreward_pass_premium` : `uuid`, `season`, `source` (`shop`, `gift:<acheteur>`, `game`, `clan:<chef>`), `given_at`.
+- `eterreward_pass_box` : colis (`id`, `uuid`, `season`, `label`, `money`, `resource_keys`, `resource_minutes`, `items`, `permissions`, `commands`, `special`).
+- `eterreward_pass_xp_log` : `uuid`, `hour`, `source`, `amount` (gardé 7 jours).
+- `eterreward_pass_boosts` : évènements (`until`, `multiplier`, `uncapped`, `label`).
+- `eterreward_pass_clan_goals` : `clan`, `season`, `step` (objectifs de clan atteints).
 - `eterreward_challenge_periods` : `period`, `challenges` (identifiants tirés, séparés par des virgules).
 - `eterreward_challenge_progress` : `uuid`, `period`, `challenge`, `progress`, `done`.
 - `eterreward_challenge_monthly` : `uuid`, `season`, `completed` (défis réussis du mois, pour le classement).

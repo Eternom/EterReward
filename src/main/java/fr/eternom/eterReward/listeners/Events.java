@@ -7,6 +7,7 @@ import fr.eternom.eterReward.module.daily.DailyListener;
 import fr.eternom.eterReward.module.pass.MarketQuestListener;
 import fr.eternom.eterReward.module.vote.VoteListener;
 import fr.eternom.eterReward.module.pass.PassActivity;
+import fr.eternom.eterReward.module.pass.SuccessListener;
 
 public class Events {
 
@@ -16,6 +17,11 @@ public class Events {
         PassActivity activity = new PassActivity(main.getPass(), main.getRanking()::playedMinute);
         main.getServer().getPluginManager().registerEvents(activity, main);
         activity.start();
+
+        // Succès : seulement si EterSuccess est là
+        if (main.getServer().getPluginManager().isPluginEnabled("EterSuccess")) {
+            main.getServer().getPluginManager().registerEvents(new SuccessListener(main.getPass()), main);
+        }
 
         main.getServer().getPluginManager().registerEvents(new VoteListener(main.getVotes()), main);
 

@@ -201,7 +201,7 @@ public class RankingService {
                     ResourceRewards.give(winner, reward.keys(), 0);
                 }
                 if (reward.passXp() > 0) {
-                    pass.addXp(winner, reward.passXp());
+                    pass.addXp(winner, reward.passXp(), PassService.Source.RANKING);
                 }
                 names[Math.min(place, 2)] = name(winner);
                 bus.notify(winner, "ranking.winner." + board.id(), true, "place", String.valueOf(place + 1),

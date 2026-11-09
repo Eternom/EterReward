@@ -4,7 +4,7 @@
 #   money            : de l'argent (EterEconomy)
 #   keys             : des clés de monde ressource (EterResource)
 #   resource-minutes : du temps de monde ressource (EterResource)
-#   items            : des objets, "MATIÈRE quantité" ; ce qui ne rentre pas est posé au sol
+#   items            : des objets, "MATIÈRE quantité" ; ce qui ne rentre pas part dans la boîte (/pass colis)
 #   permissions      : "permission durée" (d, h, m), par LuckPerms, sur tout le réseau. La durée est la sienne,
 #                      même après la fin du pass. Seulement des commandes d'usage (/craft, /back...), jamais
 #                      ce que le joueur garde (homes, annonces) : il le perdrait à la fin.
@@ -25,6 +25,9 @@ bonus:
 
 # Le pass des kits : accès aux kits de grade (eterkit.kit.<kit>, EterKit) tout au long des paliers. Un kit se
 # réclame une fois par semaine : 3 jours donnent une réclamation, 7 jours une ou deux.
+# Missions de la semaine propres à ce pass (challenges.yml > missions) ; sans cette liste : toutes.
+missions: [ "m-artisan", "m-carriere", "m-moisson" ]
+
 tiers:
   1:
     free:

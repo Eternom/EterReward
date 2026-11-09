@@ -14,7 +14,6 @@ import fr.eternom.eterReward.module.challenge.ChallengeStore;
 import fr.eternom.eterReward.module.daily.DailyRewards;
 import fr.eternom.eterReward.module.daily.DailyService;
 import fr.eternom.eterReward.module.daily.DailyStore;
-import fr.eternom.eterReward.module.pass.PassCatalog;
 import fr.eternom.eterReward.module.pass.PassService;
 import fr.eternom.eterReward.module.pass.PassStore;
 import fr.eternom.eterReward.module.ranking.Podium;
@@ -74,8 +73,9 @@ public final class Main extends JavaPlugin {
         Database database = lib.database(TABLE_PREFIX);
         ZoneId zone = zone();
 
-        pass = new PassService(this, new PassStore(database), PassCatalog.load(this, PASS_TIERS), PassService.Settings.load(getConfig()),
-                messages, zone, lib.backButton(getConfig().getString("menus.pass.back-command", "")));
+        pass = new PassService(this, new PassStore(database), PASS_TIERS, messages, zone,
+                lib.backButton(getConfig().getString("menus.pass.back-command", "")));
+        pass.start();
         daily = new DailyService(this, new DailyStore(database),
                 DailyRewards.load(getConfig().getConfigurationSection("daily.days"), getLogger()), messages, zone,
                 lib.backButton(getConfig().getString("menus.daily.back-command", "")), pass,

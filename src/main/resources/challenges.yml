@@ -2,7 +2,7 @@
 #  Défis du jour et de la semaine (/defis)
 # ============================================================
 #
-#  Chaque jour (minuit) et chaque semaine (lundi minuit), dans le fuseau daily.time-zone de config.yml, des défis
+#  Chaque jour (minuit) et chaque semaine (lundi minuit, avec les missions du pass), dans le fuseau daily.time-zone de config.yml, des défis
 #  sont tirés au hasard ici, les MÊMES pour tout le réseau. Un défi validé donne de l'XP du pass et de l'argent.
 #  Le texte de chaque défi est dans lang/ (challenges.list.<identifiant>), <target> = le nombre à atteindre.
 #
@@ -15,6 +15,9 @@
 
 daily-count: 3
 weekly-count: 3
+# Missions du pass : tirées chaque semaine (lundi minuit) parmi celles que le pass du mois choisit (passes/<pass>.yml >
+# missions), sinon parmi toutes. Plus longues, elles rapportent plus d'XP (source « mission » de /pass historique).
+missions-count: 3
 
 # Récompense par défaut. Repère : 3 défis du jour + 3 de la semaine valent ~470 XP du pass par jour.
 defaults:
@@ -24,6 +27,9 @@ defaults:
   weekly:
     xp: 300
     money: 150
+  missions:
+    xp: 500
+    money: 200
 
 daily:
   pierre:
@@ -162,3 +168,52 @@ weekly:
     match: [ "nether_quartz_ore" ]
     target: 400
     icon: QUARTZ
+
+# Missions du pass (identifiants en m-... : textes dans lang/, challenges.list.<identifiant>)
+missions:
+  m-traque:
+    kind: kill
+    match: [ "#monsters" ]
+    target: 300
+    icon: IRON_SWORD
+  m-moisson:
+    kind: harvest
+    target: 1500
+    icon: WHEAT
+  m-bucheron:
+    kind: break
+    match: [ "#logs" ]
+    target: 700
+    icon: OAK_LOG
+  m-peche:
+    kind: fish
+    target: 120
+    icon: FISHING_ROD
+  m-filon:
+    kind: break
+    match: [ "#ores" ]
+    target: 350
+    icon: IRON_ORE
+  m-carriere:
+    kind: break
+    match: [ "#stone" ]
+    target: 3000
+    icon: COBBLESTONE
+  m-artisan:
+    kind: quest
+    target: 10
+    icon: WRITABLE_BOOK
+  m-terrassier:
+    kind: break
+    match: [ "#dirt" ]
+    target: 2500
+    icon: DIRT
+  m-sable:
+    kind: break
+    match: [ "#sand" ]
+    target: 1200
+    icon: SAND
+  m-maitre:
+    kind: quest
+    target: 20
+    icon: ENCHANTED_BOOK

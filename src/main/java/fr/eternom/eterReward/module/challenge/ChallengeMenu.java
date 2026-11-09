@@ -18,22 +18,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Menu /defis, 5 lignes :
+ * Menu /defis, 6 lignes :
  * <pre>
- *  ▣ ▣ ▢ ▢ ☀ ▢ ▢ ▣ ▣     ☀ = défis du jour (temps restant)
- *  ▣ · · d d d · · ▣     d = défis du jour
- *  ▢ ▢ ▢ ▢ ☾ ▢ ▢ ▢ ▢     ☾ = défis de la semaine (temps restant)
- *  ▣ · · w w w · · ▣     w = défis de la semaine
- *  ▣ ▣ ▢ ▢ « ▢ ▢ ▣ ▣
+ *  ▣ ▣ ▣ ▣ ▣ ▣ ▣ ▣ ▣
+ *  ▣ ☀ · d d d · · ▣     ☀ = défis du jour (temps restant), d = défis du jour
+ *  ▣ ☾ · w w w · · ▣     ☾ = défis de la semaine, w = défis de la semaine
+ *  ▣ ★ · m m m · · ▣     ★ = missions du pass de la semaine (plus longues, plus d'XP), m = missions
+ *  ▣ · · · · · · · ▣
+ *  ▣ ▣ ▣ ▣ « ▣ ▣ ▣ ▣
  * </pre>
  */
 class ChallengeMenu implements Menu {
 
-    private static final int DAILY_HEADER = 4;
+    private static final int DAILY_HEADER = 10;
     private static final int DAILY_ROW = 12;
-    private static final int WEEKLY_HEADER = 22;
-    private static final int WEEKLY_ROW = 30;
-    private static final int BACK = 40;
+    private static final int WEEKLY_HEADER = 19;
+    private static final int WEEKLY_ROW = 21;
+    private static final int MISSION_HEADER = 28;
+    private static final int MISSION_ROW = 30;
+    private static final int BACK = 49;
     private static final int BAR = 10;
 
     private final ChallengeService service;
@@ -43,12 +46,14 @@ class ChallengeMenu implements Menu {
     ChallengeMenu(ChallengeService service, Player viewer, View view) {
         this.service = service;
         this.viewer = viewer;
-        this.inventory = Bukkit.createInventory(this, 45, text("challenges.menu.title"));
+        this.inventory = Bukkit.createInventory(this, 54, text("challenges.menu.title"));
         Frame.draw(inventory, Material.ORANGE_STAINED_GLASS_PANE);
         inventory.setItem(DAILY_HEADER, header(view.daily(), Material.SUNFLOWER, "challenges.menu.daily"));
         inventory.setItem(WEEKLY_HEADER, header(view.weekly(), Material.CLOCK, "challenges.menu.weekly"));
         fill(view, view.daily(), DAILY_ROW);
+        inventory.setItem(MISSION_HEADER, header(view.missions(), Material.NETHER_STAR, "challenges.menu.missions"));
         fill(view, view.weekly(), WEEKLY_ROW);
+        fill(view, view.missions(), MISSION_ROW);
         inventory.setItem(BACK, service.backButton().item(viewer));
     }
 

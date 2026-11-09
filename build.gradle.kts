@@ -26,7 +26,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:26.2.build.129-stable")
 
     // Socle commun : base, langues, menus (plugin EterLib installé sur le serveur)
-    compileOnly("com.github.Eternom:EterLib:1.20.1")
+    compileOnly("com.github.Eternom:EterLib:1.21.1")
     // Inventaire en cours de chargement (SyncApi) : aucun objet donné avant (softdepend)
     compileOnly("com.github.Eternom:EterSync:1.2.2")
     // Podium du classement général (PNJ) et placeholders, facultatifs
@@ -38,8 +38,17 @@ dependencies {
     compileOnly("com.github.Eternom:EterMarket:1.7.0")
     // Clés et temps de monde ressource : l'API d'EterResource (softdepend)
     compileOnly("com.github.Eternom:EterResource:1.1.0")
+    // Objectifs de clan et premium offert au clan : l'API d'EterClan (softdepend)
+    compileOnly("com.github.Eternom:EterClan:1.7.0")
+    // XP du pass pour les succès débloqués : l'événement d'EterSuccess (softdepend)
+    compileOnly("com.github.Eternom:EterSuccess:1.5.6")
     // Permissions temporaires (récompenses, premium) : l'API de LuckPerms (softdepend)
     compileOnly("net.luckperms:api:5.4")
+
+    // Tests de la logique pure (courbe d'XP, rattrapage, plafond)
+    testImplementation(platform("org.junit:junit-bom:5.11.4"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 java {
@@ -47,6 +56,10 @@ java {
 }
 
 tasks {
+    test {
+        useJUnitPlatform()
+    }
+
     processResources {
         val props = mapOf("version" to version)
         // Déclarée comme entrée : sinon le cache de Gradle réutilise un plugin.yml avec l'ancienne version
