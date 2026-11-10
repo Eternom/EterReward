@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Menu /classement : un bouton par classement, avec son top 3 ; le temps restant avant la fin du mois en haut. */
+/** Menu /ranking : un bouton par classement, avec son top 3 ; le temps restant avant la fin du mois en haut. */
 class RankingMenu implements Menu {
 
     private static final int INFO = 4;

@@ -22,8 +22,8 @@ import java.util.UUID;
  *   compris), dernier niveau annoncé (une seule annonce par palier, même avec deux gains au même moment) ;
  * - pass_claims : paliers réclamés (une ligne par palier et par ligne), avec le serveur et l'heure (litiges) ;
  * - pass_premium : le premium de chaque joueur pour chaque mois (boutique, cadeau, achat en jeu, clan, staff) ;
- * - pass_box : la boîte de colis (/pass colis) ;
- * - pass_xp_log : l'XP gagnée par heure et par source (/pass historique), gardée 7 jours ;
+ * - pass_box : la boîte de colis (/pass box) ;
+ * - pass_xp_log : l'XP gagnée par heure et par source (/pass history), gardée 7 jours ;
  * - pass_boosts : évènements (XP multipliée, temps de jeu sans plafond) ;
  * - pass_clan_goals : objectifs de clan atteints, une fois par mois.
  * Chaque changement est UNE requête qui vérifie elle-même ses conditions : deux serveurs ou deux clics au même moment ne

@@ -173,7 +173,7 @@ pass:
     clan-min-members: 3
     # Acheté dans les derniers jours du mois : le mois suivant est compris.
     late-buy-days: 5
-    # Chaque premium donne l'insigne du mois (objet de collection, dans la boîte /pass colis).
+    # Chaque premium donne l'insigne du mois (objet de collection, dans la boîte /pass box).
     badge: true
 
   # Annonce du nouveau pass le 1er du mois à tous les joueurs (et le bilan du mois d'avant au staff).
@@ -181,7 +181,7 @@ pass:
   # Annonces et bilans aussi sur un salon Discord (URL d'un webhook ; vide : non).
   discord-webhook: ""
 
-# Classements (/classement), recalculés toutes les 5 minutes. Du mois (remis à zéro chaque mois) : XP du pass, défis
+# Classements (/ranking), recalculés toutes les 5 minutes. Du mois (remis à zéro chaque mois) : XP du pass, défis
 # et quêtes de métier réussis, votes, temps de jeu actif, et le GÉNÉRAL (moyenne des cinq : une note sur 100 selon la
 # place dans chacun ; les paliers du pass comptent, premium ou non). Depuis toujours : points de succès, fortune, clans
 # (le temps de jeu total est dans /stats d'EterSuccess). Temps de jeu du mois : seules les minutes où le joueur a

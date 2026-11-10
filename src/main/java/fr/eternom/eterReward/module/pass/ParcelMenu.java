@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * La boîte du pass (/pass colis), 6 lignes : jusqu'à 28 colis (les plus anciens d'abord), un clic pour en prendre un,
+ * La boîte du pass (/pass box), 6 lignes : jusqu'à 28 colis (les plus anciens d'abord), un clic pour en prendre un,
  * le coffre en bas pour tout prendre. Ce qui ne tient pas dans l'inventaire reste dans la boîte.
  * <pre>
  *  ▣ ▣ ▣ ▣ ▣ ▣ ▣ ▣ ▣

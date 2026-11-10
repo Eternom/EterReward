@@ -29,7 +29,7 @@ import java.util.function.BiConsumer;
  * - gift <joueur> <acheteur>, skip <joueur> <paliers> ;
  * - set <pass> (pass du mois, tout le réseau), reload (config et passes/, tout le réseau) ;
  * - xp <joueur> <montant> [source], setxp <joueur> <xp>, info <joueur>, reset <joueur>, unclaim <joueur> <palier> [premium] ;
- * - event <durée> [multiplicateur] [sans-plafond] | event stop.
+ * - event <durée> [multiplicateur] [uncapped] | event stop.
  */
 public class PassCommand implements TabExecutor {
 
@@ -58,8 +58,8 @@ public class PassCommand implements TabExecutor {
                 return true;
             }
             switch (args.length == 0 ? "" : args[0].toLowerCase(Locale.ROOT)) {
-                case "colis", "box", "boite" -> pass.openBox(player);
-                case "historique", "history", "xp" -> pass.history(player);
+                case "box" -> pass.openBox(player);
+                case "history", "xp" -> pass.history(player);
                 case "premium" -> pass.premium().shopLink(player);
                 default -> pass.open(player);
             }
@@ -203,8 +203,7 @@ public class PassCommand implements TabExecutor {
                 multiplier = -1;
             }
         }
-        boolean uncapped = Arrays.stream(args).skip(3).anyMatch(arg -> arg.equalsIgnoreCase("uncapped")
-                || arg.equalsIgnoreCase("sans-plafond"));
+        boolean uncapped = Arrays.stream(args).skip(3).anyMatch(arg -> arg.equalsIgnoreCase("uncapped"));
         if (duration == null || multiplier < 1 || multiplier > 10 || multiplier == 1 && !uncapped) {
             messages.send(sender, "pass.event.usage");
             return;
@@ -275,7 +274,7 @@ public class PassCommand implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (!admin) {
-            return args.length == 1 ? filter(List.of("colis", "historique", "premium"), args[0]) : List.of();
+            return args.length == 1 ? filter(List.of("box", "history", "premium"), args[0]) : List.of();
         }
         return switch (args.length) {
             case 1 -> List.of("pass");

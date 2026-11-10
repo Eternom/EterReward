@@ -39,6 +39,6 @@ public interface RewardApi {
     /** Le menu /pass. Thread principal. */
     void openPass(Player player);
 
-    /** Le menu /defis. Thread principal. */
+    /** Le menu /challenges. Thread principal. */
     void openChallenges(Player player);
 }

@@ -195,7 +195,7 @@ pass:
     button: "<accent><bold>[Open the box]</bold></accent>"
     button-hover: "<info>Open <accent>/pass box"
     reminder: "<info>You have <accent><count></accent> parcel(s) in your pass box."
-    badge: "<info>Your <primary>premium badge</primary> is waiting in your box: <accent><click:run_command:'/pass colis'>/pass box</click>"
+    badge: "<info>Your <primary>premium badge</primary> is waiting in your box: <accent><click:run_command:'/pass box'>/pass box</click>"
   menu:
     title: "<primary>Pass <dark_gray>·</dark_gray> <pass>"
     title-next: "<primary>Preview <dark_gray>·</dark_gray> <pass>"
@@ -239,7 +239,7 @@ pass:
     how-quests: "<dark_gray>▸ <info>Job quests: <accent><easy></accent>, <accent><normal></accent> or <accent><hard> XP"
     how-quest-bonus: "<dark_gray>▸ <success>This month: <job> quests ×<multiplier>"
     how-quest-bonus-all: "<dark_gray>▸ <success>This month: all quests ×<multiplier>"
-    how-challenges: "<dark_gray>▸ <info>Challenges and missions (<accent>/defis</accent>): XP ×<accent><multiplier>"
+    how-challenges: "<dark_gray>▸ <info>Challenges and missions (<accent>/challenges</accent>): XP ×<accent><multiplier>"
     how-votes: "<dark_gray>▸ <info>Votes: pass XP ×<accent><multiplier>"
     how-success: "<dark_gray>▸ <info>Achievements: <accent><xp> XP</accent> per point"
     how-clan: "<dark_gray>▸ <info>Clan goals: XP for every member"

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Menu /defis, 6 lignes :
+ * Menu /challenges, 6 lignes :
  * <pre>
  *  ▣ ▣ ▣ ▣ ▣ ▣ ▣ ▣ ▣
  *  ▣ ☀ · d d d · · ▣     ☀ = défis du jour (temps restant), d = défis du jour

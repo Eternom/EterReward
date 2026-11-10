@@ -118,7 +118,7 @@ pass:
     empty: "<info>Aucune XP de pass gagnée ces dernières 24 h."
     title: "<info>XP du pass des dernières 24 h : <accent><total> XP"
     line: "<dark_gray> ▸ <info><source> : <accent>+<xp> XP"
-  # Sources d'XP (/pass historique)
+  # Sources d'XP (/pass history)
   source:
     playtime: "Temps de jeu"
     daily: "Récompense du jour"
@@ -176,7 +176,7 @@ pass:
     unknown-pass: "<accent>Saison"
     lore: "<dark_gray>Pass premium de la saison <month>."
     owner: "<dark_gray>Obtenu par <player>."
-  # Boîte de colis (/pass colis)
+  # Boîte de colis (/pass box)
   box:
     title: "<primary>Boîte du pass <dark_gray>· <count> colis"
     empty: "<info>Ta boîte est vide."
@@ -193,9 +193,9 @@ pass:
     taken: "<info><accent><count></accent> colis pris."
     full: "<info>Ton inventaire est plein : le reste est toujours dans ta boîte."
     button: "<accent><bold>[Ouvrir la boîte]</bold></accent>"
-    button-hover: "<info>Ouvrir <accent>/pass colis"
+    button-hover: "<info>Ouvrir <accent>/pass box"
     reminder: "<info>Tu as <accent><count></accent> colis dans ta boîte du pass."
-    badge: "<info>Ton <primary>insigne du premium</primary> t'attend dans ta boîte : <accent><click:run_command:'/pass colis'>/pass colis</click>"
+    badge: "<info>Ton <primary>insigne du premium</primary> t'attend dans ta boîte : <accent><click:run_command:'/pass box'>/pass box</click>"
   menu:
     title: "<primary>Pass <dark_gray>·</dark_gray> <pass>"
     title-next: "<primary>Aperçu <dark_gray>·</dark_gray> <pass>"
@@ -239,7 +239,7 @@ pass:
     how-quests: "<dark_gray>▸ <info>Quêtes de métier : <accent><easy></accent>, <accent><normal></accent> ou <accent><hard> XP"
     how-quest-bonus: "<dark_gray>▸ <success>Ce mois : quêtes de <job> ×<multiplier>"
     how-quest-bonus-all: "<dark_gray>▸ <success>Ce mois : toutes les quêtes ×<multiplier>"
-    how-challenges: "<dark_gray>▸ <info>Défis et missions (<accent>/defis</accent>) : XP ×<accent><multiplier>"
+    how-challenges: "<dark_gray>▸ <info>Défis et missions (<accent>/challenges</accent>) : XP ×<accent><multiplier>"
     how-votes: "<dark_gray>▸ <info>Votes : XP de pass ×<accent><multiplier>"
     how-success: "<dark_gray>▸ <info>Succès : <accent><xp> XP</accent> par point"
     how-clan: "<dark_gray>▸ <info>Objectifs de clan : de l'XP pour tous les membres"

@@ -1,5 +1,5 @@
 # ============================================================
-#  Défis du jour et de la semaine (/defis)
+#  Défis du jour et de la semaine (/challenges)
 # ============================================================
 #
 #  Chaque jour (minuit) et chaque semaine (lundi minuit, avec les missions du pass), dans le fuseau daily.time-zone de config.yml, des défis
@@ -16,7 +16,7 @@
 daily-count: 3
 weekly-count: 3
 # Missions du pass : tirées chaque semaine (lundi minuit) parmi celles que le pass du mois choisit (passes/<pass>.yml >
-# missions), sinon parmi toutes. Plus longues, elles rapportent plus d'XP (source « mission » de /pass historique).
+# missions), sinon parmi toutes. Plus longues, elles rapportent plus d'XP (source « mission » de /pass history).
 missions-count: 3
 
 # Récompense par défaut. Repère : 3 défis du jour + 3 de la semaine valent ~470 XP du pass par jour.

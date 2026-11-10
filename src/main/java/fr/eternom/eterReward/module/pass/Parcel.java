@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Un colis de la boîte du pass (/pass colis) : ce qui n'a pas pu être donné tout de suite (inventaire plein, joueur
+ * Un colis de la boîte du pass (/pass box) : ce qui n'a pas pu être donné tout de suite (inventaire plein, joueur
  * parti, plugin absent de ce serveur) ou ce qui attend le joueur (insigne du premium). Pris d'un clic, sur tout le réseau.
  *
  * @param id      0 tant qu'il n'est pas en base

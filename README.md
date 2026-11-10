@@ -1,7 +1,7 @@
 # EterReward
 
 Les récompenses du réseau : la **récompense quotidienne** (`/daily`), le **pass de saison** (`/pass`) et les **défis**
-(`/defis`). Plus tard : les récompenses de vote. Document développeur, à tenir à jour avec le code.
+(`/challenges`). Plus tard : les récompenses de vote. Document développeur, à tenir à jour avec le code.
 
 ## Prérequis
 
@@ -64,7 +64,7 @@ rapport par pass (récompenses gratuites et premium) et des avertissements (pali
 
 **XP** (`XpCurve`, logique pure testée) : `xp-curve` (coût de chaque palier, la dernière valeur vaut pour la suite), sinon
 `xp-per-tier`. Après le dernier palier, des **paliers bonus** répétables (`overflow` : un tous les `xp`, `max` au plus,
-`money`/`keys`). Sources (`PassService.Source`, journal `/pass historique`) :
+`money`/`keys`). Sources (`PassService.Source`, journal `/pass history`) :
 - **temps de jeu actif** (`PassActivity`, activité d'EterLib) : `playtime-xp-per-minute` (× `world-xp` selon le monde), plafonné
   par jour (`playtime-daily-cap` ou le `playtime-cap` du pass, × `playtime-cap-days` selon le jour), avec **report** de
   `playtime-carry-over` du plafond non utilisé la veille (un jour au plus). Toutes les minutes du serveur en **une lecture
@@ -89,7 +89,7 @@ ne peut pas être donné sur ce serveur (EterResource ou LuckPerms absent) part 
 le thread principal ; ce qui ne tient pas dans l'inventaire part en colis. Les récompenses du mois d'avant restent
 réclamables `grace-days` jours (bouton dans le menu, rappel à l'arrivée).
 
-**Boîte de colis** (`/pass colis`, `ParcelMenu`, table `pass_box`) : ce qui n'a pas pu être donné (inventaire plein,
+**Boîte de colis** (`/pass box`, `ParcelMenu`, table `pass_box`) : ce qui n'a pas pu être donné (inventaire plein,
 joueur parti, plugin absent), et l'insigne du premium. Un colis est retiré de la base avant d'être donné (une seule fois
 sur tout le réseau). L'ancienne file `pass_pending` est vidée dans la boîte au démarrage.
 
@@ -121,12 +121,12 @@ pas, EterLib `PlacedBlocks`), `harvest` (cultures mûres), `kill` (tuées par le
 (`done = FALSE AND progress >= target`) : récompense (XP du pass, argent « EterReward · défis ») une seule fois, même avec
 plusieurs serveurs ; puis l'événement `ChallengeCompleteEvent`.
 
-**Menu** `/defis` (aussi depuis le menu du pass) : défis du jour et de la semaine, barre d'avancée, récompense, temps
+**Menu** `/challenges` (aussi depuis le menu du pass) : défis du jour et de la semaine, barre d'avancée, récompense, temps
 restant. Les textes de chaque défi : `challenges.list.<id>` dans `lang/`.
 
 ## Classements
 
-`/classement` (`RankingService`) : 9 classements, et un bouton vers `/stats` (EterSuccess) s'il est là. **Du mois** (remis à zéro chaque mois : un nouveau joueur part à
+`/ranking` (`RankingService`) : 9 classements, et un bouton vers `/stats` (EterSuccess) s'il est là. **Du mois** (remis à zéro chaque mois : un nouveau joueur part à
 égalité) : XP du pass (`eterreward_pass_progress`), défis réussis (`eterreward_challenge_monthly`), quêtes de métier
 réussies (`eterreward_ranking_monthly`, comptées à chaque `JobQuestCompleteEvent`), votes (même table, voir Votes), temps de jeu actif
 (même table, board `playtime`, une ligne par minute active, voir plus bas) et le
@@ -188,8 +188,8 @@ par EterEconomy, XP du pass, clés par EterResource) ; il n'y a donc pas d'objet
 |---|---|---|
 | `/daily` (`reward`, `recompense`) | `eterreward.daily` | tous |
 | `/pass` (`battlepass`, `saison`) [`colis` \| `historique` \| `premium`] | `eterreward.pass` ; premium : `eterreward.pass.premium.always` (ou `.<mois>`, `.*`) ; booster : `eterreward.pass.boost.<pourcentage>` | tous / personne |
-| `/defis` (`challenges`, `defi`) | `eterreward.challenges` | tous |
-| `/classement` (`ranking`, `top`) | `eterreward.ranking` | tous |
+| `/challenges` (`challenges`, `defi`) | `eterreward.challenges` | tous |
+| `/ranking` (`ranking`, `top`) | `eterreward.ranking` | tous |
 | `/eterreward pass premium <joueur> [acheteur] [paliers]` · `gift` · `skip` · `set <pass>` · `reload` · `xp <joueur> <montant> [source]` · `setxp` · `info` · `reset` · `unclaim <joueur> <palier> [premium]` · `event <durée> [multiplicateur] [uncapped] | stop` (aussi depuis la console) ; `/eterreward podium <1-5>` ; `/eterreward vote <joueur>` (console, lancée par le site) | `eterreward.admin` | op |
 
 `eterreward.admin` regroupe tout.
@@ -202,7 +202,7 @@ par EterEconomy, XP du pass, clés par EterResource) ; il n'y a donc pas d'objet
 - `openMenu(joueur)` : le menu `/daily` ;
 - `addPassXp(uuid, xp)` : XP du pass en cours, `passTier(uuid)` : palier atteint (bloquants) ; `openPass(joueur)` : le menu `/pass` ;
 - événement `DailyClaimEvent` (joueur, jour de la série, 7 = série complète) à chaque `/daily` réclamé ;
-- `openChallenges(joueur)` : le menu `/defis` ; événement `ChallengeCompleteEvent` (joueur, défi, semaine ou jour) à chaque
+- `openChallenges(joueur)` : le menu `/challenges` ; événement `ChallengeCompleteEvent` (joueur, défi, semaine ou jour) à chaque
   défi validé.
 
 ## Données

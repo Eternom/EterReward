@@ -25,8 +25,8 @@ public class Commands {
         register(main, "eterreward", new AdminCommand(new PassCommand(main.getPass(), main.getMessages(), true),
                 main.getPodiumCommand(), main.getVotes(), main.getMessages()));
 
-        register(main, "defis", menu(main, main.getChallenges()::open));
-        register(main, "classement", menu(main, main.getRanking()::open));
+        register(main, "challenges", menu(main, main.getChallenges()::open));
+        register(main, "ranking", menu(main, main.getRanking()::open));
     }
 
     /** Une commande sans argument qui ouvre un menu au joueur. */

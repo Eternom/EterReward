@@ -15,22 +15,22 @@ commands:
   daily:
     description: Récompense quotidienne (série de 7 jours).
     usage: /daily
-    aliases: [reward, recompense]
+    aliases: [reward]
     permission: eterreward.daily
   pass:
     description: Le pass de saison du mois.
-    usage: /pass [colis|historique|premium]
-    aliases: [battlepass, saison]
+    usage: /pass [box|history|premium]
+    aliases: [battlepass]
     permission: eterreward.pass
-  defis:
+  challenges:
     description: Les défis du jour et de la semaine.
-    usage: /defis
-    aliases: [challenges, defi, challenge]
+    usage: /challenges
+    aliases: [challenge]
     permission: eterreward.challenges
-  classement:
+  ranking:
     description: Les classements du réseau (et les récompenses du mois).
-    usage: /classement
-    aliases: [ranking, leaderboard, top]
+    usage: /ranking
+    aliases: [leaderboard, top]
     permission: eterreward.ranking
   eterreward:
     description: Gérer le pass, poser le podium du classement général, enregistrer un vote (staff, console).

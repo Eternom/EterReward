@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
  * Réclamer : la base enregistre d'abord (INSERT IGNORE, une seule fois même sur deux serveurs), puis on donne : la partie
  * à distance en tâche de fond (si une permission ne peut pas être donnée, la réclamation est annulée), le reste sur le
  * thread principal. Ce qui ne peut pas être donné (inventaire plein, joueur parti, plugin absent ici) part en colis
- * dans la boîte (/pass colis).
+ * dans la boîte (/pass box).
  */
 public class PassService {
 
@@ -63,7 +63,7 @@ public class PassService {
     /** Paliers « clés » : annonce en grand. */
     private static final int KEY_TIER_EVERY = 10;
 
-    /** D'où vient l'XP (journal /pass historique). catchUp : compte pour le rattrapage ; boosted : évènements et boosters. */
+    /** D'où vient l'XP (journal /pass history). catchUp : compte pour le rattrapage ; boosted : évènements et boosters. */
     public enum Source {
         PLAYTIME(false, true), DAILY(true, true), QUEST(true, true), CHALLENGE(true, true), MISSION(true, true),
         VOTE(true, true), RANKING(false, false), SUCCESS(true, true), CLAN(false, false), EVENT(true, true),
@@ -120,7 +120,7 @@ public class PassService {
     /** Boosters des joueurs de ce serveur (pourcentage), relus chaque minute sur le thread principal. */
     private final Map<UUID, Integer> boosts = new ConcurrentHashMap<>();
     private volatile List<PassStore.Boost> events = List.of();
-    /** Le menu /defis, pour le bouton du menu du pass (null tant qu'il n'est pas branché). */
+    /** Le menu /challenges, pour le bouton du menu du pass (null tant qu'il n'est pas branché). */
     private Consumer<Player> challengesMenu;
 
     public PassService(JavaPlugin plugin, PassStore store, int tierCount, Messages messages, ZoneId zone, BackButton backButton) {
@@ -944,7 +944,7 @@ public class PassService {
     /** Message avec un bouton qui ouvre la boîte. */
     void boxButton(Player player, String key, String... placeholders) {
         Component button = messages.get(player, "pass.box.button")
-                .clickEvent(ClickEvent.runCommand("/pass colis"))
+                .clickEvent(ClickEvent.runCommand("/pass box"))
                 .hoverEvent(HoverEvent.showText(messages.get(player, "pass.box.button-hover")));
         player.sendMessage(messages.prefix().append(messages.get(player, key, placeholders)).append(Component.space()).append(button));
     }
@@ -997,7 +997,7 @@ public class PassService {
 
     // ---------- Historique ----------
 
-    /** /pass historique : l'XP des dernières 24 h, par source. */
+    /** /pass history : l'XP des dernières 24 h, par source. */
     void history(Player player) {
         UUID uuid = player.getUniqueId();
         Tasks.async(plugin, player, () -> store.history(uuid, 24), sums -> {

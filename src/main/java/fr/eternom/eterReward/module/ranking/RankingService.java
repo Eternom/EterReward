@@ -37,7 +37,7 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
- * Les classements (/classement). Les tops sont recalculés toutes les 5 minutes en tâche de fond et gardés en mémoire :
+ * Les classements (/ranking). Les tops sont recalculés toutes les 5 minutes en tâche de fond et gardés en mémoire :
  * ouvrir le menu ne charge pas la base. La place du joueur est lue à l'ouverture.
  *
  * Fin du mois : le premier serveur qui voit le nouveau mois (et qui a EterResource, pour les clés) réserve les
