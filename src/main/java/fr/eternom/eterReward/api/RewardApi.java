@@ -36,6 +36,16 @@ public interface RewardApi {
     /** Palier atteint dans le pass en cours (0 à 30). Bloquant (base). */
     int passTier(UUID player);
 
+    /** Récompenses du pass en cours prêtes à réclamer (gratuites, et premium s'il l'a). Bloquant (base). */
+    default int claimablePassRewards(UUID player) {
+        return 0;
+    }
+
+    /** Colis en attente dans la boîte du pass (récompenses mises de côté). Bloquant (base). */
+    default int parcels(UUID player) {
+        return 0;
+    }
+
     /** Le menu /pass. Thread principal. */
     void openPass(Player player);
 

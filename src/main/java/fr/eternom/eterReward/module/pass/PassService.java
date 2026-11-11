@@ -661,6 +661,26 @@ public class PassService {
                 || permissions.contains(season.pass().id()) || store.hasPremium(player, season.key());
     }
 
+    /**
+     * Récompenses du pass en cours prêtes à réclamer (gratuites, et premium s'il l'a), pour un autre plugin (/menu).
+     * Bloquant (base). Les permissions premium d'un joueur connecté sont lues ici : lecture seule, sûre avec LuckPerms.
+     */
+    public int claimableCount(UUID player) {
+        Season season = enabled() ? season() : null;
+        if (season == null) {
+            return 0;
+        }
+        Player online = Bukkit.getPlayer(player);
+        Set<String> permissions = online == null ? Set.of() : premiumPermissions(online);
+        return claimableLines(season, store.xp(player, season.key()), store.claims(player, season.key()),
+                isPremium(player, permissions, season)).size();
+    }
+
+    /** Colis en attente (récompenses mises de côté, /pass > boîte). Bloquant (base). */
+    public int parcelCount(UUID player) {
+        return store.parcelCount(player);
+    }
+
     // ---------- Menu ----------
 
     public void open(Player player) {

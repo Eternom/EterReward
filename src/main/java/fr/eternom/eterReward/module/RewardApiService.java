@@ -47,6 +47,16 @@ public class RewardApiService implements RewardApi {
     }
 
     @Override
+    public int claimablePassRewards(UUID player) {
+        return pass.claimableCount(player);
+    }
+
+    @Override
+    public int parcels(UUID player) {
+        return pass.parcelCount(player);
+    }
+
+    @Override
     public void openPass(Player player) {
         pass.open(player);
     }
