@@ -29,7 +29,7 @@ commands:
     permission: eterreward.challenges
   ranking:
     description: Les classements du réseau (et les récompenses du mois).
-    usage: /ranking
+    usage: /ranking [general|pass|challenges|quests|votes|playtime|success|wealth|clans]
     aliases: [leaderboard, top]
     permission: eterreward.ranking
   eterreward:

@@ -232,7 +232,7 @@ public class RankingService {
         return cache.getOrDefault(board, List.of());
     }
 
-    boolean available(Boards board) {
+    public boolean available(Boards board) {
         return cache.containsKey(board);
     }
 
@@ -240,7 +240,8 @@ public class RankingService {
         player.openInventory(new RankingMenu(this, player).getInventory());
     }
 
-    void openBoard(Player player, Boards board) {
+    /** Un classement précis (/ranking <classement>), le BoardMenu revient au menu des classements. */
+    public void openBoard(Player player, Boards board) {
         UUID uuid = player.getUniqueId();
         Boards.Context context = context(season());
         Tasks.async(plugin, player, () -> {
