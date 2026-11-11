@@ -70,6 +70,11 @@ pass:
   premium-already: "<error>Tu as déjà le premium de ce mois."
   premium-poor: "<error>Il te faut <accent><price></accent> pour ça."
   premium-bought: "<success>Pass premium acheté pour <accent><price></accent> ! Toutes les récompenses premium débloquées sont réclamables."
+  premium-confirm:
+    title: "<primary>Pass premium"
+    body: "<info>Acheter le pass premium de ce mois pour <accent><price></accent> ? Les récompenses premium déjà débloquées deviennent réclamables."
+    body-clan: "<info>Offrir le pass premium à chaque membre de ton clan qui ne l'a pas : <accent><price></accent> par membre, <accent>-<discount> %</accent> pour le clan. Le total est retiré de ton solde."
+    confirm: "<success>Acheter"
   premium-shop: "<info>Le pass premium est sur la boutique :"
   premium-shop-link: "<accent><bold>[Ouvrir la boutique]</bold></accent>"
   premium-shop-none: "<info>Le pass premium s'obtient auprès du staff ou lors des évènements."

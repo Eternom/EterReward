@@ -1,6 +1,9 @@
 package fr.eternom.eterReward.module.pass;
 
 import fr.eternom.eterLib.helper.economy.Money;
+import fr.eternom.eterLib.helper.gui.Dialogs;
+import io.papermc.paper.registry.data.dialog.DialogBase;
+import io.papermc.paper.registry.data.dialog.body.DialogBody;
 import fr.eternom.eterLib.helper.gui.Frame;
 import fr.eternom.eterLib.helper.gui.Items;
 import fr.eternom.eterLib.helper.gui.Menu;
@@ -138,9 +141,9 @@ class PassMenu implements Menu {
                 }
                 Sounds.click(player);
                 if (click == ClickType.SHIFT_LEFT && service.settings().premiumPrice() > 0) {
-                    service.premium().buy(player);
+                    confirmPremium(player, false);
                 } else if (click == ClickType.SHIFT_RIGHT && service.settings().premiumPrice() > 0) {
-                    service.premium().buyForClan(player);
+                    confirmPremium(player, true);
                 } else {
                     player.closeInventory();
                     service.premium().shopLink(player);
@@ -220,6 +223,30 @@ class PassMenu implements Menu {
         } else {
             Sounds.refuse(player);
         }
+    }
+
+    /**
+     * Achat du premium (Maj + clic) : une confirmation commune (Dialogs) avec le prix avant de payer ; Annuler rouvre le
+     * pass. clan : pour les membres du clan qui ne l'ont pas, avec la remise du clan.
+     */
+    private void confirmPremium(Player player, boolean clan) {
+        player.closeInventory();
+        PassSettings settings = service.settings();
+        var messages = service.messages();
+        DialogBase base = DialogBase.builder(messages.get(player, "pass.premium-confirm.title"))
+                .body(List.of(DialogBody.plainMessage(clan
+                        ? messages.get(player, "pass.premium-confirm.body-clan", "price", Money.format(settings.premiumPrice()),
+                        "discount", String.valueOf(Math.round(settings.clanDiscount() * 100)))
+                        : messages.get(player, "pass.premium-confirm.body", "price", Money.format(settings.premiumPrice())))))
+                .build();
+        Dialogs.show(service.plugin(), player, base, messages.get(player, "pass.premium-confirm.confirm"),
+                messages.get(player, "dialog.cancel"), response -> {
+                    if (clan) {
+                        service.premium().buyForClan(player);
+                    } else {
+                        service.premium().buy(player);
+                    }
+                }, () -> service.open(player, Which.CURRENT, -1, false));
     }
 
     @Override

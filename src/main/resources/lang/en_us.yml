@@ -70,6 +70,11 @@ pass:
   premium-already: "<error>You already have this month's premium."
   premium-poor: "<error>You need <accent><price></accent> for that."
   premium-bought: "<success>Premium pass bought for <accent><price></accent>! Every unlocked premium reward can be claimed."
+  premium-confirm:
+    title: "<primary>Premium pass"
+    body: "<info>Buy this month's premium pass for <accent><price></accent>? Premium rewards already unlocked become claimable."
+    body-clan: "<info>Give the premium pass to every member of your clan who lacks it: <accent><price></accent> per member, <accent>-<discount> %</accent> for the clan. The total is taken from your balance."
+    confirm: "<success>Buy"
   premium-shop: "<info>The premium pass is in the shop:"
   premium-shop-link: "<accent><bold>[Open the shop]</bold></accent>"
   premium-shop-none: "<info>The premium pass is given by staff or during events."
