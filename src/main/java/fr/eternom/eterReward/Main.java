@@ -52,6 +52,7 @@ public final class Main extends JavaPlugin {
     private ChallengeService challenges;
     private RankingService ranking;
     private VoteService votes;
+    private fr.eternom.eterReward.module.referral.ReferralService referrals;
     /** /eterreward podium, null sans EterNpc. */
     private TabExecutor podiumCommand;
 
@@ -101,6 +102,8 @@ public final class Main extends JavaPlugin {
         ranking.start();
         votes = new VoteService(this, new VoteStore(database), VoteRewards.load(getConfig().getConfigurationSection("votes"), getLogger()),
                 pass, ranking, messages, zone, getConfig().getBoolean("votes.announce", true));
+        referrals = new fr.eternom.eterReward.module.referral.ReferralService(this, database, messages, pass, getConfig().getConfigurationSection("referral"));
+        referrals.start();
 
         // API pour les autres plugins (RewardApi.get())
         getServer().getServicesManager().register(RewardApi.class, new RewardApiService(daily, pass, challenges), this, ServicePriority.Normal);
@@ -155,6 +158,10 @@ public final class Main extends JavaPlugin {
 
     public RankingService getRanking() {
         return ranking;
+    }
+
+    public fr.eternom.eterReward.module.referral.ReferralService getReferrals() {
+        return referrals;
     }
 
     public VoteService getVotes() {

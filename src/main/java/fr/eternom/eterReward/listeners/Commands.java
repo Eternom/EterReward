@@ -28,6 +28,7 @@ public class Commands {
 
         register(main, "challenges", menu(main, main.getChallenges()::open));
         register(main, "ranking", ranking(main));
+        register(main, "sponsor", main.getReferrals());
     }
 
     /** /ranking : le menu des classements, ou directement un classement (/ranking wealth, /ranking quests...). */

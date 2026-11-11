@@ -421,3 +421,25 @@ vote:
   done: "<info>Vote de <accent><player></accent> enregistré <dark_gray>(série : <streak> jour(s))"
   unknown: "<error>Joueur inconnu : <accent><player></accent> <dark_gray>(jamais venu sur le serveur)"
   usage: '<error>Utilisation : <accent>/eterreward vote \<joueur>'
+
+referral:
+  unavailable: "<error>Le parrainage n'est pas disponible sur ce serveur."
+  already: "<error>Tu as déjà un parrain."
+  too-late: "<error>Le parrain se choisit dans tes <accent><hours> premières heures</accent> de jeu."
+  self: "<error>Tu ne peux pas être ton propre parrain."
+  sponsor-too-new: "<error><accent><player></accent> doit avoir au moins <accent><hours> h</accent> de jeu pour parrainer."
+  sponsor-full: "<error><accent><player></accent> a déjà le nombre maximal de filleuls."
+  declared: "<success><accent><player></accent> est ton parrain ! Quand tu auras <accent><hours> h</accent> de jeu, vous serez récompensés tous les deux."
+  new: "<success><accent><player></accent> t'a choisi comme parrain ! Aide-le à démarrer : à <accent><hours> h</accent> de jeu, vous serez récompensés. <dark_gray>(/sponsor)"
+  rewarded-newcomer: "<success>Parrainage : <accent><money></accent> pour tes premières heures de jeu, grâce à <accent><player></accent> !"
+  rewarded-sponsor: "<success>Parrainage : ton filleul <accent><player></accent> a atteint l'objectif : <accent><money></accent> et <accent><xp> XP</accent> de pass pour toi !"
+  info:
+    title: "<primary>Parrainage"
+    sponsor: "<dark_gray>▸ <info>Ton parrain : <accent><player></accent> <dark_gray>(<hours>/<goal> h)"
+    sponsor-done: "<dark_gray>▸ <info>Ton parrain : <accent><player></accent> <success>✔"
+    none: "<dark_gray>▸ <info>Pas de parrain : <accent>/sponsor pseudo</accent> dans tes <accent><hours> premières heures</accent>."
+    none-late: "<dark_gray>▸ <info>Pas de parrain."
+    godchildren: "<dark_gray>▸ <info>Tes filleuls : <accent><count></accent>/<max>"
+    godchild: "<dark_gray>   • <info><player> <dark_gray>(<hours>/<goal> h)"
+    godchild-done: "<dark_gray>   • <info><player> <success>✔"
+    rules: "<dark_gray>À <goal> h de jeu du filleul : <accent><sponsor_money></accent> au parrain (et de l'XP de pass), <accent><newcomer_money></accent> au filleul."

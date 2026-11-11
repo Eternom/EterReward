@@ -244,3 +244,17 @@ menus:
     back-command: "menu progression"
   ranking:
     back-command: "menu progression"
+
+# Parrainage (/sponsor) : un nouveau (moins de newcomer-max-hours de jeu actif) désigne un parrain qui a au moins
+# sponsor-min-hours, une seule fois. Quand le filleul atteint goal-hours de jeu actif (AFK exclu, EterSuccess), le
+# parrain reçoit sponsor-money et sponsor-pass-xp, le filleul newcomer-money (une seule fois). Au plus max-per-sponsor
+# filleuls par parrain. Sans EterSuccess : indisponible.
+referral:
+  enabled: true
+  newcomer-max-hours: 3
+  sponsor-min-hours: 20
+  goal-hours: 10
+  sponsor-money: 2000
+  sponsor-pass-xp: 100
+  newcomer-money: 1000
+  max-per-sponsor: 20

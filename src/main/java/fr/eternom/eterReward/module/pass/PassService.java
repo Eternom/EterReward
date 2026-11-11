@@ -1062,7 +1062,7 @@ public class PassService {
         return premium;
     }
 
-    NetworkBus bus() {
+    public NetworkBus bus() {
         return bus;
     }
 

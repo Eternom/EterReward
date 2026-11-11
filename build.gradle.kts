@@ -41,7 +41,7 @@ dependencies {
     // Objectifs de clan et premium offert au clan : l'API d'EterClan (softdepend)
     compileOnly("com.github.Eternom:EterClan:1.7.0")
     // XP du pass pour les succès débloqués : l'événement d'EterSuccess (softdepend)
-    compileOnly("com.github.Eternom:EterSuccess:1.5.6")
+    compileOnly("com.github.Eternom:EterSuccess:1.9.0")
     // Permissions temporaires (récompenses, premium) : l'API de LuckPerms (softdepend)
     compileOnly("net.luckperms:api:5.4")
 

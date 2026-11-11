@@ -32,6 +32,11 @@ commands:
     usage: /ranking [general|pass|challenges|quests|votes|playtime|success|wealth|clans]
     aliases: [leaderboard, top]
     permission: eterreward.ranking
+  sponsor:
+    description: Parrainage : désigner son parrain (nouveaux joueurs), voir ses filleuls.
+    usage: /sponsor [joueur]
+    aliases: [referral, parrain]
+    permission: eterreward.sponsor
   eterreward:
     description: Gérer le pass, poser le podium du classement général, enregistrer un vote (staff, console).
     usage: /eterreward <pass <premium|gift|skip|set|reload|xp|setxp|info|reset|unclaim|event> ... | podium <1-5> | vote <joueur>>
@@ -49,6 +54,9 @@ permissions:
     default: true
   eterreward.ranking:
     description: Voir les classements.
+    default: true
+  eterreward.sponsor:
+    description: Parrainage (/sponsor).
     default: true
   eterreward.pass.premium.*:
     description: La ligne premium de tous les mois. D'habitude, le premium est donné en base pour le mois (boutique, achat en jeu).

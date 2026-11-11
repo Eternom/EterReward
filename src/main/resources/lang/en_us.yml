@@ -420,3 +420,25 @@ vote:
   done: "<info>Vote from <accent><player></accent> recorded <dark_gray>(streak: <streak> day(s))"
   unknown: "<error>Unknown player: <accent><player></accent> <dark_gray>(never joined the server)"
   usage: '<error>Usage: <accent>/eterreward vote \<player>'
+
+referral:
+  unavailable: "<error>Referral is not available on this server."
+  already: "<error>You already have a sponsor."
+  too-late: "<error>You choose your sponsor during your <accent>first <hours> hours</accent> of play."
+  self: "<error>You cannot be your own sponsor."
+  sponsor-too-new: "<error><accent><player></accent> needs at least <accent><hours> h</accent> of play to sponsor."
+  sponsor-full: "<error><accent><player></accent> already has the maximum number of godchildren."
+  declared: "<success><accent><player></accent> is your sponsor! Once you reach <accent><hours> h</accent> of play, you will both be rewarded."
+  new: "<success><accent><player></accent> chose you as their sponsor! Help them get started: at <accent><hours> h</accent> of play, you will both be rewarded. <dark_gray>(/sponsor)"
+  rewarded-newcomer: "<success>Referral: <accent><money></accent> for your first hours of play, thanks to <accent><player></accent>!"
+  rewarded-sponsor: "<success>Referral: your godchild <accent><player></accent> reached the goal: <accent><money></accent> and <accent><xp> pass XP</accent> for you!"
+  info:
+    title: "<primary>Referral"
+    sponsor: "<dark_gray>▸ <info>Your sponsor: <accent><player></accent> <dark_gray>(<hours>/<goal> h)"
+    sponsor-done: "<dark_gray>▸ <info>Your sponsor: <accent><player></accent> <success>✔"
+    none: "<dark_gray>▸ <info>No sponsor: <accent>/sponsor name</accent> during your <accent>first <hours> hours</accent>."
+    none-late: "<dark_gray>▸ <info>No sponsor."
+    godchildren: "<dark_gray>▸ <info>Your godchildren: <accent><count></accent>/<max>"
+    godchild: "<dark_gray>   • <info><player> <dark_gray>(<hours>/<goal> h)"
+    godchild-done: "<dark_gray>   • <info><player> <success>✔"
+    rules: "<dark_gray>At <goal> h of play for the godchild: <accent><sponsor_money></accent> to the sponsor (and pass XP), <accent><newcomer_money></accent> to the godchild."
