@@ -70,7 +70,7 @@ class BoardMenu implements Menu {
             }
             inventory.setItem(REWARDS, Items.item(Material.CHEST, text("ranking.rewards.title"), rewards));
         }
-        inventory.setItem(BACK, Items.item(Material.ARROW, text("ranking.back"), List.of()));
+        inventory.setItem(BACK, Items.item(Material.OAK_DOOR, text("ranking.back"), List.of()));
     }
 
     @Override
