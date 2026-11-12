@@ -33,7 +33,7 @@ commands:
     aliases: [leaderboard, top]
     permission: eterreward.ranking
   sponsor:
-    description: Parrainage : désigner son parrain (nouveaux joueurs), voir ses filleuls.
+    description: "Parrainage : désigner son parrain (nouveaux joueurs), voir ses filleuls."
     usage: /sponsor [joueur]
     aliases: [referral, parrain]
     permission: eterreward.sponsor
