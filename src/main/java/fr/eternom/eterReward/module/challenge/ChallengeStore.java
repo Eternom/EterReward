@@ -64,6 +64,12 @@ public class ChallengeStore {
                 + " ON DUPLICATE KEY UPDATE progress = progress + ?", player, period, challenge, amount, amount);
     }
 
+    /** Les joueurs qui ont fait avancer ce défi dans cette période (progress > 0). Bloquant. */
+    public java.util.List<UUID> contributors(String period, String challenge) {
+        return database.query("SELECT uuid FROM " + database.table(PROGRESS) + " WHERE period = ? AND challenge = ? AND progress > 0",
+                period, challenge).stream().map(row -> row.getUUID("uuid")).toList();
+    }
+
     /** Valide le défi s'il est atteint et pas encore validé ; true pour le seul appel qui le valide (récompense). */
     public boolean complete(UUID player, String period, String challenge, int target) {
         return database.execute("UPDATE " + database.table(PROGRESS) + " SET done = TRUE"

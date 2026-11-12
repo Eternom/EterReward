@@ -38,17 +38,20 @@ public final class ChallengeCatalog {
                 case DAILY -> "daily";
                 case WEEKLY -> "weekly";
                 case MISSION -> "missions";
+                case CLAN -> "clan";
             };
-            counts.put(period, Math.max(0, yaml.getInt(name + "-count", 3)));
+            counts.put(period, Math.max(0, yaml.getInt(name + "-count", period == Period.CLAN ? 1 : 3)));
             int xp = yaml.getInt("defaults." + name + ".xp", switch (period) {
                 case DAILY -> 100;
                 case WEEKLY -> 300;
                 case MISSION -> 500;
+                case CLAN -> 400;
             });
             double money = yaml.getDouble("defaults." + name + ".money", switch (period) {
                 case DAILY -> 30;
                 case WEEKLY -> 150;
                 case MISSION -> 200;
+                case CLAN -> 1000;
             });
             List<ChallengeDefinition> pool = new ArrayList<>();
             ConfigurationSection section = yaml.getConfigurationSection(name);

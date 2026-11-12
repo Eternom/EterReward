@@ -24,7 +24,7 @@ import java.util.List;
  *  ▣ ☀ · d d d · · ▣     ☀ = défis du jour (temps restant), d = défis du jour
  *  ▣ ☾ · w w w · · ▣     ☾ = défis de la semaine, w = défis de la semaine
  *  ▣ ★ · m m m · · ▣     ★ = missions du pass de la semaine (plus longues, plus d'XP), m = missions
- *  ▣ · · · · · · · ▣
+ *  ▣ ⚑ · c · · · · ▣     ⚑ = défi de clan de la semaine (tout le clan ensemble), c = le défi
  *  ▣ ▣ ▣ ▣ « ▣ ▣ ▣ ▣
  * </pre>
  */
@@ -36,6 +36,8 @@ class ChallengeMenu implements Menu {
     private static final int WEEKLY_ROW = 21;
     private static final int MISSION_HEADER = 28;
     private static final int MISSION_ROW = 30;
+    private static final int CLAN_HEADER = 37;
+    private static final int CLAN_ROW = 39;
     private static final int BACK = 49;
     private static final int BAR = 10;
 
@@ -54,7 +56,38 @@ class ChallengeMenu implements Menu {
         inventory.setItem(MISSION_HEADER, header(view.missions(), Material.NETHER_STAR, "challenges.menu.missions"));
         fill(view, view.weekly(), WEEKLY_ROW);
         fill(view, view.missions(), MISSION_ROW);
+        inventory.setItem(CLAN_HEADER, header(view.clan(), Material.WHITE_BANNER, "challenges.menu.clan"));
+        fillClan(view);
         inventory.setItem(BACK, service.backButton().item(viewer));
+    }
+
+    /** Le défi de clan : l'avancée du clan entier, sa propre part ; sans clan, une invitation à en rejoindre un. */
+    private void fillClan(View view) {
+        List<ChallengeDefinition> challenges = view.clan().challenges();
+        if (!view.inClan()) {
+            inventory.setItem(CLAN_ROW + 1, Items.item(Material.GRAY_BANNER, text("challenges.menu.no-clan"), List.of(text("challenges.menu.no-clan-lore"))));
+            return;
+        }
+        if (challenges.isEmpty()) {
+            inventory.setItem(CLAN_ROW + 1, Items.item(Material.BARRIER, text("challenges.menu.none"), List.of()));
+            return;
+        }
+        for (int i = 0; i < challenges.size() && i < 5; i++) {
+            ChallengeDefinition challenge = challenges.get(i);
+            int[] total = view.clanProgress().getOrDefault(challenge.id(), new int[]{0, 0});
+            int[] mine = view.progress().getOrDefault(view.clan().key() + "|" + challenge.id(), new int[]{0, 0});
+            int done = Math.min(total[0], challenge.target());
+            boolean completed = total[1] == 1;
+            List<Component> lore = new ArrayList<>();
+            lore.add(text("challenges.menu.progress", "bar", bar(done, challenge.target()),
+                    "done", String.valueOf(done), "target", String.valueOf(challenge.target())));
+            lore.add(text("challenges.menu.clan-mine", "count", String.valueOf(mine[0])));
+            lore.add(text("challenges.menu.clan-reward", "xp", String.valueOf(challenge.xp()), "money", Money.format(challenge.money())));
+            lore.add(Component.empty());
+            lore.add(text(completed ? "challenges.menu.completed" : "challenges.menu.clan-ongoing"));
+            inventory.setItem(CLAN_ROW + i, Items.item(completed ? Material.LIME_DYE : challenge.icon(),
+                    text("challenges.list." + challenge.id(), "target", String.valueOf(challenge.target())), lore, completed));
+        }
     }
 
     @Override

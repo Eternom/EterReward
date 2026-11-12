@@ -19,6 +19,9 @@ weekly-count: 3
 # Missions du pass : tirées chaque semaine (lundi minuit) parmi celles que le pass du mois choisit (passes/<pass>.yml >
 # missions), sinon parmi toutes. Plus longues, elles rapportent plus d'XP (source « mission » de /pass history).
 missions-count: 3
+# Défi de clan de la semaine (lundi minuit) : tous les membres avancent ensemble ; à l'objectif, chaque membre qui a
+# aidé reçoit la récompense (une fois). Sans EterClan, ou sans clan, il ne s'affiche pas.
+clan-count: 1
 
 # Récompense par défaut. Repère : 3 défis du jour + 3 de la semaine valent ~470 XP du pass par jour.
 defaults:
@@ -31,6 +34,9 @@ defaults:
   missions:
     xp: 500
     money: 200
+  clan:
+    xp: 400
+    money: 1000
 
 daily:
   pierre:
@@ -232,3 +238,39 @@ missions:
     kind: quest
     target: 20
     icon: ENCHANTED_BOOK
+
+# Défis de clan (identifiants en c-... : textes dans lang/, challenges.list.<identifiant>). Objectifs pour tout le clan.
+clan:
+  c-chasse:
+    kind: kill
+    match: [ "#monsters" ]
+    target: 1500
+    icon: IRON_SWORD
+  c-elites:
+    kind: kill
+    match: [ "#monsters" ]
+    min-rank: 4
+    target: 40
+    icon: NETHERITE_SWORD
+  c-mine:
+    kind: break
+    match: [ "#ores" ]
+    target: 2500
+    icon: IRON_PICKAXE
+  c-foret:
+    kind: break
+    match: [ "#logs" ]
+    target: 4000
+    icon: IRON_AXE
+  c-recoltes:
+    kind: harvest
+    target: 4000
+    icon: WHEAT
+  c-peche:
+    kind: fish
+    target: 400
+    icon: FISHING_ROD
+  c-guilde:
+    kind: quest
+    target: 60
+    icon: WRITABLE_BOOK

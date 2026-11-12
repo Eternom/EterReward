@@ -8,6 +8,7 @@ import fr.eternom.eterLib.helper.message.Messages;
 import fr.eternom.eterLib.helper.task.Tasks;
 import fr.eternom.eterReward.api.ChallengeCompleteEvent;
 import fr.eternom.eterReward.module.challenge.ChallengeDefinition.Kind;
+import fr.eternom.eterReward.module.pass.ClanGoals;
 import fr.eternom.eterReward.module.pass.PassService;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -41,7 +42,7 @@ import java.util.function.Predicate;
 public class ChallengeService {
 
     /** Période d'un défi : jour, semaine, ou mission de la semaine du pass (choisie selon le pass du mois). */
-    public enum Period { DAILY, WEEKLY, MISSION }
+    public enum Period { DAILY, WEEKLY, MISSION, CLAN }
 
     /** Défis en cours d'une période, avec leur clé en base. */
     record Active(Period period, String key, List<ChallengeDefinition> challenges, ZonedDateTime end) {
@@ -128,7 +129,7 @@ public class ChallengeService {
         LocalDate today = LocalDate.now(zone);
         return period == Period.DAILY
                 ? "d:" + today.toEpochDay()
-                : (period == Period.MISSION ? "m:" : "w:") + today.get(IsoFields.WEEK_BASED_YEAR) + "-" + today.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+                : (period == Period.MISSION ? "m:" : period == Period.CLAN ? "c:" : "w:") + today.get(IsoFields.WEEK_BASED_YEAR) + "-" + today.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
     }
 
     private ZonedDateTime end(Period period) {
@@ -201,9 +202,63 @@ public class ChallengeService {
             String[] parts = entry.getKey().split("\\|", 2);
             try {
                 store.add(uuid, parts[0], parts[1], entry.getValue());
-                checkCompletion(uuid, parts[0], parts[1]);
+                if (parts[0].startsWith(CLAN_PREFIX)) {
+                    // Défi de clan : la part du joueur (ci-dessus) et le total de son clan, validé pour le clan entier
+                    ClanGoals.Clan clan = clanOf(uuid);
+                    if (clan != null) {
+                        store.add(clanKey(clan.id()), parts[0], parts[1], entry.getValue());
+                        checkClan(clan, parts[0], parts[1]);
+                    }
+                } else {
+                    checkCompletion(uuid, parts[0], parts[1]);
+                }
             } catch (RuntimeException e) {
                 plugin.getLogger().warning("Avancée du défi " + parts[1] + " perdue pour " + uuid + " : " + e.getMessage());
+            }
+        }
+    }
+
+    // ---------- Défi de clan de la semaine ----------
+
+    private static final String CLAN_PREFIX = "c:";
+    private static final long CLAN_CACHE_MILLIS = 5 * 60_000;
+    /** Clan des joueurs (relu toutes les 5 min) : joueur -> {clan ou null, lu à}. */
+    private final Map<UUID, Object[]> clans = new ConcurrentHashMap<>();
+
+    /** Bloquant : le clan du joueur (EterClan), gardé 5 min ; null sans clan. */
+    ClanGoals.Clan clanOf(UUID player) {
+        Object[] known = clans.get(player);
+        long now = System.currentTimeMillis();
+        if (known != null && now - (long) known[1] < CLAN_CACHE_MILLIS) {
+            return (ClanGoals.Clan) known[0];
+        }
+        ClanGoals.Clan clan = ClanGoals.clanOf(player);
+        clans.put(player, new Object[]{clan, now});
+        return clan;
+    }
+
+    /** L'avancée d'un clan est gardée sous un identifiant propre au clan (même table que celle des joueurs). */
+    static UUID clanKey(long clanId) {
+        return UUID.nameUUIDFromBytes(("eterreward-clan:" + clanId).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
+    /** Le clan a atteint l'objectif : validé une seule fois (même entre serveurs), puis chaque membre qui a aidé est récompensé. */
+    private void checkClan(ClanGoals.Clan clan, String periodKey, String id) {
+        Active active = current.get(Period.CLAN);
+        Active before = previous.get(Period.CLAN);
+        Active known = active != null && active.key().equals(periodKey) ? active
+                : before != null && before.key().equals(periodKey) ? before : null;
+        if (known == null) {
+            return;
+        }
+        for (ChallengeDefinition challenge : known.challenges()) {
+            if (challenge.id().equals(id) && store.complete(clanKey(clan.id()), periodKey, id, challenge.target())) {
+                java.util.Set<UUID> members = new java.util.HashSet<>(clan.members());
+                for (UUID helper : store.contributors(periodKey, id)) {
+                    if (members.contains(helper)) {
+                        reward(helper, challenge, Period.CLAN);
+                    }
+                }
             }
         }
     }
@@ -251,6 +306,7 @@ public class ChallengeService {
                         case DAILY -> "challenges.done-daily";
                         case WEEKLY -> "challenges.done-weekly";
                         case MISSION -> "challenges.done-mission";
+                        case CLAN -> "challenges.done-clan";
                     },
                     "challenge", messages.plain(player, "challenges.list." + challenge.id(), "target", String.valueOf(challenge.target())),
                     "xp", String.valueOf(shownXp), "money", Money.format(challenge.money()));
@@ -262,7 +318,9 @@ public class ChallengeService {
     // ---------- Menu ----------
 
     /** Ce que montre le menu : défis en cours et avancée du joueur (base + pas encore enregistré). */
-    record View(Active daily, Active weekly, Active missions, Map<String, int[]> progress) {
+    /** clanProgress : défi -> {total du clan, validé} ; inClan : le joueur a un clan (sinon pas de défi de clan pour lui). */
+    record View(Active daily, Active weekly, Active missions, Active clan, Map<String, int[]> progress,
+                Map<String, int[]> clanProgress, boolean inClan) {
     }
 
     public void open(Player player) {
@@ -271,17 +329,21 @@ public class ChallengeService {
             Active daily = active(Period.DAILY);
             Active weekly = active(Period.WEEKLY);
             Active missions = active(Period.MISSION);
+            Active clan = active(Period.CLAN);
+            ClanGoals.Clan mine = clanOf(uuid);
+            Map<String, int[]> clanProgress = mine == null ? Map.of() : store.progress(clanKey(mine.id()), clan.key());
             Map<String, int[]> progress = new HashMap<>();
             store.progress(uuid, daily.key()).forEach((id, value) -> progress.put(daily.key() + "|" + id, value));
             store.progress(uuid, weekly.key()).forEach((id, value) -> progress.put(weekly.key() + "|" + id, value));
             store.progress(uuid, missions.key()).forEach((id, value) -> progress.put(missions.key() + "|" + id, value));
+            store.progress(uuid, clan.key()).forEach((id, value) -> progress.put(clan.key() + "|" + id, value));
             Map<String, Integer> unsaved = new HashMap<>();
             pending.computeIfPresent(uuid, (key, counts) -> {
                 unsaved.putAll(counts); // copie sous verrou : le thread principal continue d'ajouter
                 return counts;
             });
             unsaved.forEach((key, amount) -> progress.merge(key, new int[]{amount, 0}, (a, b) -> new int[]{a[0] + b[0], a[1]}));
-            return new View(daily, weekly, missions, progress);
+            return new View(daily, weekly, missions, clan, progress, clanProgress, mine != null);
         }, view -> player.openInventory(new ChallengeMenu(this, player, view).getInventory()),
                 () -> messages.send(player, "error.generic"));
     }

@@ -16,16 +16,16 @@ import java.util.UUID;
  * - le clan d'un joueur, pour le premium offert à tout le clan.
  * Bloquant (base) : hors du thread principal.
  */
-final class ClanGoals {
+public final class ClanGoals {
 
     /** Ce dont le pass a besoin d'un clan. */
-    record Clan(long id, String name, UUID owner, List<UUID> members) {
+    public record Clan(long id, String name, UUID owner, List<UUID> members) {
     }
 
     private ClanGoals() {
     }
 
-    static Clan clanOf(UUID player) {
+    public static Clan clanOf(UUID player) {
         if (!Bukkit.getPluginManager().isPluginEnabled("EterClan")) {
             return null;
         }
