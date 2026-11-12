@@ -48,6 +48,8 @@ public class ChallengeListener implements Listener {
         challenges.count(player, Kind.BREAK, challenge -> challenge.matchesBlock(type));
     }
 
+    private static final org.bukkit.NamespacedKey RANK = new org.bukkit.NamespacedKey("etermob", "ratio");
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onKill(EntityDeathEvent event) {
         Player killer = event.getEntity().getKiller();
@@ -55,7 +57,10 @@ public class ChallengeListener implements Listener {
             return;
         }
         boolean monster = event.getEntity() instanceof Enemy;
-        challenges.count(killer, Kind.KILL, challenge -> challenge.matchesEntity(event.getEntityType(), monster));
+        // Rang EterMob (etermob:ratio sur l'entité : 1 Ordinaire à 5 Fléau ; 0 sans EterMob)
+        Integer rank = event.getEntity().getPersistentDataContainer().get(RANK, org.bukkit.persistence.PersistentDataType.INTEGER);
+        int value = rank == null ? 0 : rank;
+        challenges.count(killer, Kind.KILL, challenge -> challenge.matchesEntity(event.getEntityType(), monster, value));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

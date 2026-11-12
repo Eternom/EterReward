@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  * blocs ou des créatures (vide : tout). Le texte affiché est dans lang/ (challenges.list.<id>).
  */
 public record ChallengeDefinition(String id, Kind kind, Set<Material> blocks, Set<EntityType> entities, boolean monsters,
-                                  int target, int xp, double money, Material icon) {
+                                  int target, int xp, double money, Material icon, int minRank) {
 
     public enum Kind {
         /** Casser des blocs NATURELS (pas posés par un joueur). */
@@ -50,7 +50,11 @@ public record ChallengeDefinition(String id, Kind kind, Set<Material> blocks, Se
         return blocks.isEmpty() || blocks.contains(material);
     }
 
-    boolean matchesEntity(EntityType type, boolean isMonster) {
+    /** rank : rang EterMob du monstre (1 Ordinaire à 5 Fléau ; 0 sans EterMob). min-rank : au moins ce rang. */
+    boolean matchesEntity(EntityType type, boolean isMonster, int rank) {
+        if (rank < minRank) {
+            return false;
+        }
         if (monsters) {
             return isMonster;
         }
@@ -101,6 +105,6 @@ public record ChallengeDefinition(String id, Kind kind, Set<Material> blocks, Se
         Material icon = Material.matchMaterial(section.getString("icon", "PAPER"));
         return new ChallengeDefinition(id, kind, Set.copyOf(blocks), Set.copyOf(entities), monsters, target,
                 Math.max(0, section.getInt("xp", defaultXp)), Math.max(0, section.getDouble("money", defaultMoney)),
-                icon == null || !icon.isItem() ? Material.PAPER : icon);
+                icon == null || !icon.isItem() ? Material.PAPER : icon, Math.max(0, section.getInt("min-rank", 0)));
     }
 }

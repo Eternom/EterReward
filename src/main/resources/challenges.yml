@@ -10,6 +10,7 @@
 #          cultures mûres), kill (tuer des créatures), fish (pêcher), quest (valider des quêtes de métier)
 #  match : blocs ou créatures qui comptent (vide : tout). Groupes : #ores, #logs, #stone, #dirt, #sand, #monsters
 #  target, icon ; xp et money pour changer la récompense d'un défi (sinon : defaults)
+#  min-rank (kill) : monstres d'EterMob d'au moins ce rang seulement (2 Robuste, 3 Dangereux, 4 Élite, 5 Fléau)
 #  Garder ce fichier identique sur tous les serveurs (un défi absent d'un serveur n'y avance pas).
 #  Toute modification nécessite un redémarrage.
 
@@ -81,6 +82,13 @@ daily:
     match: [ "creeper" ]
     target: 10
     icon: CREEPER_HEAD
+  rangs:
+    kind: kill
+    match: [ "#monsters" ]
+    min-rank: 2
+    target: 12
+    icon: IRON_SWORD
+
   peche:
     kind: fish
     target: 20
@@ -140,6 +148,13 @@ weekly:
     match: [ "#monsters" ]
     target: 500
     icon: IRON_SWORD
+  elites:
+    kind: kill
+    match: [ "#monsters" ]
+    min-rank: 4
+    target: 5
+    icon: NETHERITE_SWORD
+
   endermen:
     kind: kill
     match: [ "enderman" ]

@@ -323,6 +323,8 @@ challenges:
     or: "Mine <target> gold ores"
     recoltes: "Harvest <target> grown crops"
     chasse: "Kill <target> monsters"
+    rangs: "Kill <target> monsters stronger than Ordinary"
+    elites: "Kill <target> Elites or Scourges"
     endermen: "Kill <target> endermen"
     blazes: "Kill <target> blazes"
     sorcieres: "Kill <target> witches"

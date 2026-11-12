@@ -323,6 +323,8 @@ challenges:
     or: "Miner <target> minerais d'or"
     recoltes: "Récolter <target> cultures mûres"
     chasse: "Tuer <target> monstres"
+    rangs: "Tuer <target> monstres plus forts qu'Ordinaire"
+    elites: "Tuer <target> Élites ou Fléaux"
     endermen: "Tuer <target> endermen"
     blazes: "Tuer <target> blazes"
     sorcieres: "Tuer <target> sorcières"
