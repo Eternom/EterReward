@@ -164,9 +164,54 @@ public class ChallengeService {
                         map.merge(key, 1, Integer::sum);
                         return map;
                     });
+                    showProgress(player, active, challenge, key);
                 }
             }
         }
+    }
+
+    // ---------- Avancée en barre d'action ----------
+
+    private static final long SHOW_EVERY_MILLIS = 2000;
+    /** Avancée connue du joueur (base lue une fois + ce qu'il a fait depuis) : "période|défi" -> total. */
+    private final Map<UUID, Map<String, Integer>> totals = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> shownAt = new ConcurrentHashMap<>();
+
+    /** Thread principal : « Défi : Tuer 40 monstres · 12/40 » (au plus toutes les 2 s), une fois l'avancée connue. */
+    private void showProgress(Player player, Active active, ChallengeDefinition challenge, String key) {
+        UUID uuid = player.getUniqueId();
+        Map<String, Integer> known = totals.get(uuid);
+        if (known == null) {
+            // Première action : la base est lue en tâche de fond (le +1 en attente est compté une fois lue)
+            totals.put(uuid, new ConcurrentHashMap<>());
+            Tasks.async(plugin, () -> {
+                Map<String, Integer> loaded = new ConcurrentHashMap<>();
+                for (Active period : current.values()) {
+                    store.progress(uuid, period.key()).forEach((id, value) -> loaded.put(period.key() + "|" + id, value[0]));
+                }
+                Map<String, Integer> waiting = pending.getOrDefault(uuid, Map.of());
+                waiting.forEach((k, amount) -> loaded.merge(k, amount, Integer::sum));
+                totals.put(uuid, loaded);
+            }, "Avancée des défis non lue pour " + uuid);
+            return;
+        }
+        int total = known.merge(key, 1, Integer::sum);
+        if (total > challenge.target()) {
+            return; // déjà atteint : plus rien à montrer
+        }
+        long now = System.currentTimeMillis();
+        if (total < challenge.target() && now - shownAt.getOrDefault(uuid, 0L) < SHOW_EVERY_MILLIS) {
+            return;
+        }
+        shownAt.put(uuid, now);
+        messages.actionBar(player, "challenges.progress", "challenge", messages.plain(player, "challenges.list." + challenge.id(),
+                "target", String.valueOf(challenge.target())), "done", String.valueOf(total), "target", String.valueOf(challenge.target()));
+    }
+
+    /** Départ : la mémoire de l'avancée est oubliée (relue à la prochaine action). */
+    void forget(UUID uuid) {
+        totals.remove(uuid);
+        shownAt.remove(uuid);
     }
 
     /** Toutes les 15 s (tâche de fond) : enregistre, valide ce qui est atteint, et tire les défis d'une nouvelle période. */
@@ -190,6 +235,7 @@ public class ChallengeService {
 
     /** Départ du joueur (thread principal) : son avancée part tout de suite. */
     void quit(UUID uuid) {
+        forget(uuid);
         Tasks.async(plugin, () -> flush(uuid), "Avancée des défis non enregistrée pour " + uuid);
     }
 

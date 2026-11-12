@@ -14,7 +14,8 @@ daily:
   claimed: "<info>Day <accent><day></accent> claimed: <accent><content></accent>!"
   already: "<error>You already claimed today's reward. Next one in <accent><time></accent>."
   play-first: "<error>Play at least <accent><minutes> min</accent> today before claiming your reward: <accent><time></accent> to go."
-  dropped: "<info>Inventory full: the rest is on the ground in front of you."
+  dropped: "<info>Inventory full: the rest waits in your box <accent><click:run_command:'/pass box'>/pass box</click></accent>."
+  parcel-label: "Daily reward"
   economy-missing: "<error>The economy is not available: try again later."
   loot:
     line: "<dark_gray>• <white><content></white> <dark_gray>(<chance>%)"
@@ -288,6 +289,7 @@ challenges:
   done-weekly: "<info>Weekly challenge complete: <accent><challenge></accent>! <accent>+<xp></accent> pass XP and <accent><money></accent>."
   done-mission: "<info>Pass mission complete: <accent><challenge></accent>! <accent>+<xp></accent> pass XP and <accent><money></accent>."
   done-clan: "<info>Clan challenge done: <accent><challenge></accent>! Your share earns you <accent>+<xp> XP</accent> of pass and <accent><money></accent>."
+  progress: "<dark_gray>Challenge: <info><challenge> <dark_gray>· <accent><done>/<target>"
   menu:
     title: "<primary>Challenges"
     daily: "<accent>Daily challenges"
@@ -423,6 +425,7 @@ ranking:
 
 # Votes on voting sites (eterreward vote command, run by the website)
 vote:
+  remind: "<info>You have not voted today: every vote earns a reward. <accent><click:run_command:'/vote'>[Vote]</click></accent>"
   received: "<success>Thanks for voting!</success> <info>You get <accent><content></accent>. <dark_gray>(streak: <streak> day(s))"
   away: "<success>While you were away, your votes (<votes>) earned you <accent><content></accent>. Thanks!"
   keys-delivered: "<info>Your <accent><amount> resource world key(s)</accent> earned by voting have arrived."

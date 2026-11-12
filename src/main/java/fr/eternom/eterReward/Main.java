@@ -93,6 +93,7 @@ public final class Main extends JavaPlugin {
         // Podium du classement général (PNJ d'EterNpc) et placeholders (PlaceholderAPI) : seulement s'ils tournent ici
         if (getServer().getPluginManager().isPluginEnabled("EterNpc")) {
             Podium podium = new Podium(this, messages);
+            getServer().getPluginManager().registerEvents(podium, this);
             ranking.onGeneral(podium::update);
             podiumCommand = new PodiumCommand(podium, messages);
         }

@@ -1050,6 +1050,20 @@ public class PassService {
         return rewards;
     }
 
+    /**
+     * Objets qui n'ont pas tenu dans l'inventaire (récompense du jour...) : vers la boîte du pass (/pass box), jamais au
+     * sol. Thread principal.
+     */
+    public void parcelItems(Player player, String label, List<org.bukkit.inventory.ItemStack> items) {
+        if (items.isEmpty()) {
+            return;
+        }
+        List<PassDefinition.ItemReward> rewards = items.stream()
+                .map(item -> new PassDefinition.ItemReward(item.getType(), item.getAmount())).toList();
+        UUID uuid = player.getUniqueId();
+        Tasks.async(plugin, () -> store.addParcel(uuid, Parcel.items("", label, rewards)), "Colis non enregistré pour " + player.getName());
+    }
+
     PassStore store() {
         return store;
     }

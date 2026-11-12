@@ -14,7 +14,8 @@ daily:
   claimed: "<info>Jour <accent><day></accent> réclamé : <accent><content></accent> !"
   already: "<error>Tu as déjà réclamé ta récompense aujourd'hui. Prochaine dans <accent><time></accent>."
   play-first: "<error>Joue au moins <accent><minutes> min</accent> aujourd'hui avant de réclamer ta récompense : encore <accent><time></accent>."
-  dropped: "<info>Inventaire plein : le reste est posé au sol devant toi."
+  dropped: "<info>Inventaire plein : le reste t'attend dans ta boîte <accent><click:run_command:'/pass box'>/pass box</click></accent>."
+  parcel-label: "Récompense du jour"
   economy-missing: "<error>L'économie n'est pas disponible : réessaie plus tard."
   loot:
     line: "<dark_gray>• <white><content></white> <dark_gray>(<chance> %)"
@@ -288,6 +289,7 @@ challenges:
   done-weekly: "<info>Défi de la semaine réussi : <accent><challenge></accent> ! <accent>+<xp> XP</accent> de pass et <accent><money></accent>."
   done-mission: "<info>Mission du pass réussie : <accent><challenge></accent> ! <accent>+<xp> XP</accent> de pass et <accent><money></accent>."
   done-clan: "<info>Défi de clan réussi : <accent><challenge></accent> ! Ta part te vaut <accent>+<xp> XP</accent> de pass et <accent><money></accent>."
+  progress: "<dark_gray>Défi : <info><challenge> <dark_gray>· <accent><done>/<target>"
   menu:
     title: "<primary>Défis"
     daily: "<accent>Défis du jour"
@@ -424,6 +426,7 @@ ranking:
 
 # Votes sur les sites de vote (commande eterreward vote, lancée par le site)
 vote:
+  remind: "<info>Tu n'as pas encore voté aujourd'hui : une récompense t'attend à chaque vote. <accent><click:run_command:'/vote'>[Voter]</click></accent>"
   received: "<success>Merci pour ton vote !</success> <info>Tu reçois <accent><content></accent>. <dark_gray>(série : <streak> jour(s))"
   away: "<success>Pendant ton absence, tes votes (<votes>) t'ont rapporté <accent><content></accent>. Merci !"
   keys-delivered: "<info>Tes <accent><amount> clé(s) de monde ressource</accent> gagnées en votant sont arrivées."

@@ -159,14 +159,13 @@ public class DailyService {
 
     /** Thread principal. */
     private void give(Player player, Day day, Loot loot) {
-        boolean dropped = false;
+        // Ce qui ne tient pas dans l'inventaire part dans la boîte du pass (/pass box), jamais au sol
+        java.util.List<ItemStack> boxed = new java.util.ArrayList<>();
         for (Reward reward : loot.items()) {
-            Map<Integer, ItemStack> leftover = player.getInventory().addItem(ItemStack.of(reward.material(), reward.amount()));
-            for (ItemStack item : leftover.values()) {
-                player.getWorld().dropItem(player.getLocation(), item); // posé sur place, sans dispersion
-                dropped = true;
-            }
+            boxed.addAll(player.getInventory().addItem(ItemStack.of(reward.material(), reward.amount())).values());
         }
+        boolean dropped = !boxed.isEmpty();
+        pass.parcelItems(player, messages.plain(player, "daily.parcel-label"), boxed);
         for (String command : loot.commands()) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
         }

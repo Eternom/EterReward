@@ -66,6 +66,9 @@ public class VoteService {
     private final RankingService ranking;
     private final Messages messages;
     private final ZoneId zone;
+    /** Rappel de vote : une fois toutes les 6 h au plus, sur tout le réseau. */
+    private final fr.eternom.eterLib.helper.cache.Cooldowns remind = new fr.eternom.eterLib.helper.cache.Cooldowns(
+            fr.eternom.eterLib.EterLib.get().getRedis(), "eterreward:vote-remind", java.time.Duration.ofHours(6));
     private final boolean announce;
     private final NetworkBus bus;
 
@@ -167,6 +170,17 @@ public class VoteService {
      */
     public void welcome(Player player) {
         UUID uuid = player.getUniqueId();
+        // Rappel : pas encore voté aujourd'hui (au plus une fois toutes les 6 h sur tout le réseau)
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (player.isOnline() && Bukkit.getCommandMap().getCommand("vote") != null) {
+                Tasks.async(plugin, player, () -> store.lastDay(uuid) < LocalDate.now(zone).toEpochDay() && remind.tryStart(uuid),
+                        due -> {
+                            if (due) {
+                                messages.send(player, "vote.remind");
+                            }
+                        }, () -> { });
+            }
+        }, 20 * 20);
         boolean withKeys = Bukkit.getPluginManager().isPluginEnabled("EterResource");
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (!player.isOnline()) {

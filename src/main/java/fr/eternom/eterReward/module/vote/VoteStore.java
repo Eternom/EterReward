@@ -54,6 +54,11 @@ public class VoteStore {
         return new Day(streak, first);
     }
 
+    /** Dernier jour de vote du joueur (LocalDate#toEpochDay), -1 s'il n'a jamais voté. Bloquant. */
+    public long lastDay(UUID player) {
+        return database.getFirst(TABLE, Map.of("uuid", player)).map(row -> row.getLong("last_day")).orElse(-1L);
+    }
+
     /**
      * Ce qui attend le joueur à sa prochaine arrivée : le résumé des votes reçus hors ligne (déjà donnés, à lui dire) et
      * les clés pas encore données (vote reçu sur un serveur sans EterResource).
